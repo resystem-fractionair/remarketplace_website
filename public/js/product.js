@@ -24,7 +24,7 @@
     svg('<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>')
   ];
 
-  function render(p, all) {
+  function render(p, all, featuredRow) {
     document.title = `${p.name} — reMarketplace`;
     const md = document.querySelector('meta[name="description"]');
     if (md) md.setAttribute('content', p.summary || p.tagline || '');
@@ -36,11 +36,13 @@
     const bookLbl = soon ? 'Join early access' : 'Book a demo';
     const related = all.filter(x => x.slug !== p.slug && x.category === p.category)
       .concat(all.filter(x => x.slug !== p.slug && x.category !== p.category && x.group === p.group)).slice(0, 4);
+    const featured = (featuredRow || []).filter(x => x.slug !== p.slug);
+    const bottom = featured.concat(related.filter(r => !featured.some(f => f.slug === r.slug))).slice(0, 4);
     const hlBy = new Map((p.highlights || []).map(h => [h.title.toLowerCase(), h.text]));
     const features = (p.features || []).map(f => ({ t: f, d: hlBy.get(f.toLowerCase()) || '' }))
       .concat((p.highlights || []).filter(h => !(p.features || []).some(f => f.toLowerCase() === h.title.toLowerCase())).map(h => ({ t: h.title, d: h.text })));
     const pdfMobile = p.pdfMobile && p.pdfMobile !== p.pdfDesktop ? p.pdfMobile : '';
-    const hasCreds = p.demoEmail || p.demoPassword;
+    const hasCreds = (p.demoCreds || []).length > 0;
 
     const tabs = [['overview', 'Overview'], features.length && ['features', 'Features'], (has(p.whyPoints) || has(p.whatYouCanDo)) && ['details', 'Why & how'],
       has(p.useCases) && ['use-cases', 'Use cases'], ['demo', 'Demo'], p.investUrl && ['invest', 'Invest']].filter(Boolean);
@@ -70,11 +72,7 @@
         </div>
       </section>
 
-      <section class="pa-hero">
-        ${banner ? `<div class="pa-banner" style="--bg:url('${esc(banner)}')"><img src="${esc(banner)}" alt="${esc(p.name)} product preview"></div>` : ''}
-        <div class="pa-facts">${facts.map(([l, v]) => `<div><span>${l}</span><b>${esc(v)}</b></div>`).join('')}
-          ${has(p.stats) ? p.stats.slice(0, facts.length % 2 ? 1 : 2).map(s => `<div class="acc"><span>Highlight</span><b>${esc(s)}</b></div>`).join('') : ''}</div>
-      </section>
+      ${banner ? `<section class="pa-hero"><div class="pa-banner" style="--bg:url('${esc(banner)}')"><img src="${esc(banner)}" alt="${esc(p.name)} product preview"></div></section>` : ''}
 
       <nav class="pa-tabs" id="paTabs">${tabs.map(([id, l], i) => `<a href="#${id}"${i ? '' : ' class="on"'}>${l}</a>`).join('')}</nav>
 
@@ -102,11 +100,15 @@
 
         <aside class="pa-side">
           <div class="pa-card pa-demo" id="demo">
-            <h3><span class="ic">${I.key}</span>Demo access</h3>
-            ${demo ? `<a class="pa-res" href="${esc(demo)}" target="_blank" rel="noopener"><span class="ic">${I.play}</span><span><b>Open demo</b><small>${esc(host(demo))}</small></span><i>↗</i></a>` : ''}
-            ${hasCreds ? `${p.demoEmail ? cred('Login', p.demoEmail) : ''}${p.demoPassword ? cred('Password', p.demoPassword) : ''}${p.demoNote ? `<p class="small muted">${esc(p.demoNote)}</p>` : ''}`
-              : `<p class="small muted">Demo login credentials are shared on request — usually within one business day.</p>
+            <h3><span class="ic">${I.key}</span>Sandbox credentials <em class="pa-badge">Test data</em></h3>
+            <div class="pa-creds">
+              ${demo ? `<div class="pa-cred"><span>Demo URL</span><a href="${esc(demo)}" target="_blank" rel="noopener">${esc(demo.replace(/^https?:\/\//, ''))}</a><button class="copy" data-copy="${esc(demo)}">Copy</button></div>` : ''}
+              ${(p.demoCreds || []).map(c => cred(esc(c.label), c.value)).join('')}
+            </div>
+            ${hasCreds ? `<p class="small muted">${esc(p.demoNote || 'Sandbox data resets nightly. No real funds, KYC records or on-chain transactions are created.')}</p>`
+              : `<p class="small muted">${esc(p.demoNote || 'Login credentials are shared on request — usually within one business day.')}</p>
                  <button class="btn btn-ghost block" data-book="${esc(p.name)}">Request demo credentials</button>`}
+            ${demo ? `<a class="btn btn-accent block" href="${esc(demo)}" target="_blank" rel="noopener">Open demo ↗</a>` : ''}
           </div>
 
           ${res.length ? `<div class="pa-card"><h3>Resources</h3>${res.map(r => `
@@ -120,11 +122,16 @@
             <div><b>Share this product</b><span>Scan to open on another device</span>
               <div><a href="/qr/${esc(p.slug)}.png" download="${esc(p.slug)}-qr.png">Download QR</a> · <button class="link" data-copy="${esc(pageUrl)}">Copy link</button></div></div>
           </div>
+          ${featured.length ? `<div class="pa-card pa-featside"><h3>Featured products</h3>${featured.slice(0, 4).map(r => `
+            <a class="pa-fs" href="/product/${esc(r.slug)}">${r.image ? `<span class="ri"><img src="${esc(r.image)}" alt="" loading="lazy"></span>` : RM.mark(r)}<span class="rt"><b>${esc(r.name)}</b><small>${esc(r.tagline || r.category)}</small></span></a>`).join('')}</div>` : ''}
         </aside>
       </div>
 
-      ${related.length ? `<section class="pa-sec"><h2>Related products</h2><div class="pa-rel">${related.map(r => `
-        <a href="/product/${esc(r.slug)}">${r.image ? `<span class="ri"><img src="${esc(r.image)}" alt="" loading="lazy"></span>` : RM.mark(r)}<span class="rt"><b>${esc(r.name)}</b><small>${esc(r.tagline || r.category)}</small></span><i>→</i></a>`).join('')}</div></section>` : ''}
+      ${bottom.length ? `<section class="pa-sec"><h2>${featured.length ? 'Featured products' : 'Related products'}</h2><div class="pa-fgrid">${bottom.map(r => `
+        <a class="card pcard" href="/product/${esc(r.slug)}">${r.image ? `<div class="pc-img"><img src="${esc(r.image)}" alt="" loading="lazy"></div>` : ''}
+          <div class="card-top">${RM.mark(r)}<span class="cat-tag">${esc(r.category)}</span>${r.status ? `<span class="badge">${esc(r.status)}</span>` : ''}</div>
+          <h3>${esc(r.name)}</h3><p>${esc(r.tagline || r.summary)}</p>
+          <div class="card-foot"><span>${esc(r.group || '')}</span><span class="view">View product →</span></div></a>`).join('')}</div></section>` : ''}
     </div>
     <div class="pa-mbar"><button class="btn btn-accent grow" data-book="${esc(p.name)}">${bookLbl}</button>${demo ? `<a class="btn btn-ghost" href="#demo">Try demo</a>` : ''}</div>`;
 
@@ -135,9 +142,10 @@
     links.forEach(a => { const s = document.querySelector(a.getAttribute('href')); if (s) io.observe(s); });
   }
 
-  RM.loadProducts().then(all => {
+  fetch('/api/home').then(r => r.json()).then(home => {
+    const all = RM.products = home.products;
     const p = all.find(x => x.slug === slug);
     if (!p) { location.replace('/404'); return; }
-    render(p, all);
+    render(p, all, home.rows[0] ? home.rows[0].products : []);
   });
 })();

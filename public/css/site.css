@@ -342,3 +342,23 @@ a.pa-res i { font-style: normal; color: var(--accent); font-weight: 700; }
 .pa-feat { grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); }
 .pa-uc { grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
 @media (max-width: 720px) { .pa-hero .pa-banner { height: 220px; } }
+
+/* ===== v3: single hero, sandbox credentials, featured ===== */
+.pa-hero { display: block; }
+.pa-hero .pa-banner { height: clamp(260px, 34vw, 540px); }
+.pa-badge { font: 700 10px var(--body); font-style: normal; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 100px; background: var(--t-b-bg); color: var(--t-b); margin-left: auto; }
+.pa-creds { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: grid; }
+.pa-creds .pa-cred { border: 0; border-radius: 0; border-bottom: 1px solid var(--line); background: var(--card); padding: 8px 10px; }
+.pa-creds .pa-cred:last-child { border-bottom: 0; }
+.pa-cred span { width: 74px; }
+.pa-cred a { flex: 1; min-width: 0; font: 12.5px ui-monospace, Menlo, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pa-creds:empty { display: none; }
+.pa-featside { gap: 6px; }
+.pa-fs { display: flex; align-items: center; gap: 10px; padding: 6px; border-radius: 10px; color: var(--ink); transition: background .2s; }
+.pa-fs:hover { background: var(--accent-soft); }
+.pa-fs .ri { width: 56px; height: 40px; flex: none; border-radius: 8px; overflow: hidden; background: var(--line); display: block; }
+.pa-fs .ri img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pa-fs .rt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.pa-fs b { font-size: 13.5px; } .pa-fs small { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pa-fs .mark { width: 40px; height: 40px; font-size: 12px; }
+.pa-fgrid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }

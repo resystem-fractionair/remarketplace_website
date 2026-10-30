@@ -28,6 +28,13 @@ function clean(p) {
   LIST_FIELDS.forEach(k => { o[k] = (Array.isArray(p[k]) ? p[k] : []).map(x => String(x).trim()).filter(Boolean).slice(0, 30); });
   o.highlights = (Array.isArray(p.highlights) ? p.highlights : [])
     .map(h => ({ title: String(h.title || '').trim(), text: String(h.text || '').trim() })).filter(h => h.title || h.text).slice(0, 20);
+  o.demoCreds = (Array.isArray(p.demoCreds) ? p.demoCreds : [])
+    .map(c => ({ label: String(c.label || '').trim().slice(0, 60), value: String(c.value || '').trim().slice(0, 300) })).filter(c => c.label && c.value).slice(0, 12);
+  if (!o.demoCreds.length) {
+    if (o.demoEmail) o.demoCreds.push({ label: 'Test email', value: o.demoEmail });
+    if (o.demoPassword) o.demoCreds.push({ label: 'Password', value: o.demoPassword });
+  }
+  o.demoEmail = ''; o.demoPassword = '';
   o.visible = p.visible !== false;
   o.position = Number.isFinite(+p.position) ? +p.position : 999;
   o.tone = ['a', 'b', 'c', 'd'].includes(o.tone) ? o.tone : 'a';

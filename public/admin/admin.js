@@ -93,7 +93,7 @@
   let editing = null;
   const LISTS = [['features', 'Key features'], ['whyPoints', 'Why points'], ['whatYouCanDo', 'What you can do'], ['useCases', 'Use cases'], ['stats', 'Stats chips (e.g. 99.9% uptime)']];
   const IMAGES = [['image', 'Card image (catalog + banner, 16:9)'], ['hero', 'Banner image override (wide)'], ['logo', 'Logo / icon (square)']];
-  const LINKS = [['externalUrl', 'Live site'], ['demoUrl', 'Demo URL (login page)'], ['demoEmail', 'Demo login — email / username'], ['demoPassword', 'Demo login — password'], ['demoNote', 'Demo note (e.g. resets nightly)'], ['investUrl', 'Investment opportunity URL'], ['pdfDesktop', 'Brochure PDF — desktop'], ['pdfMobile', 'Brochure PDF — mobile'], ['sourceUrl', 'resystem.org page']];
+  const LINKS = [['externalUrl', 'Live site'], ['demoUrl', 'Demo URL (login page)'], ['demoNote', 'Sandbox note (shown under credentials)'], ['investUrl', 'Investment opportunity URL'], ['pdfDesktop', 'Brochure PDF — desktop'], ['pdfMobile', 'Brochure PDF — mobile'], ['sourceUrl', 'resystem.org page']];
   const field = (k, label, v, attrs) => `<label>${esc(label)}<input name="${k}" value="${esc(v)}" ${attrs || ''}></label>`;
   const area = (k, label, v, rows, hint) => `<label>${esc(label)}${hint ? `<small>${esc(hint)}</small>` : ''}<textarea name="${k}" rows="${rows || 4}">${esc(v)}</textarea></label>`;
   const select = (k, label, v, opts) => `<label>${esc(label)}<select name="${k}">${opts.map(o => `<option${o === v ? ' selected' : ''}>${esc(o)}</option>`).join('')}</select></label>`;
@@ -129,6 +129,10 @@
       <fieldset><legend>Page content</legend><p class="muted small">One item per line.</p>
         ${LISTS.map(([k, l]) => area(k, l, (p[k] || []).join('\n'), 4)).join('')}
         ${area('highlights', 'Highlights', (p.highlights || []).map(h => h.title + ' | ' + h.text).join('\n'), 4, 'Title | description — one per line')}
+      </fieldset>
+      <fieldset><legend>Sandbox / demo credentials</legend>
+        <p class="muted small">Shown on the product page with Copy buttons and a TEST DATA badge. The Demo URL row comes from the Demo URL field above.</p>
+        ${area('demoCreds', 'Credentials', (p.demoCreds || []).map(c => c.label + ' | ' + c.value).join('\n'), 5, 'Label | value — one per line, e.g. Test email | demo@yourapp.io')}
       </fieldset>`;
     document.body.classList.add('lock'); $('#edOv').hidden = false;
   }
@@ -166,6 +170,7 @@
       ...IMAGES.map(x => x[0]), ...LINKS.map(x => x[0])].forEach(k => { p[k] = v(k).trim(); });
     LISTS.forEach(([k]) => { p[k] = v(k).split('\n').map(s => s.trim()).filter(Boolean); });
     p.highlights = v('highlights').split('\n').map(s => s.trim()).filter(Boolean).map(s => { const [t, ...rest] = s.split('|'); return { title: t.trim(), text: rest.join('|').trim() }; });
+    p.demoCreds = v('demoCreds').split('\n').map(s => s.trim()).filter(Boolean).map(s => { const [l, ...rest] = s.split('|'); return { label: l.trim(), value: rest.join('|').trim() }; }).filter(c => c.label && c.value);
     p.visible = f.visible.checked;
     return p;
   }
