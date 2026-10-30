@@ -590,3 +590,9 @@ a.pa-res i { font-style: normal; color: var(--accent); font-weight: 700; }
 /* placeholder art for products without an image */
 .pc-ph { display: grid; place-items: center; background: linear-gradient(135deg, var(--dark), #3a1a0e 70%, var(--accent-dk)); }
 .pc-ph .mark { width: 64px; height: 64px; font-size: 20px; border-radius: 16px; }
+
+/* fixed headline: only the word inside the box moves */
+.hx-rot { transition: none; text-align: center; }
+.hx-rot > span { left: 0; right: 0; text-align: center; }
+.hx-rot > .hx-measure { right: auto; }
+.hx-l1 { white-space: nowrap; }

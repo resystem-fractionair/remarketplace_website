@@ -63,7 +63,8 @@
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     /* measure each word once; the box eases to the next word's width so the line never jumps or overlaps */
     const widthOf = txt => { const m = document.createElement('span'); m.className = 'hx-measure'; m.textContent = txt; rot.appendChild(m); const x = m.getBoundingClientRect().width; m.remove(); return Math.ceil(x) + 2; };
-    const setW = () => { rot.style.width = widthOf(words[w]) + 'px'; };
+    /* box is always as wide as the longest word, so the rest of the headline never moves */
+    const setW = () => { rot.style.width = Math.max(...words.map(widthOf)) + 'px'; };
     (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(setW);
     addEventListener('resize', setW);
     const step = () => {
@@ -72,7 +73,7 @@
       const cur = rot.querySelector('.cur'), n = document.createElement('span');
       n.textContent = words[w]; n.className = 'cur in';
       if (cur) { cur.className = 'out'; setTimeout(() => cur.remove(), 700); }
-      rot.appendChild(n); setW();
+      rot.appendChild(n);
       setTimeout(step, 2800);
     };
     rot.firstElementChild.className = 'cur';
