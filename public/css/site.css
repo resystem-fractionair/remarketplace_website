@@ -597,3 +597,8 @@ a.pa-res i { font-style: normal; color: var(--accent); font-weight: 700; }
 .hx-rot > .hx-measure { right: auto; }
 .hx-l1 { white-space: nowrap; }
 .hx-rot, .hx-rot > span { text-align: left; }
+/* left-aligned hero: every line shares one left edge, the word slot's spare room falls at the line end where it isn't visible */
+.hx-copy { justify-items: start; text-align: left; margin: 0; max-width: 1100px; }
+.hx-copy > p { margin: 0; }
+.hx-copy .hero-cta { justify-content: flex-start; }
+.hx-stats { margin: 10px 0 0; }
