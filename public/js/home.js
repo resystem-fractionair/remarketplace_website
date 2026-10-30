@@ -88,6 +88,29 @@
       requestAnimationFrame(f);
     }));
     document.querySelectorAll('.hx-stats [data-count]').forEach(el => io.observe(el));
+    /* white-label motion graphic: one master app, re-branded on a loop */
+    const brands = [
+      { n: 'NovaPay', d: 'app.novapay.io', c: '#F7541D', cur: 'AED', bal: 248930, u: '12.4k' },
+      { n: 'Atlas ID', d: 'id.atlas.app', c: '#2B6BFF', cur: 'USD', bal: 91420, u: '38.1k' },
+      { n: 'Verde Wealth', d: 'verde.finance', c: '#1F9D6B', cur: 'EUR', bal: 1204500, u: '4.9k' },
+      { n: 'Zenith Estates', d: 'invest.zenith.ae', c: '#8B5CF6', cur: 'AED', bal: 5630000, u: '2.2k' }
+    ];
+    const viz = $('#hxViz'); let bi = 0;
+    const steps = [...document.querySelectorAll('#hvSteps li')];
+    const show = () => {
+      const x = brands[bi];
+      viz.style.setProperty('--brand', x.c);
+      viz.classList.remove('swap'); void viz.offsetWidth; viz.classList.add('swap');
+      $('#hvName').textContent = x.n; $('#hvLogo').textContent = x.n[0]; $('#hvDomain').textContent = x.d;
+      $('#hvCur').textContent = x.cur; $('#hvUsers').textContent = x.u;
+      const el = $('#hvBal'), t0 = performance.now(), to = x.bal;
+      const tick = now => { const k = Math.min(1, (now - t0) / 900); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))).toLocaleString('en'); if (k < 1) requestAnimationFrame(tick); };
+      requestAnimationFrame(tick);
+      steps.forEach((s, i) => { s.className = ''; setTimeout(() => { s.className = 'on'; }, 300 + i * 550); });
+    };
+    show();
+    if (!reduce) setInterval(() => { if (!document.hidden) { bi = (bi + 1) % brands.length; show(); } }, 4200);
+
     /* network canvas background: drifting nodes, links and travelling packets */
     const cv = $('#hxNet'), ctx = cv.getContext('2d');
     let W = 0, H = 0, nodes = [], packets = [], mx = -999, my = -999, dpr = Math.min(2, devicePixelRatio || 1);
