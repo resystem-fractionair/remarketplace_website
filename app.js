@@ -131,7 +131,7 @@ require('./admin')(app, store);
 
 /* ---------- Pages ---------- */
 app.get(['/admin', '/admin/'], (_req, res) => res.sendFile(path.join(PUB, 'admin', 'index.html')));
-app.use(express.static(PUB, { extensions: ['html'], maxAge: '5m' }));
+app.use(express.static(PUB, { extensions: ['html'], maxAge: 0, setHeaders: res => res.set('Cache-Control', 'no-cache') }));
 app.get('/product/:slug', wrap(async (req, res, next) => (await bySlug(req.params.slug)) ? res.sendFile(path.join(PUB, 'product.html')) : next()));
 app.get('/sitemap.xml', wrap(async (_req, res) => {
   const urls = ['/', ...(await visible()).map(p => '/product/' + p.slug)];
