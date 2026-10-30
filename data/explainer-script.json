@@ -1,0 +1,53 @@
+{
+ "duration": 105.29,
+ "chapters": [
+  {
+   "title": "The problem",
+   "text": "Building a fintech or Web3 product from scratch is slow, and expensive. Most teams spend twelve months or more \u2014 and well over two hundred thousand dollars \u2014 before a single customer signs up.",
+   "start": 0.0,
+   "end": 12.52
+  },
+  {
+   "title": "The solution",
+   "text": "reMarketplace changes that. It's a marketplace of pre-built, fully working products: identity, payments, wallets, real-world assets, investment, and AI. Each one is ready to launch, under your own brand.",
+   "start": 13.27,
+   "end": 26.52
+  },
+  {
+   "title": "Time saving",
+   "text": "Instead of a year of development, you go live in days. A complete, white-label vertical marketplace takes about three weeks. So you focus on your brand and your customers, not on engineering.",
+   "start": 27.27,
+   "end": 38.94
+  },
+  {
+   "title": "Easy deployment",
+   "text": "It's simple. Pick a master label. Add your logo, your colours, and your domain. Connect your data, and deploy. No ground-up build, and no large development team to hire.",
+   "start": 39.69,
+   "end": 50.51
+  },
+  {
+   "title": "Every platform",
+   "text": "Every product runs on web and mobile, with its own admin console. And they all share one identity layer, reID, and one ledger on INFRA Network \u2014 so your products work together, as a single platform.",
+   "start": 51.26,
+   "end": 64.48
+  },
+  {
+   "title": "Compliant & scalable",
+   "text": "Compliance comes built in: KYC, AML, audit trails, and on-chain proof of ownership. And it scales, with enterprise performance \u2014 ninety-nine point nine percent uptime, thirty-eight millisecond latency, and twelve hundred transactions per second.",
+   "start": 65.23,
+   "end": 80.91
+  },
+  {
+   "title": "List your product",
+   "text": "Built something great already? List your own master label on reMarketplace, or let the ReSystem team build one for you \u2014 and reach businesses that are ready to license it, and deploy it.",
+   "start": 81.66,
+   "end": 92.88
+  },
+  {
+   "title": "Launch today",
+   "text": "From real estate and neobanks, to exchanges, payroll, and government \u2014 reMarketplace gets you to market in days, not months. Book a demo, and launch your product today.",
+   "start": 93.63,
+   "end": 104.54
+  }
+ ]
+}

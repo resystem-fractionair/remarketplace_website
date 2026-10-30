@@ -62,7 +62,7 @@ const DEFAULT_CONTENT = () => ({
   seo: { siteName: 'reMarketplace', title: 'reMarketplace — Launch fintech & Web3 products in days', description: 'reMarketplace gives businesses pre-built, white-label fintech, Web3, AI and identity products to customise, rebrand and deploy in days, not months.',
     keywords: 'white label fintech, white label crypto exchange, white label wallet, tokenization platform, RWA marketplace, digital identity, master label, Dubai, UAE', ogImage: '', twitter: '@Reidentity_net' },
   header: { announcement: '', announcementLink: '', cta: 'Book a demo', search: 'Search products',
-    links: [{ label: 'Products', href: '/#catalog' }, { label: 'Why us', href: '/#why' }, { label: 'Use cases', href: '/#use-cases' }, { label: 'ReSystem ↗', href: 'https://resystem.org' }] },
+    links: [{ label: 'Products', href: '/#catalog' }, { label: 'Explainer', href: '/#explainer' }, { label: 'Why us', href: '/#why' }, { label: 'Use cases', href: '/#use-cases' }, { label: 'ReSystem ↗', href: 'https://resystem.org' }] },
   product: { model: 'Master label · White label', credsTitle: 'Sandbox credentials', credsNote: 'Sandbox data resets nightly. No real funds, KYC records, or on-chain transactions are created.',
     credsRequest: 'Login credentials are shared on request — usually within one business day.', investTitle: 'Own a share of', investText: 'On-chain shares on INFRA Network via ReSystem Business Opportunity.',
     investCta: 'View opportunity', brochureTitle: 'Brochure & links', featuredTitle: 'Featured products', bookCta: 'Book a demo', demoCta: 'Try demo' },
