@@ -1,34 +1,64 @@
 # reMarketplace — remarketplace.store
 
-Standalone reMarketplace site (moved out of resystem.org). Node.js + Express, no build step.
+The white-label product marketplace of the ReSystem ecosystem. Businesses browse pre-built "master label" products (identity, payments, wallets, real-world assets, investment, AI), try the demo, book a walkthrough and launch them under their own brand.
 
-- `/` — pitch, catalog (search, filters, sort), use cases, FAQ, demo booking
-- `/product/:slug` — product page: details, features, use cases, live demo, PDF brochures, investment link, QR code
-- `/qr/home.svg`, `/qr/:slug.svg|.png` — QR codes generated from `SITE_URL`
-- `/api/products`, `/api/bookings`, `/api/me`, `/api/auth/reid/*` (reID OAuth 2.0 + PKCE), `/sitemap.xml`
+Node.js + Express, plain HTML/CSS/JS (no build step), Supabase for data, deployed on Vercel.
 
-## Run
+## Repository structure
+
 ```
+remarketplace_website/
+├── api/index.js            Vercel serverless entry → server/app.js
+├── server.js               Local entry (npm start → http://localhost:3000)
+├── vercel.json             Routes every request to api/index.js, bundles public/ and data/
+├── server/
+│   ├── app.js              Express app: public API, SEO page rendering, QR codes, bookings, reID sign-in, crawlers
+│   ├── admin.js            Admin API (/api/admin/*): login, products, settings, bookings, uploads, IndexNow
+│   ├── store.js            Data layer: Supabase (Postgres + Storage) or local JSON files; defaults for all content
+│   └── mailer.js           Booking emails (SMTP) with calendar invite (.ics)
+├── public/
+│   ├── index.html          Homepage
+│   ├── product.html        Product page shell (filled by js/product.js)
+│   ├── 404.html
+│   ├── admin/              Admin console (index.html, admin.js, admin.css)
+│   ├── js/                 common.js (shared + booking wizard), home.js, product.js, explainer.js, theme.js
+│   ├── css/                style.css (base tokens), site.css (all page sections)
+│   ├── img/                Logos, icons, OG share image
+│   └── media/explainer.mp3 Narrated explainer soundtrack (voice + music)
+├── data/
+│   ├── products.json       Seed catalog (copied into Supabase on first run)
+│   └── explainer-script.json  Explainer narration script and chapter timings
+├── supabase/schema.sql     Tables and storage bucket
+└── docs/                   ARCHITECTURE, ADMIN-GUIDE, API, DEPLOYMENT, SEO
+```
+
+## Run locally
+
+```bash
 npm install
-cp .env.example .env   # fill in, then export the vars
-npm start              # http://localhost:3000
+npm start               # http://localhost:3000 — admin at /admin (dev login admin / admin)
 ```
 
-## Edit products
-All product content lives in `data/products.json` (sourced from resystem.org/suit/* pages). Add or edit an entry and redeploy — the catalog, product page, QR code and sitemap update automatically.
+Without Supabase variables the site reads and writes `data/*.json` (local development only).
 
-## Deploy (Vercel)
-Import the repo as a new Vercel project; `vercel.json` routes everything through `api/index.js`. Set the env vars from `.env.example`, add the domain `remarketplace.store`, and register `https://remarketplace.store/api/auth/reid/callback` as the reID redirect URI.
+## Configuration (Vercel → Settings → Environment Variables)
 
-Bookings are logged and, if `BOOKING_WEBHOOK_URL` is set, POSTed there as JSON.
+| Variable | Purpose |
+|---|---|
+| `SITE_URL` | Public URL, e.g. `https://remarketplace.store` (QR codes, canonical links, sitemap, reID redirect) |
+| `SESSION_SECRET` | Long random string that signs login cookies |
+| `ADMIN_USER`, `ADMIN_PASSWORD` | Admin console login |
+| `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Database + image storage (required for admin saves on Vercel) |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | Booking emails to info@remarketplace.store and the customer |
+| `REID_CLIENT_ID`, `REID_CLIENT_SECRET`, `REID_AUTH_URL`, `REID_TOKEN_URL`, `REID_USERINFO_URL` | "Sign in with reID" (OAuth 2.0 + PKCE) |
+| `BOOKING_WEBHOOK_URL` | Optional: every booking is also POSTed here as JSON |
+| `INDEXNOW_KEY` | Optional: fixed IndexNow key (one is derived from `SITE_URL` otherwise) |
 
-## SEO & AI discovery
-Server-rendered title, description, canonical, Open Graph, Twitter and JSON-LD (Organization, WebSite, ItemList, FAQPage, SoftwareApplication, BreadcrumbList) on every page. `/robots.txt` welcomes search engines and AI crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, …), `/sitemap.xml` includes images, `/llms.txt` and `/llms-full.txt` summarise the site and products for AI agents, plus `/site.webmanifest`, favicon.ico and app icons. All generated from the admin data.
+## Documentation
 
-## Admin console — `/admin`
-Password: `ADMIN_PASSWORD` env var (dev default `admin` only when NODE_ENV isn't production).
-- **Products:** add / edit / delete, upload images (card, hero, mobile, logo) and PDFs, edit all page content, show/hide toggle, drag to reorder the catalog.
-- **Homepage rows:** create rows, pick which products go in each row and their order (drag), reorder/delete rows, toggle the full catalog.
-- **Categories & groups:** add, rename (applied to all products), reorder (sets the homepage filter order).
-
-Storage: set `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` and run `supabase/schema.sql` once. The first load seeds the database from `data/products.json`. Without Supabase, edits are written to `data/*.json` (local dev only).
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — how the pieces fit, data model, request flow
+- [docs/ADMIN-GUIDE.md](docs/ADMIN-GUIDE.md) — everything the admin console can do
+- [docs/API.md](docs/API.md) — every route
+- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) — Vercel, Supabase, email, domain, go-live checklist
+- [docs/SEO.md](docs/SEO.md) — meta tags, structured data, sitemap, robots, llms.txt, IndexNow
+- `docs/handover/` — technical and marketing handover PDFs

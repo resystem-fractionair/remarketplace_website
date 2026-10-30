@@ -7,7 +7,7 @@ const QRCode = require('qrcode');
 
 const store = require('./store');
 const SITE_URL = (process.env.SITE_URL || 'https://remarketplace.store').replace(/\/$/, '');
-const PUB = path.join(__dirname, 'public');
+const PUB = path.join(__dirname, '..', 'public');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -195,6 +195,7 @@ ${m.keywords ? `<meta name="keywords" content="${ea(m.keywords)}">` : ''}
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${ea(m.title)}"><meta name="twitter:description" content="${ea(m.description)}"><meta name="twitter:image" content="${ea(m.image)}">${m.twitter ? `<meta name="twitter:site" content="${ea(m.twitter)}">` : ''}
 <link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" href="/img/favicon.png"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="alternate" type="text/plain" title="LLM summary" href="/llms.txt">
+${m.googleVerify ? `<meta name="google-site-verification" content="${ea(m.googleVerify)}">` : ''}${m.bingVerify ? `<meta name="msvalidate.01" content="${ea(m.bingVerify)}">` : ''}
 ${ld}`;
   return tpl(file)
     .replace(/<title>[\s\S]*?<\/title>/, '').replace(/<meta name="description"[^>]*>/, '').replace(/<meta property="og:[^>]*>/g, '')
@@ -206,6 +207,7 @@ const org = c => ({ '@context': 'https://schema.org', '@type': 'Organization', n
 app.get(['/', '/index.html'], wrap(async (_req, res) => {
   const { settings } = await store.load(); const c = settings.content; const list = await visible();
   res.set('Cache-Control', 'no-cache').type('html').send(page('index.html', {
+    googleVerify: c.seo.googleVerify, bingVerify: c.seo.bingVerify,
     title: c.seo.title, description: c.seo.description, keywords: c.seo.keywords, url: SITE_URL + '/', siteName: c.seo.siteName, twitter: c.seo.twitter,
     image: abs(c.seo.ogImage) || SITE_URL + '/img/og.png',
     jsonld: [org(c), { '@context': 'https://schema.org', '@type': 'WebSite', name: c.seo.siteName, url: SITE_URL + '/', description: c.seo.description },
@@ -227,6 +229,18 @@ app.get('/product/:slug', wrap(async (req, res, next) => {
       { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: c.seo.siteName, item: SITE_URL + '/' }, { '@type': 'ListItem', position: 2, name: 'Products', item: SITE_URL + '/#catalog' }, { '@type': 'ListItem', position: 3, name: p.name, item: url }] }]
   }));
 }));
+
+/* ---------- IndexNow (Bing, Yandex, Seznam, Naver …): instant URL submission ---------- */
+const INDEXNOW_KEY = process.env.INDEXNOW_KEY || crypto.createHash('sha256').update('remarketplace-indexnow:' + SITE_URL).digest('hex').slice(0, 32);
+app.get(`/${INDEXNOW_KEY}.txt`, (_req, res) => res.type('text/plain').send(INDEXNOW_KEY));
+app.locals.indexNow = async () => {
+  const urls = [SITE_URL + '/', SITE_URL + '/llms.txt', ...(await visible()).map(p => `${SITE_URL}/product/${p.slug}`)];
+  try {
+    const r = await fetch('https://api.indexnow.org/indexnow', { method: 'POST', headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({ host: new URL(SITE_URL).host, key: INDEXNOW_KEY, keyLocation: `${SITE_URL}/${INDEXNOW_KEY}.txt`, urlList: urls }) });
+    return { ok: r.status === 200 || r.status === 202, status: r.status, count: urls.length };
+  } catch (e) { return { ok: false, status: e.message, count: 0 }; }
+};
 
 /* ---------- Crawlers & AI agents ---------- */
 const AI_BOTS = ['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-User', 'Claude-SearchBot', 'anthropic-ai', 'PerplexityBot', 'Perplexity-User', 'Google-Extended', 'Applebot-Extended', 'Bingbot', 'CCBot', 'Meta-ExternalAgent', 'Amazonbot', 'DuckAssistBot', 'MistralAI-User', 'cohere-ai'];

@@ -161,3 +161,6 @@ input:checked + .sw::after { transform: translateX(16px); }
   .editor { max-width: 100%; }
   .rc-head input:first-of-type { width: 100%; }
 }
+
+.seo-box { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.seo-box > div { display: grid; gap: 4px; max-width: 760px; }

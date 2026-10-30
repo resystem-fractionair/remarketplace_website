@@ -1,3 +1,5 @@
+/* Homepage: hero (rotating word, network canvas, white-label motion graphic), site content from the admin,
+   curated catalog with "View all", section reveal/step animations and the FAQ. Data: GET /api/home. */
 (function () {
   const { $, esc } = RM;
   const SORTS = ['Featured', 'Fastest to deploy', 'A–Z'];

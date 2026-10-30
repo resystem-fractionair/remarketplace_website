@@ -1,3 +1,6 @@
+/* Admin console (/admin): login, Products (CRUD, images, schedule, SEO, credentials, duplicate, drag order),
+   Homepage (default products, featured row), Site content (generic editor for every text), Categories,
+   Bookings (list, status, CSV, booking settings, agents) and QR & SEO (QR downloads, IndexNow). Talks to /api/admin/*. */
 (function () {
   const $ = s => document.querySelector(s);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -18,7 +21,7 @@
   function showLogin() { $('#app').hidden = true; $('#login').hidden = false; $('#pw').focus(); }
   $('#loginForm').addEventListener('submit', async e => {
     e.preventDefault(); $('#loginErr').hidden = true;
-    try { await api('POST', '/api/admin/login', { password: $('#pw').value }); $('#pw').value = ''; boot(); }
+    try { await api('POST', '/api/admin/login', { username: $('#un').value, password: $('#pw').value }); $('#pw').value = ''; boot(); }
     catch (err) { $('#loginErr').textContent = err.message; $('#loginErr').hidden = false; }
   });
   $('#logout').onclick = async () => { await api('POST', '/api/admin/logout'); showLogin(); };
@@ -417,7 +420,7 @@
 
   /* ---------- Site content (generic form built from the content structure) ---------- */
   const LABELS = { seo: 'SEO, social sharing & AI discovery', header: 'Header (menu, button, announcement bar)', product: 'Product page labels', booking: 'Book a demo panel', hero: 'Hero', why: 'Why reMarketplace cards', steps: 'Listing steps', usecases: 'Use cases & target market', glossary: 'Glossary & QR card', catalog: 'All products section', faq: 'FAQ', footer: 'Footer' };
-  const pretty = k => ({ slowLabel: 'Slow option label', slowValue: 'Slow option value', fastLabel: 'Fast option label', fastValue: 'Fast option value', industries: 'Industries (comma separated)', cards: 'Cards', ogImage: 'Share image (Open Graph)', siteName: 'Site name', twitter: 'X handle', announcementLink: 'Announcement link', announcement: 'Announcement bar text (blank = hidden)', cta: 'Header button', search: 'Search placeholder', href: 'Link (URL or /#section)', label: 'Label', colTitle: 'Footer column title', railTitle: 'Panel title', railNote: 'Panel note', credsNote: 'Note under credentials', credsRequest: 'Note when no credentials', credsTitle: 'Credentials title', investCta: 'Invest button', investTitle: 'Invest title (product name follows)', investText: 'Invest text', brochureTitle: 'Brochure card title', featuredTitle: 'Featured section title', bookCta: 'Book button', demoCta: 'Demo button', model: 'Model label (blank = hidden)', cta1: 'Primary button', cta2: 'Secondary button', line2: 'Line 2', accent: 'Orange ending', prefix: 'First word', words: 'Rotating words (comma separated)', t: 'Title', d: 'Text', q: 'Question', a: 'Answer', x: 'X / Twitter URL', linkedin: 'LinkedIn URL', viewAll: '"View all" button' }[k] || k.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()));
+  const pretty = k => ({ googleVerify: 'Google Search Console verification code', bingVerify: 'Bing Webmaster verification code', slowLabel: 'Slow option label', slowValue: 'Slow option value', fastLabel: 'Fast option label', fastValue: 'Fast option value', industries: 'Industries (comma separated)', cards: 'Cards', ogImage: 'Share image (Open Graph)', siteName: 'Site name', twitter: 'X handle', announcementLink: 'Announcement link', announcement: 'Announcement bar text (blank = hidden)', cta: 'Header button', search: 'Search placeholder', href: 'Link (URL or /#section)', label: 'Label', colTitle: 'Footer column title', railTitle: 'Panel title', railNote: 'Panel note', credsNote: 'Note under credentials', credsRequest: 'Note when no credentials', credsTitle: 'Credentials title', investCta: 'Invest button', investTitle: 'Invest title (product name follows)', investText: 'Invest text', brochureTitle: 'Brochure card title', featuredTitle: 'Featured section title', bookCta: 'Book button', demoCta: 'Demo button', model: 'Model label (blank = hidden)', cta1: 'Primary button', cta2: 'Secondary button', line2: 'Line 2', accent: 'Orange ending', prefix: 'First word', words: 'Rotating words (comma separated)', t: 'Title', d: 'Text', q: 'Question', a: 'Answer', x: 'X / Twitter URL', linkedin: 'LinkedIn URL', viewAll: '"View all" button' }[k] || k.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()));
   let CT = null;
   function renderContent() {
     CT = JSON.parse(JSON.stringify(S.settings.content || {}));
@@ -476,6 +479,13 @@
     if (e.target.id === 'saveQr') { S.settings.qr = { mainUrl: $('#qrMainUrl').value.trim() }; await saveSettings('Main QR target saved'); renderQR(); }
     const c = e.target.closest('[data-copy]'); if (c && $('#tab-qr') && !$('#tab-qr').hidden) { try { navigator.clipboard.writeText(c.dataset.copy); toast('Link copied'); } catch (_) {} }
   });
+
+  $('#indexNow').onclick = async () => {
+    const b = $('#indexNow'); b.disabled = true; b.textContent = 'Submitting…';
+    try { const r = await api('POST', '/api/admin/indexnow'); toast(r.ok ? `Submitted ${r.count} pages to search engines` : 'Search engines answered ' + r.status); }
+    catch (err) { toast(err.message); }
+    b.disabled = false; b.textContent = 'Submit all pages now';
+  };
 
   boot();
 })();

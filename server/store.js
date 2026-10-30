@@ -10,10 +10,10 @@ const BUCKET = process.env.SUPABASE_BUCKET || 'rm-images';
 const MODE = SB && KEY ? 'supabase' : 'file';
 // New sb_secret_ keys go in the apikey header only; legacy JWT service_role keys also go in Authorization.
 const AUTH = KEY.startsWith('eyJ') ? { apikey: KEY, Authorization: 'Bearer ' + KEY } : { apikey: KEY };
-const DATA = path.join(__dirname, 'data');
+const DATA = path.join(__dirname, '..', 'data');
 const SEED_PRODUCTS = path.join(DATA, 'products.json');
 const SEED_SETTINGS = path.join(DATA, 'settings.json');
-const UPLOADS = path.join(__dirname, 'public', 'uploads');
+const UPLOADS = path.join(__dirname, '..', 'public', 'uploads');
 
 const LIST_FIELDS = ['features', 'whyPoints', 'whatYouCanDo', 'useCases', 'stats'];
 const TEXT_FIELDS = ['showFrom', 'showUntil', 'seoTitle', 'seoDescription', 'name', 'tagline', 'category', 'group', 'status', 'deploy', 'price', 'summary', 'whatItIs',
@@ -60,7 +60,7 @@ const DEFAULT_SETTINGS = () => {
 };
 const DEFAULT_CONTENT = () => ({
   seo: { siteName: 'reMarketplace', title: 'reMarketplace — Launch fintech & Web3 products in days', description: 'reMarketplace gives businesses pre-built, white-label fintech, Web3, AI and identity products to customise, rebrand and deploy in days, not months.',
-    keywords: 'white label fintech, white label crypto exchange, white label wallet, tokenization platform, RWA marketplace, digital identity, master label, Dubai, UAE', ogImage: '', twitter: '@Reidentity_net' },
+    keywords: 'white label fintech, white label crypto exchange, white label wallet, tokenization platform, RWA marketplace, digital identity, master label, Dubai, UAE', ogImage: '', twitter: '@Reidentity_net', googleVerify: '', bingVerify: '' },
   header: { announcement: '', announcementLink: '', cta: 'Book a demo', search: 'Search products',
     links: [{ label: 'Products', href: '/#catalog' }, { label: 'Explainer', href: '/#explainer' }, { label: 'Why us', href: '/#why' }, { label: 'Use cases', href: '/#use-cases' }, { label: 'ReSystem ↗', href: 'https://resystem.org' }] },
   product: { model: 'Master label · White label', credsTitle: 'Sandbox credentials', credsNote: 'Sandbox data resets nightly. No real funds, KYC records, or on-chain transactions are created.',

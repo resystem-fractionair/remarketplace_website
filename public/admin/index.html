@@ -19,6 +19,7 @@
   <form class="login-card" id="loginForm">
     <img class="lg-light" src="/img/logo-light.png" alt="reMarketplace" height="28"><img class="lg-dark" src="/img/logo-dark.png" alt="" height="28">
     <h1>Admin console</h1>
+    <label>Username<input id="un" autocomplete="username" required></label>
     <label>Password<input type="password" id="pw" autocomplete="current-password" required></label>
     <p class="err" id="loginErr" hidden></p>
     <button class="btn btn-accent block">Sign in</button>
@@ -36,7 +37,7 @@
       <button data-tab="content">Site content</button>
       <button data-tab="cats">Categories</button>
       <button data-tab="bookings">Bookings</button>
-      <button data-tab="qr">QR codes</button>
+      <button data-tab="qr">QR & SEO</button>
     </nav>
     <span class="mode" id="mode"></span>
     <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode"><span class="sun">☀</span><span class="moon">☾</span></button>
@@ -84,6 +85,7 @@
 
   <!-- QR codes -->
   <section class="panel" id="tab-qr" hidden>
+    <div class="box-card seo-box"><div><b>Search engines</b><span class="muted small">Tells Bing, Yandex, Seznam and other IndexNow engines about every page now. Google reads the sitemap: add the site in Google Search Console and paste its verification code in Site content → SEO.</span></div><button class="btn btn-accent sm" id="indexNow">Submit all pages now</button></div>
     <div class="p-head"><div><h2>QR codes</h2><p class="muted small">Generated live from each page address — always up to date. Download PNG for print or SVG for design files.</p></div></div>
     <div class="qr-main box-card" id="qrMain"></div>
     <div class="qr-grid" id="qrGrid"></div>
