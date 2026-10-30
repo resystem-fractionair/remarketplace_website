@@ -58,13 +58,20 @@
 
   /* ---------- Animated hero ---------- */
   function hero(list) {
-    const words = ['fintech', 'identity', 'Web3', 'wallet', 'real-world asset', 'investment', 'AI'];
+    const words = ['fintech', 'identity', 'Web3', 'wallet', 'RWA', 'investment', 'AI'];
     const rot = $('#hxRot'); let w = 0;
+    /* fixed box = widest word, so nothing around it moves or overlaps */
+    const fit = () => {
+      const m = document.createElement('span'); m.className = 'hx-measure'; rot.appendChild(m);
+      let max = 0; words.forEach(x => { m.textContent = x; max = Math.max(max, m.getBoundingClientRect().width); });
+      m.remove(); rot.style.width = Math.ceil(max + 4) + 'px';
+    };
+    
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!reduce) setInterval(() => {
       w = (w + 1) % words.length;
       const n = document.createElement('span'); n.textContent = words[w]; n.className = 'in';
-      const old = rot.firstElementChild; if (old) { old.className = 'out'; setTimeout(() => old.remove(), 600); }
+      [...rot.children].forEach(o => { if (o.className !== 'out') { o.className = 'out'; setTimeout(() => o.remove(), 650); } });
       rot.appendChild(n);
     }, 2400);
     /* count-up */
