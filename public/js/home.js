@@ -101,7 +101,8 @@
       const x = brands[bi];
       viz.style.setProperty('--brand', x.c);
       viz.classList.remove('swap'); void viz.offsetWidth; viz.classList.add('swap');
-      $('#hvName').textContent = x.n; $('#hvLogo').textContent = x.n[0];
+      const masked = x.n.replace(/\s+/g, '').slice(0, 2) + '#'.repeat(Math.max(3, x.n.replace(/\s+/g, '').length - 2));
+      $('#hvName').textContent = masked; $('#hvLogo').textContent = x.n.slice(0, 2);
       $('#hvCur').textContent = x.cur; $('#hvUsers').textContent = x.u;
       const el = $('#hvBal'), t0 = performance.now(), to = x.bal;
       const tick = now => { const k = Math.min(1, (now - t0) / 900); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))).toLocaleString('en'); if (k < 1) requestAnimationFrame(tick); };

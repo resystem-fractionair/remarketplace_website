@@ -705,3 +705,11 @@ a.pa-res i { font-style: normal; color: var(--accent); font-weight: 700; }
 .gx-qr b { font: 700 16px var(--head); } .gx-qr span { font-size: 13px; color: var(--muted); }
 @media (min-width: 1000px) { .wx-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } .lx-track { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
 @media (min-width: 640px) and (max-width: 999px) { .wx-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .lx-track { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* masked brand + chips kept clear of the app window */
+.hv-top b { letter-spacing: .02em; }
+.hv-logo { font-size: 16px; }
+.hx-viz { padding-top: 54px; padding-bottom: 56px; }
+.hx-viz .hx-chip.c1 { left: auto; right: 8px; top: 6px; }
+.hx-viz .hx-chip.c2 { left: 8px; right: auto; top: 6px; }
+.hx-viz .hx-chip.c3 { left: auto; right: 8px; top: auto; bottom: 4px; }
