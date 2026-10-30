@@ -67,7 +67,7 @@
         </div>
         <div class="pa-actions">
           <button class="btn btn-accent" data-book="${esc(p.name)}">${bookLbl}</button>
-          ${demo ? `<a class="btn btn-ghost" href="#demo">${I.play} Try demo</a>` : ''}
+          <button class="btn btn-ghost" data-demo>${I.play} ${hasCreds || demo ? 'Try demo' : 'Request demo'}</button>
           ${p.investUrl ? `<a class="btn btn-ghost" href="${esc(p.investUrl)}" target="_blank" rel="noopener">Invest ↗</a>` : ''}
         </div>
       </section>
@@ -107,7 +107,7 @@
             </div>
             ${hasCreds ? `<p class="small muted">${esc(p.demoNote || 'Sandbox data resets nightly. No real funds, KYC records or on-chain transactions are created.')}</p>`
               : `<p class="small muted">${esc(p.demoNote || 'Login credentials are shared on request — usually within one business day.')}</p>
-                 <button class="btn btn-ghost block" data-book="${esc(p.name)}">Request demo credentials</button>`}
+                 <button class="btn btn-ghost block" data-demo>Request demo credentials</button>`}
             ${demo ? `<a class="btn btn-accent block" href="${esc(demo)}" target="_blank" rel="noopener">Open demo ↗</a>` : ''}
           </div>
 
@@ -133,7 +133,8 @@
           <h3>${esc(r.name)}</h3><p>${esc(r.tagline || r.summary)}</p>
           <div class="card-foot"><span>${esc(r.group || '')}</span><span class="view">View product →</span></div></a>`).join('')}</div></section>` : ''}
     </div>
-    <div class="pa-mbar"><button class="btn btn-accent grow" data-book="${esc(p.name)}">${bookLbl}</button>${demo ? `<a class="btn btn-ghost" href="#demo">Try demo</a>` : ''}</div>`;
+    <div class="pa-mbar"><button class="btn btn-accent grow" data-book="${esc(p.name)}">${bookLbl}</button><button class="btn btn-ghost" data-demo>Try demo</button></div>`;
+    openDrawer = () => drawer(p, features, demo, hasCreds, banner);
 
     const links = [...document.querySelectorAll('#paTabs a')];
     const io = new IntersectionObserver(es => es.forEach(e => {
@@ -141,6 +142,32 @@
     }), { rootMargin: '-45% 0px -50% 0px' });
     links.forEach(a => { const s = document.querySelector(a.getAttribute('href')); if (s) io.observe(s); });
   }
+
+  let openDrawer = null;
+  function drawer(p, features, demo, hasCreds, banner) {
+    let ov = document.getElementById('demoOv');
+    if (!ov) {
+      ov = document.createElement('div'); ov.className = 'overlay'; ov.id = 'demoOv'; ov.hidden = true;
+      ov.innerHTML = '<aside class="drawer dd" role="dialog" aria-modal="true" aria-labelledby="ddName"><button class="x" data-close aria-label="Close">×</button><div id="ddBody"></div></aside>';
+      document.body.appendChild(ov);
+    }
+    const row = (l, v) => `<div class="cred"><div><span>${esc(l)}</span><code>${esc(v)}</code></div><button class="copy" data-copy="${esc(v)}">Copy</button></div>`;
+    $('#ddBody').innerHTML = `
+      <div class="d-head">${RM.mark(p)}<div><h3 id="ddName">${esc(p.name)}</h3><span class="cat-tag">${[p.category, p.group].filter(Boolean).map(esc).join(' · ')}</span></div></div>
+      <div class="dd-bar"><span>${p.deploy ? 'Live in <b>' + esc(p.deploy) + '</b>' : esc(p.status || 'Master label · White label')}</span><b>${esc(p.price || 'Pricing on request')}</b></div>
+      ${banner ? `<div class="dd-img"><img src="${esc(banner)}" alt=""></div>` : ''}
+      <p class="d-blurb">${esc(p.tagline ? p.tagline + '. ' : '')}${esc(p.summary || '')}</p>
+      <h4 class="dd-h">Sandbox credentials <em class="pa-badge">Test data</em></h4>
+      ${(demo || hasCreds) ? `<div class="creds">${demo ? row('Demo URL', demo) : ''}${(p.demoCreds || []).map(c => row(c.label, c.value)).join('')}</div>
+        <p class="muted small">${esc(p.demoNote || 'Sandbox data resets nightly. No real funds, KYC records, or on-chain transactions are created.')}</p>
+        ${demo ? `<a class="btn btn-accent block" href="${esc(demo)}" target="_blank" rel="noopener">Open demo ↗</a>` : ''}`
+        : `<p class="muted small">Sandbox credentials for ${esc(p.name)} are issued on request — book a call and the team will send them, usually within one business day.</p>`}
+      ${features.length ? `<h4 class="dd-h">What ships with it</h4><ul class="dd-list">${features.slice(0, 8).map(f => `<li>${esc(f.t)}</li>`).join('')}</ul>` : ''}
+      <button class="btn btn-ghost block dd-book" data-book="${esc(p.name)}">Book a demo call</button>`;
+    RM.openOv('#demoOv');
+  }
+  document.addEventListener('click', e => { if (e.target.closest('[data-demo]') && openDrawer) { e.preventDefault(); openDrawer(); } });
+  if (location.hash === '#try-demo') setTimeout(() => openDrawer && openDrawer(), 300);
 
   fetch('/api/home').then(r => r.json()).then(home => {
     const all = RM.products = home.products;

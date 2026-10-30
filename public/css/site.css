@@ -362,3 +362,19 @@ a.pa-res i { font-style: normal; color: var(--accent); font-weight: 700; }
 .pa-fs b { font-size: 13.5px; } .pa-fs small { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pa-fs .mark { width: 40px; height: 40px; font-size: 12px; }
 .pa-fgrid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+
+/* Demo drawer */
+.dd .d-head { margin-bottom: 12px; }
+.dd-bar { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); font-size: 14px; margin-bottom: 14px; }
+.dd-img { border-radius: 12px; overflow: hidden; aspect-ratio: 16/10; background: var(--dark); margin-bottom: 14px; }
+.dd-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dd-h { display: flex; align-items: center; gap: 8px; font: 600 12px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 20px 0 10px; }
+.dd-h .pa-badge { margin-left: 0; }
+.dd .creds { gap: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin: 0 0 10px; }
+.dd .cred { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; }
+.dd .cred:last-child { border-bottom: 0; }
+.dd .btn-accent { margin-top: 10px; }
+.dd-list { list-style: none; margin: 0; padding: 0; }
+.dd-list li { position: relative; padding: 10px 0 10px 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.dd-list li::before { content: '•'; position: absolute; left: 2px; color: var(--accent); }
+.dd-book { margin-top: 18px; }
