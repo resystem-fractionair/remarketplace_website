@@ -33,24 +33,37 @@
 
 <main>
   <!-- Hero -->
-  <section class="hero wrap">
-    <span class="eyebrow">White-label concept · ReSystem ecosystem</span>
-    <div class="hero-grid">
-      <h1>Launch fintech &amp; Web3 products in days, <em>not months.</em></h1>
-      <div class="hero-side">
-        <p>reMarketplace provides pre-built infrastructure for businesses to build, launch and scale fully functional products that are simple to customise, rebrand and deploy.</p>
+  <section class="hx">
+    <div class="hx-bg" aria-hidden="true"><canvas id="hxNet"></canvas><span class="hx-grid"></span><span class="hx-glow g1"></span><span class="hx-glow g2"></span></div>
+    <div class="wrap hx-in">
+      <div class="hx-copy">
+        <span class="eyebrow">White-label concept · ReSystem ecosystem</span>
+        <h1>Launch <span class="hx-rot" id="hxRot"><span>fintech</span></span><br>products in days, <em>not months.</em></h1>
+        <p>Pre-built infrastructure to build, launch and scale fully functional products — simple to customise, rebrand and deploy under your name.</p>
         <div class="hero-cta">
           <a class="btn btn-accent" href="#catalog">Browse products</a>
           <button class="btn btn-ghost" data-book>Book a demo call</button>
         </div>
+        <div class="hx-stats">
+          <div><b data-count="17" id="statCount">0</b><span>ecosystem products</span></div>
+          <div><b data-count="3" data-suffix=" wks">0</b><span>to a vertical marketplace</span></div>
+          <div><b data-count="99.9" data-dec="1" data-suffix="%">0</b><span>uptime · 38ms latency</span></div>
+          <div><b data-count="1200" data-sep="1">0</b><span>TPS on ReSystem backend</span></div>
+        </div>
+      </div>
+      <div class="hx-stage" id="hxStage" aria-hidden="true">
+        <svg class="hx-lines" viewBox="0 0 600 600"><defs><radialGradient id="hxr"><stop offset="0" stop-color="#F7541D" stop-opacity=".9"/><stop offset="1" stop-color="#F7541D" stop-opacity="0"/></radialGradient></defs>
+          <circle cx="300" cy="300" r="250" class="o1"/><circle cx="300" cy="300" r="180" class="o2"/><circle cx="300" cy="300" r="110" class="o3"/>
+          <circle cx="300" cy="300" r="90" fill="url(#hxr)" opacity=".35"/></svg>
+        <div class="hx-hub"><span>re</span><small>Master label</small></div>
+        <div class="hx-orbit" id="hxOrbit"></div>
+        <span class="hx-chip c1">✓ KYC / AML built in</span>
+        <span class="hx-chip c2">⛓ Ownership on-chain</span>
+        <span class="hx-chip c3">⚡ Live in 3 weeks</span>
+        <span class="hx-chip c4">◎ reAED settlement</span>
       </div>
     </div>
-    <div class="stats stats-4">
-      <div><b id="statCount">15+</b><span>ecosystem products</span></div>
-      <div><b>3 weeks</b><span>to launch a vertical marketplace</span></div>
-      <div><b>99.9%</b><span>uptime · 38ms latency</span></div>
-      <div><b>1,200</b><span>TPS on the ReSystem backend</span></div>
-    </div>
+    <div class="hx-marquee" aria-hidden="true"><div class="hx-track" id="hxTrack"></div></div>
   </section>
 
   <!-- Why + listing (pitch page 1) -->

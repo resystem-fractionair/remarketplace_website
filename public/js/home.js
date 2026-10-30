@@ -55,10 +55,85 @@
   $('#q').addEventListener('focus', () => { if (scrollY < 200) document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' }); });
 
   renderFaq();
+
+  /* ---------- Animated hero ---------- */
+  function hero(list) {
+    const words = ['fintech', 'identity', 'Web3', 'wallet', 'real-world asset', 'investment', 'AI'];
+    const rot = $('#hxRot'); let w = 0;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduce) setInterval(() => {
+      w = (w + 1) % words.length;
+      const n = document.createElement('span'); n.textContent = words[w]; n.className = 'in';
+      const old = rot.firstElementChild; if (old) { old.className = 'out'; setTimeout(() => old.remove(), 600); }
+      rot.appendChild(n);
+    }, 2400);
+    /* count-up */
+    $('#statCount').dataset.count = list.length;
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return; io.unobserve(e.target);
+      const el = e.target, to = +el.dataset.count, dec = +(el.dataset.dec || 0), t0 = performance.now(), dur = reduce ? 1 : 1400;
+      const f = now => { const k = Math.min(1, (now - t0) / dur), v = to * (1 - Math.pow(1 - k, 3));
+        el.textContent = (el.dataset.sep ? Math.round(v).toLocaleString('en') : v.toFixed(dec)) + (el.dataset.suffix || ''); if (k < 1) requestAnimationFrame(f); };
+      requestAnimationFrame(f);
+    }));
+    document.querySelectorAll('.hx-stats [data-count]').forEach(el => io.observe(el));
+    /* orbiting product cards */
+    const pics = list.filter(p => p.image).slice(0, 8);
+    $('#hxOrbit').innerHTML = pics.map((p, i) => `<span class="hx-slot" style="--i:${i};--n:${pics.length}"><a class="hx-card" href="/product/${esc(p.slug)}" tabindex="-1">
+      <img src="${esc(p.image)}" alt=""><span><b>${esc(p.name)}</b><small>${esc(p.category)}</small></span></a></span>`).join('');
+    /* marquee */
+    const items = list.map(p => `<span class="hx-mi">${RM.mark(p)}<b>${esc(p.name)}</b><small>${esc(p.category)}</small></span>`).join('');
+    $('#hxTrack').innerHTML = items + items;
+    /* network canvas background: drifting nodes, links and travelling packets */
+    const cv = $('#hxNet'), ctx = cv.getContext('2d');
+    let W = 0, H = 0, nodes = [], packets = [], mx = -999, my = -999, dpr = Math.min(2, devicePixelRatio || 1);
+    const size = () => {
+      const r = cv.parentElement.getBoundingClientRect(); W = r.width; H = r.height;
+      cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const n = Math.round(Math.min(90, Math.max(28, W * H / 16000)));
+      nodes = Array.from({ length: n }, () => ({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .25, vy: (Math.random() - .5) * .25, r: 1.2 + Math.random() * 2, hub: Math.random() < .12 }));
+    };
+    size(); addEventListener('resize', size);
+    const dark = () => document.documentElement.getAttribute('data-theme') === 'dark';
+    const LINK = 150;
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      const dk = dark(), line = dk ? '255,140,100' : '247,84,29', dot = dk ? 'rgba(255,170,140,.85)' : 'rgba(194,66,26,.75)';
+      for (const p of nodes) {
+        if (!reduce) { p.x += p.vx; p.y += p.vy; if (p.x < 0 || p.x > W) p.vx *= -1; if (p.y < 0 || p.y > H) p.vy *= -1; }
+        const dx = p.x - mx, dy = p.y - my, d = Math.hypot(dx, dy);
+        if (d < 120 && d > 0) { p.x += dx / d * .6; p.y += dy / d * .6; }
+      }
+      for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i], c = nodes[j], d = Math.hypot(a.x - c.x, a.y - c.y);
+        if (d < LINK) { ctx.strokeStyle = `rgba(${line},${(1 - d / LINK) * .28})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(c.x, c.y); ctx.stroke();
+          if (!reduce && packets.length < 18 && Math.random() < .0009) packets.push({ a, c, t: 0 }); }
+      }
+      for (const p of nodes) { ctx.fillStyle = dot; ctx.beginPath(); ctx.arc(p.x, p.y, p.hub ? p.r + 1.5 : p.r, 0, 6.283); ctx.fill();
+        if (p.hub) { ctx.strokeStyle = `rgba(${line},.25)`; ctx.beginPath(); ctx.arc(p.x, p.y, p.r + 6, 0, 6.283); ctx.stroke(); } }
+      packets = packets.filter(k => (k.t += .012) < 1);
+      for (const k of packets) { const x = k.a.x + (k.c.x - k.a.x) * k.t, y = k.a.y + (k.c.y - k.a.y) * k.t;
+        const g = ctx.createRadialGradient(x, y, 0, x, y, 8); g.addColorStop(0, `rgba(${line},.95)`); g.addColorStop(1, `rgba(${line},0)`);
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 8, 0, 6.283); ctx.fill(); }
+      if (!reduce && running) requestAnimationFrame(draw);
+    };
+    let running = true;
+    new IntersectionObserver(([e]) => { const was = running; running = e.isIntersecting; if (running && !was) requestAnimationFrame(draw); }).observe(cv);
+    document.querySelector('.hx').addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
+    document.querySelector('.hx').addEventListener('pointerleave', () => { mx = my = -999; });
+    requestAnimationFrame(draw);
+
+    /* pointer parallax */
+    const st = $('#hxStage');
+    if (!reduce && matchMedia('(pointer: fine)').matches) document.querySelector('.hx').addEventListener('pointermove', e => {
+      const r = st.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+      st.style.setProperty('--rx', (-y * 10).toFixed(2) + 'deg'); st.style.setProperty('--ry', (x * 14).toFixed(2) + 'deg');
+    });
+  }
   fetch('/api/home').then(r => r.json()).then(home => {
     const list = RM.products = home.products;
     cats = ['All', ...home.categories];
-    $('#statCount').textContent = list.length;
+    hero(list);
     $('#homeRows').innerHTML = home.rows.map(r => `
       <section class="wrap hrow">
         <div class="cat-head"><div><h2>${esc(r.title)}</h2>${r.subtitle ? `<p class="muted">${esc(r.subtitle)}</p>` : ''}</div></div>
