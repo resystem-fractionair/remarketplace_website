@@ -87,7 +87,11 @@
   };
 
   /* availability: a slot is open if at least one specialist is free */
-  const freeAgents = (time, lang) => CFG.specialists.filter(s => (!lang || s.langs.includes(lang)) && !b.taken.includes(`${s.id}|${b.date}|${time}`));
+  const toMin = t => +t.slice(0, 2) * 60 + +t.slice(3, 5);
+  const dowOf = key => new Date(key + 'T12:00:00Z').getUTCDay();
+  const works = (s, key, time) => s.days.includes(dowOf(key)) && (!time || (toMin(time) >= toMin(s.start) && toMin(time) + CFG.durationMin <= toMin(s.end)));
+  const agentFree = (s, time) => works(s, b.date, time) && !b.taken.includes(`${s.id}|${b.date}|${time}`);
+  const freeAgents = (time, lang) => CFG.specialists.filter(s => (!lang || s.langs.includes(lang)) && agentFree(s, time));
   const slotOpen = t => zoned(b.date, t).getTime() > Date.now() + CFG.minNoticeHours * 3600e3 && freeAgents(t).length > 0;
   async function pickDate(d) {
     b.date = d; b.time = ''; b.taken = []; render();
@@ -128,7 +132,7 @@
         <p>${b.done.emailed ? `A confirmation and calendar invite were sent to <b>${esc(b.email)}</b>.` : `Your booking is saved. The team will confirm by email at <b>${esc(b.email)}</b>.`}</p>
         <div class="summary"><div><span>Reference</span><b>${esc(b.done.ref)}</b></div>
           <div><span>When</span><b>${esc(fmt(s, { weekday: 'long', day: 'numeric', month: 'long' }))}, ${esc(b.time)} GST${localDiffers() ? `<small>Your time: ${esc(fmt(s, { weekday: 'short', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }, VTZ))}</small>` : ''}</b></div>
-          <div><span>With</span><b>${esc(agent().name)} · ${esc(b.lang)}</b></div>
+          <div><span>With</span><b>${esc(agent().name)}${agent().title ? ' — ' + esc(agent().title) : ''} · ${esc(b.lang)}</b></div>
           <div><span>Products</span><b>${pickedProducts().map(p => esc(p.name)).join(', ')}</b></div></div>
         <div class="bk-cal"><a class="btn btn-accent" href="${gcal}" target="_blank" rel="noopener">Add to Google Calendar</a><a class="btn btn-ghost" href="${ics}" download="remarketplace-demo.ics">Download .ics</a></div>
         <button class="btn btn-dark block" data-close>Done</button></div>`;
@@ -148,7 +152,7 @@
     } else if (b.step === 2) {
       const today = new Date(); const first = new Date(today.getFullYear(), today.getMonth(), 1);
       if (!b.month) {
-        let d0 = new Date(); for (let i = 0; i <= CFG.daysAhead; i++) { const k = ymd(d0); if (CFG.workDays.includes(d0.getDay()) && zoned(k, CFG.slots[CFG.slots.length - 1]).getTime() > Date.now() + CFG.minNoticeHours * 3600e3) break; d0 = new Date(d0.getTime() + 864e5); }
+        let d0 = new Date(); for (let i = 0; i <= CFG.daysAhead; i++) { const k = ymd(d0); if (CFG.workDays.includes(d0.getDay()) && CFG.specialists.some(sp => works(sp, k)) && zoned(k, CFG.slots[CFG.slots.length - 1]).getTime() > Date.now() + CFG.minNoticeHours * 3600e3) break; d0 = new Date(d0.getTime() + 864e5); }
         b.month = new Date(d0.getFullYear(), d0.getMonth(), 1);
       }
       const lastDay = new Date(Date.now() + CFG.daysAhead * 864e5);
@@ -158,7 +162,7 @@
       for (let d = 1; d <= nDays; d++) {
         const dt = new Date(m.getFullYear(), m.getMonth(), d), key = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
         const end = zoned(key, CFG.slots[CFG.slots.length - 1]).getTime();
-        const ok = CFG.workDays.includes(dt.getDay()) && end > Date.now() + CFG.minNoticeHours * 3600e3 && dt <= lastDay;
+        const ok = CFG.workDays.includes(dt.getDay()) && CFG.specialists.some(sp => works(sp, key)) && end > Date.now() + CFG.minNoticeHours * 3600e3 && dt <= lastDay;
         cells.push(`<button class="bk-day${key === b.date ? ' on' : ''}${key === ymd(new Date(Date.now() + 0)) ? ' today' : ''}" data-date="${key}"${ok ? '' : ' disabled'}>${d}</button>`);
       }
       const canPrev = m > first, canNext = new Date(m.getFullYear(), m.getMonth() + 1, 1) <= lastDay;
@@ -171,14 +175,23 @@
           <p class="muted small">Times in Dubai (GST)${localDiffers() ? ` · your time zone: ${esc(VTZ)}` : ''} · ${CFG.durationMin} min</p>
           ${b.date ? `<div class="bk-slots">${slots}</div>` : '<p class="muted small">Available days are highlighted on the calendar.</p>'}</div></div>`;
     } else if (b.step === 3) {
-      const list = b.lang ? CFG.specialists.filter(s => s.langs.includes(b.lang)) : [];
+      const want = new Set(b.picked);
+      const score = sp => sp.products.filter(x => want.has(x)).length;
+      const list = b.lang ? CFG.specialists.filter(sp => sp.langs.includes(b.lang)).sort((x, y) => (agentFree(y, b.time) - agentFree(x, b.time)) || (score(y) - score(x))) : [];
+      const best = list.find(sp => agentFree(sp, b.time) && score(sp) > 0);
+      const pname = slug => (RM.products.find(p => p.slug === slug) || {}).name;
+      const langs = [...new Set(CFG.specialists.flatMap(sp => sp.langs))];
       body.innerHTML = `<h5>Which language should the call be in?</h5>
-        <div class="pills">${CFG.languages.map(l => `<button class="pill${b.lang === l ? ' on' : ''}" data-lang="${esc(l)}">${esc(l)}</button>`).join('')}</div>
-        ${b.lang ? `<h5>Choose your specialist</h5><div class="bk-agents">${list.map(s => { const busy = b.taken.includes(`${s.id}|${b.date}|${b.time}`); return `
-          <button class="bk-agent${b.specialist === s.id ? ' on' : ''}" data-agent="${esc(s.id)}"${busy ? ' disabled' : ''}>
-            <span class="avatar">${esc(s.name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase())}</span>
-            <span class="bk-at"><b>${esc(s.name)}</b><small>${esc(s.role)}</small><span class="bk-langs">${s.langs.map(l => `<em${l === b.lang ? ' class="hit"' : ''}>${esc(l)}</em>`).join('')}</span></span>
-            <span class="bk-free">${busy ? 'Busy at ' + esc(b.time) : 'Available'}</span></button>`; }).join('') || '<p class="muted small">No specialist speaks this language yet — please choose another.</p>'}</div>` : '<p class="muted small">Pick a language to see the specialists available at your time.</p>'}`;
+        <div class="pills">${CFG.languages.filter(l => langs.includes(l)).map(l => { const n = CFG.specialists.filter(sp => sp.langs.includes(l) && agentFree(sp, b.time)).length;
+          return `<button class="pill${b.lang === l ? ' on' : ''}" data-lang="${esc(l)}"${n ? '' : ' disabled'}>${esc(l)}${n ? '' : ' · none free'}</button>`; }).join('')}</div>
+        ${b.lang ? `<h5>Choose who you’d like to speak with</h5><div class="bk-agents">${list.map(sp => { const free = agentFree(sp, b.time); const covers = sp.products.map(pname).filter(Boolean); return `
+          <button class="bk-agent${b.specialist === sp.id ? ' on' : ''}" data-agent="${esc(sp.id)}"${free ? '' : ' disabled'}>
+            ${sp.photo ? `<span class="bk-photo"><img src="${esc(sp.photo)}" alt=""></span>` : `<span class="bk-photo bk-ini">${esc(sp.name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase())}</span>`}
+            <span class="bk-at"><span class="bk-an"><b>${esc(sp.name)}</b>${best === sp ? '<em class="bk-best">Best match</em>' : ''}</span>${sp.title ? `<small>${esc(sp.title)}</small>` : ''}
+              ${sp.bio ? `<span class="bk-bio">${esc(sp.bio)}</span>` : ''}
+              <span class="bk-langs">${sp.langs.map(l => `<em${l === b.lang ? ' class="hit"' : ''}>${esc(l)}</em>`).join('')}</span>
+              ${covers.length ? `<span class="bk-covers">Covers: ${covers.map(c => `<i${[...want].some(w => pname(w) === c) ? ' class="hit"' : ''}>${esc(c)}</i>`).join('')}</span>` : ''}</span>
+            <span class="bk-free${free ? '' : ' off'}">${free ? '● Available ' + esc(b.time) : 'Not available at ' + esc(b.time)}</span></button>`; }).join('') || '<p class="muted small">No one speaks this language yet — please choose another.</p>'}</div>` : '<p class="muted small">Pick a language to see who is available at your time.</p>'}`;
     } else if (b.step === 4) {
       body.innerHTML = `<div class="form bk-form">
         <label>Full name *<input data-f="name" value="${esc(b.name)}" placeholder="Jane Doe" autocomplete="name"></label>
@@ -193,7 +206,7 @@
       body.innerHTML = `<div class="bk-review">
         <div class="bk-rv"><div class="bk-rvh"><b>Products</b><button class="link" data-goto="1">Edit</button></div><div class="bk-rvp">${pickedProducts().map(p => `<span>${thumb(p)}${esc(p.name)}</span>`).join('')}</div></div>
         <div class="bk-rv"><div class="bk-rvh"><b>Date & time</b><button class="link" data-goto="2">Edit</button></div><p>${esc(fmt(s, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }))} · ${esc(b.time)} GST · ${CFG.durationMin} min${localDiffers() ? `<br><small class="muted">Your time: ${esc(fmt(s, { weekday: 'short', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }, VTZ))}</small>` : ''}</p></div>
-        <div class="bk-rv"><div class="bk-rvh"><b>Language & specialist</b><button class="link" data-goto="3">Edit</button></div><p>${esc(b.lang)} · ${esc(agent().name)}</p></div>
+        <div class="bk-rv"><div class="bk-rvh"><b>Language & specialist</b><button class="link" data-goto="3">Edit</button></div><p class="bk-rva">${agent().photo ? `<img src="${esc(agent().photo)}" alt="">` : ''}<span>${esc(agent().name)}${agent().title ? ` <small class="muted">${esc(agent().title)}</small>` : ''}<br>${esc(b.lang)}</span></p></div>
         <div class="bk-rv"><div class="bk-rvh"><b>Your details</b><button class="link" data-goto="4">Edit</button></div><p>${esc(b.name)} · ${esc(b.email)}<br>${esc(b.company)}${b.phone ? ' · ' + esc(b.phone) : ''}</p>${b.notes ? `<p class="muted small">${esc(b.notes)}</p>` : ''}</div>
         ${b.err ? `<p class="bk-err">${esc(b.err)}</p>` : ''}</div>`;
     }
@@ -232,7 +245,7 @@
     if (d.mon) { b.month = new Date(b.month.getFullYear(), b.month.getMonth() + +d.mon, 1); return render(); }
     if (d.date) return pickDate(d.date);
     if (d.time) { b.time = d.time; if (b.specialist && b.taken.includes(`${b.specialist}|${b.date}|${b.time}`)) b.specialist = ''; return render(); }
-    if (d.lang) { b.lang = d.lang; const free = freeAgents(b.time, b.lang); b.specialist = free.length === 1 ? free[0].id : (free.some(s => s.id === b.specialist) ? b.specialist : ''); return render(); }
+    if (d.lang) { b.lang = d.lang; const free = freeAgents(b.time, b.lang); b.specialist = free.some(s => s.id === b.specialist) ? b.specialist : (free.length === 1 ? free[0].id : ''); return render(); }
     if (d.agent) { b.specialist = d.agent; return render(); }
     if (d.goto) { b.step = +d.goto; return render(); }
     if (t.id === 'bBack') { b.step = Math.max(1, b.step - 1); return render(); }

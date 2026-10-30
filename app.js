@@ -64,7 +64,7 @@ app.get('/api/booking/config', wrap(async (_req, res) => {
   const { settings } = await store.load();
   const b = settings.booking;
   res.json({ timezone: b.timezone, durationMin: b.durationMin, daysAhead: b.daysAhead, minNoticeHours: b.minNoticeHours,
-    workDays: b.workDays, slots: b.slots, languages: b.languages, specialists: b.specialists });
+    workDays: b.workDays, slots: b.slots, languages: b.languages, specialists: b.specialists.filter(s => s.active).map(s => ({ id: s.id, name: s.name, title: s.title, photo: s.photo, bio: s.bio, langs: s.langs, products: s.products, days: s.days, start: s.start, end: s.end })) });
 }));
 app.get('/api/booking/availability', wrap(async (req, res) => {
   const date = String(req.query.date || '');
@@ -89,7 +89,9 @@ app.post('/api/bookings', wrap(async (req, res) => {
   if (!start || !cfg.workDays.includes(dow)) errs.push('Pick an available date and time.');
   else if (start.getTime() < now + cfg.minNoticeHours * 3600e3 || start.getTime() > now + (cfg.daysAhead + 1) * 864e5) errs.push('That time is outside the booking window.');
   if (!cfg.languages.includes(b.lang)) errs.push('Pick a call language.');
-  if (!sp || !sp.langs.includes(b.lang)) errs.push('Pick a specialist who speaks that language.');
+  const toMin = t => +t.slice(0, 2) * 60 + +t.slice(3, 5);
+  if (!sp || !sp.active || !sp.langs.includes(b.lang)) errs.push('Pick a specialist who speaks that language.');
+  else if (!sp.days.includes(dow) || toMin(time) < toMin(sp.start) || toMin(time) + cfg.durationMin > toMin(sp.end)) errs.push(`${sp.name} isn't available at that time. Please pick another slot or specialist.`);
   if (str(b.name, 100).length < 2) errs.push('Enter your full name.');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(str(b.email, 160))) errs.push('Enter a valid work email.');
   if (str(b.company, 120).length < 2) errs.push('Enter your company.');
@@ -97,7 +99,7 @@ app.post('/api/bookings', wrap(async (req, res) => {
   if (errs.length) return res.status(400).json({ error: errs[0], errors: errs });
   const ref = 'RMK-' + date.replace(/-/g, '').slice(2) + '-' + require('crypto').randomBytes(2).toString('hex').toUpperCase();
   const booking = { ref, slotKey: `${sp.id}|${date}|${time}`, date, time, timezone: cfg.timezone, durationMin: cfg.durationMin,
-    products: prods, lang: b.lang, specialist: { id: sp.id, name: sp.name, role: sp.role },
+    products: prods, lang: b.lang, specialist: { id: sp.id, name: sp.name, role: sp.title, photo: sp.photo },
     name: str(b.name, 100), email: str(b.email, 160), company: str(b.company, 120), phone: str(b.phone, 40), role: str(b.role, 80), notes: str(b.notes, 1500),
     visitorTz: str(b.visitorTz, 60), user: req.session.user || null, receivedAt: new Date().toISOString() };
   await store.addBooking(booking);

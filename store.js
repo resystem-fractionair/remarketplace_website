@@ -65,9 +65,12 @@ const DEFAULT_BOOKING = () => ({
   slots: ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'],
   languages: ['English', 'Arabic', 'Hindi', 'Spanish', 'French', 'Russian'],
   specialists: [
-    { id: 'identity-payments', name: 'Identity & Payments desk', role: 'reID, reWALLET, INFRA', langs: ['English', 'Arabic', 'Hindi'] },
-    { id: 'rwa-invest', name: 'RWA & Investment desk', role: 'Fractionaire, reINVEST, CET', langs: ['English', 'Arabic', 'Russian'] },
-    { id: 'white-label', name: 'White-label & Partners desk', role: 'reMARKETPLACE, partner products', langs: ['English', 'Spanish', 'French', 'Hindi'] }
+    { id: 'identity-specialist', name: 'Senior Product Specialist', title: 'Identity & Payments', photo: '', bio: 'Walks you through reID sign-in, wallets and the INFRA payment rails.',
+      langs: ['English', 'Arabic', 'Hindi'], products: ['reid', 'rewallet', 'infra-reaed', 'infra-global'], days: [1, 2, 3, 4, 5], start: '09:00', end: '17:00', active: true },
+    { id: 'investment-specialist', name: 'Investment Specialist', title: 'RWA & Investment', photo: '', bio: 'Covers tokenised real-world assets, fractional ownership and private wealth.',
+      langs: ['English', 'Arabic', 'Russian'], products: ['fractionaire', 'reinvest', 'cet'], days: [1, 2, 3, 4, 5], start: '10:00', end: '18:00', active: true },
+    { id: 'partnerships-specialist', name: 'Partnerships Specialist', title: 'White-label & Partners', photo: '', bio: 'Helps you launch a branded marketplace or list your own master label.',
+      langs: ['English', 'Spanish', 'French', 'Hindi'], products: ['remarketplace', 'redomain', 'tunetailor', 'mine', 'prohandover', 'hostick', 'rechain'], days: [0, 1, 2, 3, 4], start: '09:00', end: '17:00', active: true }
   ]
 });
 function cleanBooking(b) {
@@ -75,10 +78,15 @@ function cleanBooking(b) {
   const strList = (a, n) => (Array.isArray(a) ? a : []).map(x => String(x).trim()).filter(Boolean).slice(0, n || 50);
   const num = (v, lo, hi, df) => Number.isFinite(+v) ? Math.min(hi, Math.max(lo, Math.round(+v))) : df;
   const slots = strList(b.slots, 48).filter(t => /^([01]\d|2[0-3]):[0-5]\d$/.test(t)).sort();
-  const sp = (Array.isArray(b.specialists) ? b.specialists : d.specialists).slice(0, 20).map((x, i) => ({
+  const hm = (v, df) => /^([01]\d|2[0-3]):[0-5]\d$/.test(String(v || '')) ? String(v) : df;
+  const sp = (Array.isArray(b.specialists) ? b.specialists : d.specialists).slice(0, 40).map((x, i) => ({
     id: slugify(x.id || x.name) || 'agent-' + (i + 1), name: String(x.name || '').trim().slice(0, 80),
-    role: String(x.role || '').trim().slice(0, 120), langs: strList(x.langs, 12)
+    title: String(x.title || x.role || '').trim().slice(0, 120), photo: String(x.photo || '').trim().slice(0, 500), bio: String(x.bio || '').trim().slice(0, 300),
+    langs: strList(x.langs, 12), products: strList(x.products, 40).map(slugify),
+    days: [...new Set((Array.isArray(x.days) ? x.days : [1, 2, 3, 4, 5]).map(Number).filter(n => n >= 0 && n <= 6))].sort(),
+    start: hm(x.start, '09:00'), end: hm(x.end, '17:00'), active: x.active !== false
   })).filter(x => x.name && x.langs.length);
+  const ids = new Set(); sp.forEach(x => { while (ids.has(x.id)) x.id += '-2'; ids.add(x.id); });
   return {
     notifyEmail: /.+@.+\..+/.test(b.notifyEmail || '') ? String(b.notifyEmail).trim() : d.notifyEmail,
     timezone: String(b.timezone || d.timezone),

@@ -319,22 +319,61 @@
       <div class="three"><label>Call length (min)<input name="durationMin" type="number" value="${esc(c.durationMin)}"></label><label>Bookable days ahead<input name="daysAhead" type="number" value="${esc(c.daysAhead)}"></label><label>Minimum notice (hours)<input name="minNoticeHours" type="number" value="${esc(c.minNoticeHours)}"></label></div>
       <label>Working days<div class="wd">${DAYS.map((d, i) => `<label class="wdi"><input type="checkbox" name="wd" value="${i}"${(c.workDays || []).includes(i) ? ' checked' : ''}>${d}</label>`).join('')}</div></label>
       <label>Time slots (HH:MM, comma separated)<input name="slots" value="${esc((c.slots || []).join(', '))}"></label>
-      <label>Call languages (comma separated)<input name="languages" value="${esc((c.languages || []).join(', '))}"></label>
-      <label>Specialists<small>One per line: Name | what they cover | languages (comma separated)</small><textarea name="specialists" rows="5">${esc((c.specialists || []).map(s => [s.name, s.role, s.langs.join(', ')].join(' | ')).join('\n'))}</textarea></label>`;
+      <label>Call languages offered (comma separated)<input name="languages" value="${esc((c.languages || []).join(', '))}"></label>
+      <div class="ag-head"><div><b>Agents</b><small>The people customers can book. Each has their own languages, products and working hours.</small></div><button type="button" class="btn btn-ghost sm" id="addAgent">+ Add agent</button></div>
+      <div id="agents"></div>`;
+    renderAgents();
   }
+  let AG = [];
+  function renderAgents() {
+    if (!AG.length && !renderAgents.init) { AG = JSON.parse(JSON.stringify((S.settings.booking || {}).specialists || [])); }
+    renderAgents.init = true;
+    const langs = (S.settings.booking || {}).languages || [];
+    $('#agents').innerHTML = AG.map((g, i) => `<div class="ag" data-ag="${i}">
+      <div class="ag-photo">${g.photo ? `<img src="${esc(g.photo)}" alt="">` : `<span>${esc((g.name || '?').split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase())}</span>`}
+        <label class="btn btn-ghost sm">Photo<input type="file" accept="image/*" data-agup="${i}" hidden></label>${g.photo ? `<button type="button" class="link" data-agnophoto="${i}">Remove</button>` : ''}</div>
+      <div class="ag-f">
+        <div class="two"><label>Name *<input data-agf="name" value="${esc(g.name)}" placeholder="Full name"></label><label>Job title<input data-agf="title" value="${esc(g.title)}" placeholder="e.g. Senior Product Specialist"></label></div>
+        <label>Short bio<input data-agf="bio" value="${esc(g.bio)}" placeholder="One line customers see on the booking card"></label>
+        <label>Languages *<div class="wd">${langs.map(l => `<label class="wdi"><input type="checkbox" data-agl="${esc(l)}"${(g.langs || []).includes(l) ? ' checked' : ''}>${esc(l)}</label>`).join('')}</div></label>
+        <label>Products they cover<div class="wd">${S.products.map(p => `<label class="wdi"><input type="checkbox" data-agp="${esc(p.slug)}"${(g.products || []).includes(p.slug) ? ' checked' : ''}>${esc(p.name)}</label>`).join('')}</div></label>
+        <div class="ag-time"><label>Working days<div class="wd">${DAYS.map((d, k) => `<label class="wdi"><input type="checkbox" data-agd="${k}"${(g.days || []).includes(k) ? ' checked' : ''}>${d}</label>`).join('')}</div></label>
+          <label>From<input type="time" data-agf="start" value="${esc(g.start || '09:00')}"></label><label>To<input type="time" data-agf="end" value="${esc(g.end || '17:00')}"></label></div>
+        <div class="ag-foot"><label class="switch-l"><input type="checkbox" data-agf="active"${g.active !== false ? ' checked' : ''}><span class="sw"></span>Bookable</label><button type="button" class="link danger" data-agdel="${i}">Delete agent</button></div>
+      </div></div>`).join('') || '<p class="muted small">No agents yet — add one so customers can book.</p>';
+  }
+  document.addEventListener('input', e => {
+    const box = e.target.closest && e.target.closest('[data-ag]'); if (!box) return;
+    const g = AG[+box.dataset.ag], t = e.target, d = t.dataset;
+    if (d.agf) g[d.agf] = t.type === 'checkbox' ? t.checked : t.value;
+    const toggle = (key, val) => { g[key] = g[key] || []; const i = g[key].indexOf(val); t.checked ? (i < 0 && g[key].push(val)) : (i > -1 && g[key].splice(i, 1)); };
+    if (d.agl) toggle('langs', d.agl);
+    if (d.agp) toggle('products', d.agp);
+    if (d.agd) toggle('days', +d.agd);
+  });
+  document.addEventListener('change', async e => {
+    const i = e.target.dataset && e.target.dataset.agup; if (i == null || !e.target.files[0]) return;
+    toast('Uploading photo…');
+    try { const { url } = await api('POST', '/api/admin/upload?name=agent-' + encodeURIComponent(AG[+i].name || 'photo'), null, e.target.files[0]); AG[+i].photo = url; renderAgents(); toast('Photo added — remember to save'); }
+    catch (err) { toast(err.message); }
+  });
+  document.addEventListener('click', e => {
+    const t = e.target.closest('button'); if (!t) return;
+    if (t.id === 'addAgent') { AG.push({ name: '', title: '', bio: '', photo: '', langs: ['English'], products: [], days: [1, 2, 3, 4, 5], start: '09:00', end: '17:00', active: true }); renderAgents(); }
+    else if (t.dataset.agdel != null) { if (confirm('Delete this agent? Existing bookings keep their details.')) { AG.splice(+t.dataset.agdel, 1); renderAgents(); } }
+    else if (t.dataset.agnophoto != null) { AG[+t.dataset.agnophoto].photo = ''; renderAgents(); }
+  });
   $('#saveBk').onclick = async () => {
     const f = $('#bkForm'), v = n => f.querySelector(`[name="${n}"]`).value, list = n => v(n).split(',').map(x => x.trim()).filter(Boolean);
-    const old = (S.settings.booking || {}).specialists || [];
+    const bad = AG.find(g => !String(g.name || '').trim() || !(g.langs || []).length);
+    if (bad) return toast('Every agent needs a name and at least one language');
     S.settings.booking = {
       notifyEmail: v('notifyEmail').trim(), timezone: v('timezone').trim(), durationMin: +v('durationMin'), daysAhead: +v('daysAhead'), minNoticeHours: +v('minNoticeHours'),
       workDays: [...f.querySelectorAll('[name=wd]:checked')].map(x => +x.value), slots: list('slots'), languages: list('languages'),
-      specialists: v('specialists').split('\n').map(l => l.split('|').map(x => x.trim())).filter(x => x[0]).map(([name, role, langs]) => {
-        const prev = old.find(o => o.name === name);
-        return { id: prev ? prev.id : '', name, role: role || '', langs: (langs || '').split(',').map(x => x.trim()).filter(Boolean) };
-      })
+      specialists: AG.map(g => Object.assign({}, g, { id: g.id || '' }))
     };
     await saveSettings('Booking settings saved');
-    renderBkForm();
+    AG = []; renderAgents.init = false; renderBkForm();
   };
 
   boot();
