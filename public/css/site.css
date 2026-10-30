@@ -646,3 +646,8 @@ a.pa-res i { font-style: normal; color: var(--accent); font-weight: 700; }
 .hx-viz .hx-chip.c1 { left: auto; right: 10px; top: 4px; }
 .hx-viz .hx-chip.c2 { right: -44px; top: 230px; }
 .hx-viz .hx-chip.c3 { left: -56px; bottom: auto; top: 300px; }
+
+.hv-url { display: flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; }
+.hv-url svg { color: #1F9D6B; flex: none; }
+.hv-mask { letter-spacing: .12em; color: var(--muted); }
+.hv-url em { margin-left: auto; font-style: normal; font-size: 10.5px; font-weight: 700; color: var(--brand); background: var(--bg); border: 1px solid var(--line); border-radius: 100px; padding: 1px 8px; transition: color .6s; }
