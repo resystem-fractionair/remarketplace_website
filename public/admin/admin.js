@@ -118,7 +118,7 @@
     $('#edView').hidden = !slug; $('#edView').href = '/product/' + (slug || '');
     const cats = [...new Set(['', ...S.settings.categories, p.category || ''])];
     const groups = [...new Set(['', ...S.settings.groups, p.group || ''])];
-    $('#edForm').innerHTML = `
+    $('#edForm').innerHTML = `<div class="ed-cols">
       <fieldset><legend>Basics</legend>
         <div class="two">${field('name', 'Name *', p.name, 'required')}${field('slug', 'URL slug *', p.slug, 'placeholder="auto from name"')}</div>
         ${field('tagline', 'Tagline', p.tagline)}
@@ -150,7 +150,7 @@
       <fieldset><legend>Sandbox / demo credentials</legend>
         <p class="muted small">Shown on the product page with Copy buttons and a TEST DATA badge. The Demo URL row comes from the Demo URL field above.</p>
         ${area('demoCreds', 'Credentials', (p.demoCreds || []).map(c => c.label + ' | ' + c.value).join('\n'), 5, 'Label | value — one per line, e.g. Test email | demo@yourapp.io')}
-      </fieldset>`;
+      </fieldset></div>`;
     document.body.classList.add('lock'); $('#edOv').hidden = false;
   }
   const closeEditor = () => { $('#edOv').hidden = true; document.body.classList.remove('lock'); };
