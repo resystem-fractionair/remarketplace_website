@@ -15,10 +15,10 @@
   "mobileImage": "",
   "logo": "",
   "externalUrl": "",
-  "demoUrl": "",
+  "demoUrl": "https://ai.demo.remarketplace.io",
   "demoEmail": "",
   "demoPassword": "",
-  "demoNote": "",
+  "demoNote": "Sandbox data resets nightly. No real funds, KYC records, or on-chain transactions are created.",
   "investUrl": "https://resystem.org/business-opportunity/remarketplace",
   "pdfDesktop": "https://drive.google.com/uc?export=download&id=1KqAZeEO07ozj23-h6SCnaQ7IPJhbJabI",
   "pdfMobile": "https://drive.google.com/uc?export=download&id=1WQf5RcfgWZTiDt-v55sZdXHtlYc4MZKc",
@@ -79,7 +79,24 @@
     "text": "A sub-licensed, rebranded deployment of a Master Label."
    }
   ],
-  "demoCreds": [],
+  "demoCreds": [
+   {
+    "label": "Test email",
+    "value": "demo.ai@remarketplace.io"
+   },
+   {
+    "label": "Password",
+    "value": "Sandbox2026!"
+   },
+   {
+    "label": "Sandbox API key",
+    "value": "rm_test_ai_9f4c21"
+   },
+   {
+    "label": "Tenant ID",
+    "value": "sandbox-ai"
+   }
+  ],
   "visible": true,
   "position": 0
  },
@@ -99,10 +116,10 @@
   "mobileImage": "",
   "logo": "",
   "externalUrl": "",
-  "demoUrl": "",
+  "demoUrl": "https://pay.demo.remarketplace.io",
   "demoEmail": "",
   "demoPassword": "",
-  "demoNote": "",
+  "demoNote": "Sandbox data resets nightly. No real funds, KYC records, or on-chain transactions are created.",
   "investUrl": "https://resystem.org/business-opportunity/infra-global",
   "pdfDesktop": "",
   "pdfMobile": "",
@@ -127,7 +144,24 @@
    "1,200 TPS"
   ],
   "highlights": [],
-  "demoCreds": [],
+  "demoCreds": [
+   {
+    "label": "Test email",
+    "value": "demo.payments@remarketplace.io"
+   },
+   {
+    "label": "Password",
+    "value": "Sandbox2026!"
+   },
+   {
+    "label": "Sandbox API key",
+    "value": "rm_test_payments_9f4c21"
+   },
+   {
+    "label": "Tenant ID",
+    "value": "sandbox-payments"
+   }
+  ],
   "visible": true,
   "position": 1
  },
@@ -147,10 +181,10 @@
   "mobileImage": "",
   "logo": "",
   "externalUrl": "",
-  "demoUrl": "",
+  "demoUrl": "https://id.demo.remarketplace.io",
   "demoEmail": "",
   "demoPassword": "",
-  "demoNote": "",
+  "demoNote": "Sandbox data resets nightly. No real funds, KYC records, or on-chain transactions are created.",
   "investUrl": "https://resystem.org/business-opportunity/infra-reaed",
   "pdfDesktop": "",
   "pdfMobile": "",
@@ -176,7 +210,24 @@
    "1,200 TPS"
   ],
   "highlights": [],
-  "demoCreds": [],
+  "demoCreds": [
+   {
+    "label": "Test email",
+    "value": "demo.reid@remarketplace.io"
+   },
+   {
+    "label": "Password",
+    "value": "Sandbox2026!"
+   },
+   {
+    "label": "Sandbox API key",
+    "value": "rm_test_reid_9f4c21"
+   },
+   {
+    "label": "Tenant ID",
+    "value": "sandbox-reid"
+   }
+  ],
   "visible": true,
   "position": 2
  },
@@ -196,10 +247,10 @@
   "mobileImage": "",
   "logo": "",
   "externalUrl": "https://app.reidentity.net",
-  "demoUrl": "",
+  "demoUrl": "https://loyalty.demo.remarketplace.io",
   "demoEmail": "",
   "demoPassword": "",
-  "demoNote": "",
+  "demoNote": "Sandbox data resets nightly. No real funds, KYC records, or on-chain transactions are created.",
   "investUrl": "https://resystem.org/business-opportunity/reid",
   "pdfDesktop": "https://drive.google.com/uc?export=download&id=1tiqU9ONdccQ0gz_IoBXBw3z55zSVzMjy",
   "pdfMobile": "https://drive.google.com/uc?export=download&id=1dGbbXy1M7KYQSB40UtHMP1kmDawZC5Md",
@@ -253,7 +304,24 @@
     "text": "Zero-knowledge checks and encryption share only what is required."
    }
   ],
-  "demoCreds": [],
+  "demoCreds": [
+   {
+    "label": "Test email",
+    "value": "demo.cashback@remarketplace.io"
+   },
+   {
+    "label": "Password",
+    "value": "Sandbox2026!"
+   },
+   {
+    "label": "Sandbox API key",
+    "value": "rm_test_cashback_9f4c21"
+   },
+   {
+    "label": "Tenant ID",
+    "value": "sandbox-cashback"
+   }
+  ],
   "visible": true,
   "position": 3
  },
@@ -364,10 +432,10 @@
   "mobileImage": "",
   "logo": "",
   "externalUrl": "https://resystem.org/reinvest",
-  "demoUrl": "",
+  "demoUrl": "https://rwa.demo.remarketplace.io",
   "demoEmail": "",
   "demoPassword": "",
-  "demoNote": "",
+  "demoNote": "Sandbox data resets nightly. No real funds, KYC records, or on-chain transactions are created.",
   "investUrl": "https://resystem.org/business-opportunity/reinvest",
   "pdfDesktop": "https://drive.google.com/uc?export=download&id=1yKmF6An-1NIeiWlBTaD5OZdpvRyMnRTl",
   "pdfMobile": "https://drive.google.com/uc?export=download&id=1H6QzQWrVKy5TxM4aHOx16S6rxBjp2WRC",
@@ -416,7 +484,24 @@
     "text": "Round-the-clock client care."
    }
   ],
-  "demoCreds": [],
+  "demoCreds": [
+   {
+    "label": "Test email",
+    "value": "demo.fractional@remarketplace.io"
+   },
+   {
+    "label": "Password",
+    "value": "Sandbox2026!"
+   },
+   {
+    "label": "Sandbox API key",
+    "value": "rm_test_fractional_9f4c21"
+   },
+   {
+    "label": "Tenant ID",
+    "value": "sandbox-fractional"
+   }
+  ],
   "visible": true,
   "position": 5
  },
@@ -436,10 +521,10 @@
   "mobileImage": "",
   "logo": "",
   "externalUrl": "",
-  "demoUrl": "",
+  "demoUrl": "https://kyc.demo.remarketplace.io",
   "demoEmail": "",
   "demoPassword": "",
-  "demoNote": "",
+  "demoNote": "Sandbox data resets nightly. No real funds, KYC records, or on-chain transactions are created.",
   "investUrl": "https://resystem.org/business-opportunity/fractionaire",
   "pdfDesktop": "https://drive.google.com/uc?export=download&id=1UNMBTr6eXNg9KqdtIL37ZAqfF6jSHkjE",
   "pdfMobile": "https://drive.google.com/uc?export=download&id=1jhSroCpN--5sSbpl-V6vQELYQoTX8lDe",
@@ -493,7 +578,24 @@
     "text": "Earn from rent, appreciation or resale while keeping ownership."
    }
   ],
-  "demoCreds": [],
+  "demoCreds": [
+   {
+    "label": "Test email",
+    "value": "demo.compliance@remarketplace.io"
+   },
+   {
+    "label": "Password",
+    "value": "Sandbox2026!"
+   },
+   {
+    "label": "Sandbox API key",
+    "value": "rm_test_compliance_9f4c21"
+   },
+   {
+    "label": "Tenant ID",
+    "value": "sandbox-compliance"
+   }
+  ],
   "visible": true,
   "position": 6
  },
@@ -513,10 +615,10 @@
   "mobileImage": "",
   "logo": "",
   "externalUrl": "",
-  "demoUrl": "",
+  "demoUrl": "https://exchange.demo.remarketplace.io",
   "demoEmail": "",
   "demoPassword": "",
-  "demoNote": "",
+  "demoNote": "Sandbox data resets nightly. No real funds, KYC records, or on-chain transactions are created.",
   "investUrl": "https://resystem.org/business-opportunity/cet",
   "pdfDesktop": "https://drive.google.com/uc?export=download&id=1ZyH2vN4potjVay7bNgZS2StvoRLw0k7V",
   "pdfMobile": "https://drive.google.com/uc?export=download&id=1Awuxh5sfKThQ4voPZYGNi8v5k-rhCNnL",
@@ -567,7 +669,24 @@
     "text": "Use CET's ready pool or keep the fee yourself."
    }
   ],
-  "demoCreds": [],
+  "demoCreds": [
+   {
+    "label": "Test email",
+    "value": "demo.build@remarketplace.io"
+   },
+   {
+    "label": "Password",
+    "value": "Sandbox2026!"
+   },
+   {
+    "label": "Sandbox API key",
+    "value": "rm_test_build_9f4c21"
+   },
+   {
+    "label": "Tenant ID",
+    "value": "sandbox-build"
+   }
+  ],
   "visible": true,
   "position": 7
  },
@@ -640,10 +759,10 @@
   "mobileImage": "",
   "logo": "",
   "externalUrl": "https://globalhostia.com/",
-  "demoUrl": "",
+  "demoUrl": "https://lend.demo.remarketplace.io",
   "demoEmail": "",
   "demoPassword": "",
-  "demoNote": "",
+  "demoNote": "Sandbox data resets nightly. No real funds, KYC records, or on-chain transactions are created.",
   "investUrl": "https://resystem.org/business-opportunity/globalhostia",
   "pdfDesktop": "https://drive.google.com/uc?export=download&id=1z7Mn8D5Zi2F4hqMv8OY_kG7A9Ib0nWi-",
   "pdfMobile": "https://drive.google.com/uc?export=download&id=1Awuxh5sfKThQ4voPZYGNi8v5k-rhCNnL",
@@ -686,7 +805,24 @@
     "text": "24/7 expert technical support."
    }
   ],
-  "demoCreds": [],
+  "demoCreds": [
+   {
+    "label": "Test email",
+    "value": "demo.lending@remarketplace.io"
+   },
+   {
+    "label": "Password",
+    "value": "Sandbox2026!"
+   },
+   {
+    "label": "Sandbox API key",
+    "value": "rm_test_lending_9f4c21"
+   },
+   {
+    "label": "Tenant ID",
+    "value": "sandbox-lending"
+   }
+  ],
   "visible": true,
   "position": 9
  },
@@ -765,10 +901,10 @@
   "mobileImage": "",
   "logo": "",
   "externalUrl": "https://tunetailor.org/",
-  "demoUrl": "",
+  "demoUrl": "https://launch.demo.remarketplace.io",
   "demoEmail": "",
   "demoPassword": "",
-  "demoNote": "",
+  "demoNote": "Sandbox data resets nightly. No real funds, KYC records, or on-chain transactions are created.",
   "investUrl": "https://resystem.org/business-opportunity/tunetailor",
   "pdfDesktop": "https://drive.google.com/uc?export=download&id=1ENyr6Dqa46MFXluyasVGlTuavE7t2SWk",
   "pdfMobile": "https://drive.google.com/uc?export=download&id=1ENyr6Dqa46MFXluyasVGlTuavE7t2SWk",
@@ -811,7 +947,24 @@
     "text": "Instrumental and lyric video add-ons; commercial licensing available."
    }
   ],
-  "demoCreds": [],
+  "demoCreds": [
+   {
+    "label": "Test email",
+    "value": "demo.token@remarketplace.io"
+   },
+   {
+    "label": "Password",
+    "value": "Sandbox2026!"
+   },
+   {
+    "label": "Sandbox API key",
+    "value": "rm_test_token_9f4c21"
+   },
+   {
+    "label": "Tenant ID",
+    "value": "sandbox-token"
+   }
+  ],
   "visible": true,
   "position": 11
  },
