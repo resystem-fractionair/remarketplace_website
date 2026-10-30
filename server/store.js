@@ -26,6 +26,8 @@ function clean(p) {
   const o = { slug: slugify(p.slug || p.name) };
   TEXT_FIELDS.forEach(k => { o[k] = String(p[k] == null ? '' : p[k]).trim().slice(0, k === 'summary' || k === 'whatItIs' ? 2000 : 500); });
   LIST_FIELDS.forEach(k => { o[k] = (Array.isArray(p[k]) ? p[k] : []).map(x => String(x).trim()).filter(Boolean).slice(0, 30); });
+  // featureIcons[i] = icon for features[i]: a library name (public/js/icons.js) or an uploaded image URL; '' = automatic
+  o.featureIcons = (Array.isArray(p.featureIcons) ? p.featureIcons : []).map(x => String(x || '').trim().slice(0, 500)).slice(0, 30);
   o.highlights = (Array.isArray(p.highlights) ? p.highlights : [])
     .map(h => ({ title: String(h.title || '').trim(), text: String(h.text || '').trim() })).filter(h => h.title || h.text).slice(0, 20);
   o.demoCreds = (Array.isArray(p.demoCreds) ? p.demoCreds : [])
@@ -72,8 +74,8 @@ const DEFAULT_CONTENT = () => ({
     cta1: 'Browse products', cta2: 'Book a demo call',
     stats: [{ value: '', suffix: '', label: 'ecosystem products' }, { value: '3', suffix: ' wks', label: 'to a vertical marketplace' }, { value: '99.9', suffix: '%', label: 'uptime · 38ms latency' }, { value: '1200', suffix: '', label: 'TPS on ReSystem backend' }] },
   why: { eyebrow: 'Why reMarketplace', title: 'Everything you need to launch, own and scale.', items: [
-    { t: 'Affordable entry', d: 'Own a share of assets that are normally out of reach.' }, { t: 'Fast resale', d: 'Sell or trade in a built-in marketplace — no waiting for buyers.' },
-    { t: 'Provable ownership', d: 'Every holding and transfer is recorded on-chain.' }, { t: 'Live in 3 weeks', d: 'White-label a vertical marketplace under your brand.' }] },
+    { icon: 'dollar', t: 'Affordable entry', d: 'Own a share of assets that are normally out of reach.' }, { icon: 'growth', t: 'Fast resale', d: 'Sell or trade in a built-in marketplace — no waiting for buyers.' },
+    { icon: 'link', t: 'Provable ownership', d: 'Every holding and transfer is recorded on-chain.' }, { icon: 'bolt', t: 'Live in 3 weeks', d: 'White-label a vertical marketplace under your brand.' }] },
   steps: { eyebrow: 'For product builders', title: 'Everyone gets a chance to be listed.', subtitle: 'From idea to a licensed product other businesses can deploy — in six steps.', items: [
     { t: 'Get it built', d: 'The ReSystem team builds your master label.' }, { t: 'List it', d: 'Publish your master label in the pre-built marketplace.' },
     { t: 'Promote it', d: 'Advertise your product to the whole ecosystem.' }, { t: 'Upgrade B2C', d: 'Turn an existing consumer product into a master label.' },

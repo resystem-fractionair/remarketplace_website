@@ -101,10 +101,37 @@
     try { await api('PUT', '/api/admin/order', { slugs }); toast('Order saved'); } catch (err) { toast(err.message); }
   });
 
+  /* ---------- Icon picker (library from /js/icons.js + upload) ---------- */
+  function iconPicker(anchor, current, onPick, uploadName) {
+    let pop = $('#iconPop'); if (pop) pop.remove();
+    pop = document.createElement('div'); pop.id = 'iconPop'; pop.className = 'ip-pop';
+    pop.innerHTML = `<div class="ip-h"><b>Choose icon</b><button type="button" class="icon" data-ipx>✕</button></div>
+      <div class="ip-grid">${RMI.names.map(n => `<button type="button" class="${n === current ? 'on' : ''}" data-ipn="${n}" title="${n}">${RMI.render(n, 20)}</button>`).join('')}</div>
+      <div class="ip-f"><label class="btn btn-ghost sm">Upload icon<input type="file" accept="image/svg+xml,image/png,image/webp" hidden></label><button type="button" class="btn btn-ghost sm" data-ipn="">Automatic</button><small>Upload: 96 × 96 px, transparent SVG or PNG</small></div>`;
+    document.body.appendChild(pop);
+    const r = anchor.getBoundingClientRect(), W = Math.min(340, innerWidth - 16);
+    pop.style.width = W + 'px'; pop.style.left = Math.max(8, Math.min(r.left, innerWidth - W - 8)) + 'px';
+    const top = r.bottom + 6; pop.style.top = (top + pop.offsetHeight > innerHeight ? Math.max(8, r.top - pop.offsetHeight - 6) : top) + 'px';
+    const close = () => { pop.remove(); document.removeEventListener('mousedown', out, true); };
+    const out = ev => { if (!pop.contains(ev.target)) close(); };
+    setTimeout(() => document.addEventListener('mousedown', out, true));
+    pop.addEventListener('click', ev => { const b = ev.target.closest('[data-ipn],[data-ipx]'); if (!b) return; if (b.dataset.ipn != null) onPick(b.dataset.ipn); close(); });
+    pop.querySelector('input[type=file]').onchange = async ev => { const f = ev.target.files[0]; if (!f) return; toast('Uploading icon…');
+      try { const { url } = await api('POST', '/api/admin/upload?name=' + encodeURIComponent(uploadName || 'icon'), null, f); onPick(url); close(); toast('Icon uploaded — remember to save'); } catch (err) { toast(err.message); } };
+  }
+
   /* ---------- Editor ---------- */
   let editing = null;
   const LISTS = [['features', 'Key features'], ['whyPoints', 'Why points'], ['whatYouCanDo', 'What you can do'], ['useCases', 'Use cases'], ['stats', 'Stats chips (e.g. 99.9% uptime)']];
-  const IMAGES = [['image', 'Card image (catalog + banner, 16:9)'], ['hero', 'Banner image override (wide)'], ['logo', 'Logo / icon (square)']];
+  // [field, label, recommended size, min width, min height, where it is used]
+  const IMAGES = [
+    ['image', 'Card image', '1600 × 900 px · 16:9 · JPG/WebP ≤ 400 KB', 1200, 675, 'Catalog cards, featured products, booking wizard, share preview (social), and the product banner when no banner override is set.'],
+    ['hero', 'Banner override', '2100 × 800 px · 21:8 · JPG/WebP ≤ 600 KB', 1600, 600, 'Top banner on the product page only. Desktop crops to 21:8, phones to 16:9 — keep the important part in the centre.'],
+    ['logo', 'Logo / app icon', '512 × 512 px · square · transparent PNG or SVG', 256, 256, 'Small product mark in cards, header chips and booking list when there is no card image.']];
+  const sizeNote = (img, box) => { const k = box.dataset.img, spec = IMAGES.find(x => x[0] === k), w = img.naturalWidth, h = img.naturalHeight, out = box.querySelector('.dim'); if (!out || !spec) return;
+    const small = w < spec[3] || h < spec[4]; out.className = 'dim ' + (small ? 'bad' : 'good'); out.textContent = `Current: ${w} × ${h} px` + (small ? ` — too small, use ${spec[2].split(' ·')[0]}` : ' ✓'); };
+  const prevHTML = url => url ? `<img src="${esc(url)}" alt="" onload="window.__dim && __dim(this)">` : '<span>No image</span>';
+  window.__dim = img => { const box = img.closest('.img-f'); if (box) sizeNote(img, box); };
   const LINKS = [['externalUrl', 'Live site'], ['demoUrl', 'Demo URL (login page)'], ['demoNote', 'Sandbox note (shown under credentials)'], ['investUrl', 'Investment opportunity URL'], ['pdfDesktop', 'Brochure PDF — desktop'], ['pdfMobile', 'Brochure PDF — mobile'], ['sourceUrl', 'resystem.org page']];
   const field = (k, label, v, attrs) => `<label>${esc(label)}<input name="${k}" value="${esc(v)}" ${attrs || ''}></label>`;
   const area = (k, label, v, rows, hint) => `<label>${esc(label)}${hint ? `<small>${esc(hint)}</small>` : ''}<textarea name="${k}" rows="${rows || 4}">${esc(v)}</textarea></label>`;
@@ -134,9 +161,10 @@
       <fieldset><legend>SEO & sharing (optional)</legend><p class="muted small">Overrides the page title and search/social description. The card image is used as the share image.</p>
         ${field('seoTitle', 'SEO title', p.seoTitle || '', 'placeholder="' + esc(p.name || '') + ' — ' + esc(p.tagline || '') + '"')}
         ${area('seoDescription', 'SEO description (≈155 characters)', p.seoDescription || '', 2)}</fieldset>
-      <fieldset><legend>Images</legend><div class="img-grid">${IMAGES.map(([k, l]) => `
-        <div class="img-f" data-img="${k}"><span class="lbl">${esc(l)}</span>
-          <div class="prev">${p[k] ? `<img src="${esc(p[k])}" alt="">` : '<span>No image</span>'}</div>
+      <fieldset><legend>Images</legend><p class="muted small">Recommended sizes are shown on each image. After upload the actual size is checked; a red note means the image will look blurry.</p><div class="img-grid">${IMAGES.map(([k, l]) => `
+        <div class="img-f" data-img="${k}"><span class="lbl">${esc(l)} <em class="rec">${esc(IMAGES.find(x => x[0] === k)[2])}</em></span>
+          <small class="use">${esc(IMAGES.find(x => x[0] === k)[5])}</small>
+          <div class="prev${k === 'logo' ? ' sq' : k === 'hero' ? ' wide' : ''}">${prevHTML(p[k])}</div><span class="dim"></span>
           <input name="${k}" value="${esc(p[k] || '')}" placeholder="Paste URL or upload">
           <div class="img-a"><label class="btn btn-ghost sm">Upload<input type="file" accept="image/*" data-up="${k}" hidden></label><button type="button" class="btn btn-ghost sm" data-clear="${k}">Remove</button></div>
         </div>`).join('')}</div></fieldset>
@@ -144,15 +172,26 @@
         ? `<label>${esc(l)}<div class="inline"><input name="${k}" value="${esc(p[k] || '')}"><label class="btn btn-ghost sm">Upload PDF<input type="file" accept="application/pdf" data-up="${k}" hidden></label></div></label>`
         : field(k, l, p[k] || '')).join('')}</fieldset>
       <fieldset><legend>Page content</legend><p class="muted small">One item per line.</p>
-        ${LISTS.map(([k, l]) => area(k, l, (p[k] || []).join('\n'), 4)).join('')}
+        ${LISTS.map(([k, l]) => area(k, l, (p[k] || []).join('\n'), 4) + (k === 'features' ? '<div class="fi-box"><span class="lbl">Feature icons <small>— click an icon to change it. Library icon, or upload your own (96 × 96 px, transparent SVG/PNG).</small></span><div id="featIcons"></div></div>' : '')).join('')}
         ${area('highlights', 'Highlights', (p.highlights || []).map(h => h.title + ' | ' + h.text).join('\n'), 4, 'Title | description — one per line')}
       </fieldset>
       <fieldset><legend>Sandbox / demo credentials</legend>
         <p class="muted small">Shown on the product page with Copy buttons and a TEST DATA badge. The Demo URL row comes from the Demo URL field above.</p>
         ${area('demoCreds', 'Credentials', (p.demoCreds || []).map(c => c.label + ' | ' + c.value).join('\n'), 5, 'Label | value — one per line, e.g. Test email | demo@yourapp.io')}
       </fieldset></div>`;
+    editing.icons = {}; (p.features || []).forEach((f, i) => { editing.icons[f] = (p.featureIcons || [])[i] || ''; });
+    renderFeatIcons();
     document.body.classList.add('lock'); $('#edOv').hidden = false;
   }
+  function renderFeatIcons() {
+    const box = $('#featIcons'); if (!box) return;
+    const feats = ($('#edForm').features.value || '').split('\n').map(s => s.trim()).filter(Boolean);
+    box.innerHTML = feats.length ? feats.map(f => `<div class="fi-row"><button type="button" class="ip-btn" data-ficon="${esc(f)}" title="Change icon">${RMI.render(editing.icons[f], 20) || '<span class="auto">Auto</span>'}</button><span>${esc(f)}</span></div>`).join('') : '<p class="muted small">Add key features above first.</p>';
+  }
+  $('#edForm').addEventListener('click', e => {
+    const b = e.target.closest('[data-ficon]'); if (!b) return;
+    iconPicker(b, editing.icons[b.dataset.ficon], v => { editing.icons[b.dataset.ficon] = v; renderFeatIcons(); }, ($('#edForm').slug.value || 'product') + '-icon');
+  });
   const closeEditor = () => { $('#edOv').hidden = true; document.body.classList.remove('lock'); };
   $('#edOv').addEventListener('click', e => { if (e.target.id === 'edOv' || e.target.closest('[data-close]')) closeEditor(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#edOv').hidden) closeEditor(); });
@@ -160,11 +199,12 @@
   $('#edForm').addEventListener('input', e => {
     if (e.target.name === 'name' && !editing.orig) $('#edForm').slug.value = e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     const box = e.target.closest('.img-f');
-    if (box && e.target.tagName === 'INPUT') box.querySelector('.prev').innerHTML = e.target.value ? `<img src="${esc(e.target.value)}" alt="">` : '<span>No image</span>';
+    if (box && e.target.tagName === 'INPUT') { box.querySelector('.prev').innerHTML = prevHTML(e.target.value); box.querySelector('.dim').textContent = ''; }
+    if (e.target.name === 'features') renderFeatIcons();
   });
   $('#edForm').addEventListener('click', e => {
     const k = e.target.dataset && e.target.dataset.clear; if (!k) return;
-    const box = e.target.closest('.img-f'); box.querySelector('input[name]').value = ''; box.querySelector('.prev').innerHTML = '<span>No image</span>';
+    const box = e.target.closest('.img-f'); box.querySelector('input[name]').value = ''; box.querySelector('.prev').innerHTML = '<span>No image</span>'; box.querySelector('.dim').textContent = '';
   });
   $('#edForm').addEventListener('change', async e => {
     const k = e.target.dataset.up; if (!k || !e.target.files[0]) return;
@@ -174,7 +214,7 @@
     try {
       const { url } = await api('POST', '/api/admin/upload?name=' + encodeURIComponent(($('#edForm').slug.value || 'product') + '-' + k), null, f);
       $('#edForm').querySelector(`[name="${k}"]`).value = url;
-      const box = e.target.closest('.img-f'); if (box) box.querySelector('.prev').innerHTML = `<img src="${esc(url)}" alt="">`;
+      const box = e.target.closest('.img-f'); if (box) box.querySelector('.prev').innerHTML = prevHTML(url);
       toast('Uploaded — remember to save');
     } catch (err) { toast(err.message); }
     e.target.value = '';
@@ -188,6 +228,7 @@
     LISTS.forEach(([k]) => { p[k] = v(k).split('\n').map(s => s.trim()).filter(Boolean); });
     p.highlights = v('highlights').split('\n').map(s => s.trim()).filter(Boolean).map(s => { const [t, ...rest] = s.split('|'); return { title: t.trim(), text: rest.join('|').trim() }; });
     p.demoCreds = v('demoCreds').split('\n').map(s => s.trim()).filter(Boolean).map(s => { const [l, ...rest] = s.split('|'); return { label: l.trim(), value: rest.join('|').trim() }; }).filter(c => c.label && c.value);
+    p.featureIcons = p.features.map(x => (editing.icons || {})[x] || '');
     p.visible = f.visible.checked;
     return p;
   }
@@ -359,7 +400,7 @@
     const langs = (S.settings.booking || {}).languages || [];
     $('#agents').innerHTML = AG.map((g, i) => `<div class="ag" data-ag="${i}">
       <div class="ag-photo">${g.photo ? `<img src="${esc(g.photo)}" alt="">` : `<span>${esc((g.name || '?').split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase())}</span>`}
-        <label class="btn btn-ghost sm">Photo<input type="file" accept="image/*" data-agup="${i}" hidden></label>${g.photo ? `<button type="button" class="link" data-agnophoto="${i}">Remove</button>` : ''}</div>
+        <label class="btn btn-ghost sm">Photo<input type="file" accept="image/*" data-agup="${i}" hidden></label><small class="muted" style="font-size:11px;text-align:center">400 × 400 px<br>square</small>${g.photo ? `<button type="button" class="link" data-agnophoto="${i}">Remove</button>` : ''}</div>
       <div class="ag-f">
         <div class="two"><label>Name *<input data-agf="name" value="${esc(g.name)}" placeholder="Full name"></label><label>Job title<input data-agf="title" value="${esc(g.title)}" placeholder="e.g. Senior Product Specialist"></label></div>
         <label>Short bio<input data-agf="bio" value="${esc(g.bio)}" placeholder="One line customers see on the booking card"></label>
@@ -424,9 +465,11 @@
   let CT = null;
   function renderContent() {
     CT = JSON.parse(JSON.stringify(S.settings.content || {}));
+    if (CT.why && Array.isArray(CT.why.items)) CT.why.items = CT.why.items.map(x => Object.assign({ icon: '' }, x));
     const field = (path, k, v) => {
       const long = String(v).length > 70 || /subtitle|description|master|white|text|tagline|^a$|^d$/.test(k);
-      if (/image|logo/i.test(k)) return `<label>${esc(pretty(k))} <small>(1200×630 recommended; blank = built-in)</small><div class="inline"><input data-cp="${path}" value="${esc(v)}" placeholder="/img/og.png"><label class="btn btn-ghost sm">Upload<input type="file" accept="image/*" data-cup="${path}" hidden></label></div></label>`;
+      if (k === 'icon') return `<label>Icon<span class="ip-wrap"><button type="button" class="ip-btn" data-cicon="${path}">${RMI.render(v, 20) || '<span class="auto">Auto</span>'}</button><small>Click to choose</small></span></label>`;
+      if (/image|logo/i.test(k)) return `<label>${esc(pretty(k))} <small>(1200 × 630 px · JPG/PNG · used when links are shared on social and chat apps; blank = built-in)</small><div class="inline"><input data-cp="${path}" value="${esc(v)}" placeholder="/img/og.png"><label class="btn btn-ghost sm">Upload<input type="file" accept="image/*" data-cup="${path}" hidden></label></div></label>`;
       return `<label>${esc(pretty(k))}${long ? `<textarea data-cp="${path}" rows="2">${esc(v)}</textarea>` : `<input data-cp="${path}" value="${esc(v)}">`}</label>`;
     };
     const obj = (o, base) => Object.entries(o).map(([k, v]) => {
@@ -445,6 +488,7 @@
   $('#contentForm').addEventListener('input', e => { const p = e.target.dataset.cp; if (!p) return; setP(CT, p, e.target.dataset.list ? e.target.value.split(',').map(x => x.trim()).filter(Boolean) : e.target.value); });
   $('#contentForm').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return; const d = b.dataset;
+    if (d.cicon) { iconPicker(b, getP(CT, d.cicon), v => { setP(CT, d.cicon, v); S.settings.content = CT; renderContent(); }, 'site-icon'); return; }
     if (d.cadd) { const arr = getP(CT, d.cadd); arr.push(Object.fromEntries(Object.keys(arr[0] || { t: '', d: '' }).map(k => [k, '']))); }
     else if (d.cdel) { const ks = d.cdel.split('.'), i = +ks.pop(); getP(CT, ks.join('.')).splice(i, 1); }
     else if (d.cmv) { const ks = d.cmv.split('.'), dir = +ks.pop(), i = +ks.pop(), arr = getP(CT, ks.join('.')); [arr[i], arr[i + dir]] = [arr[i + dir], arr[i]]; }

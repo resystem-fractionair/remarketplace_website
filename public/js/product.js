@@ -41,7 +41,7 @@
     const featured = (featuredRow || []).filter(x => x.slug !== p.slug);
     const bottom = featured.concat(related.filter(r => !featured.some(f => f.slug === r.slug))).slice(0, 4);
     const hlBy = new Map((p.highlights || []).map(h => [h.title.toLowerCase(), h.text]));
-    const features = (p.features || []).map(f => ({ t: f, d: hlBy.get(f.toLowerCase()) || '' }))
+    const features = (p.features || []).map((f, i) => ({ t: f, d: hlBy.get(f.toLowerCase()) || '', icon: (p.featureIcons || [])[i] || '' }))
       .concat((p.highlights || []).filter(h => !(p.features || []).some(f => f.toLowerCase() === h.title.toLowerCase())).map(h => ({ t: h.title, d: h.text })));
     const pdfMobile = p.pdfMobile && p.pdfMobile !== p.pdfDesktop ? p.pdfMobile : '';
     const hasCreds = (p.demoCreds || []).length > 0;
@@ -90,7 +90,7 @@
           </section>
 
           ${features.length ? `<section id="features" class="pa-sec"><h2>Key features</h2>
-            <div class="pa-feat">${features.map((f, i) => `<div><span class="fi">${FEAT[i % FEAT.length]}</span><span class="ft"><b>${esc(f.t)}</b>${f.d ? `<small>${esc(f.d)}</small>` : ''}</span></div>`).join('')}</div></section>` : ''}
+            <div class="pa-feat">${features.map((f, i) => `<div><span class="fi">${(window.RMI && RMI.render(f.icon, 20)) || FEAT[i % FEAT.length]}</span><span class="ft"><b>${esc(f.t)}</b>${f.d ? `<small>${esc(f.d)}</small>` : ''}</span></div>`).join('')}</div></section>` : ''}
 
           ${(has(p.whyPoints) || has(p.whatYouCanDo)) ? `<div class="pa-two" id="details">
             ${has(p.whyPoints) ? `<section class="pa-card"><h3>Why ${esc(p.name)}</h3><ul class="incl">${p.whyPoints.map(x => `<li>${esc(x)}</li>`).join('')}</ul></section>` : ''}

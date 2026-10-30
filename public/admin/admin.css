@@ -177,3 +177,24 @@ input:checked + .sw::after { transform: translateX(16px); }
   .ct-form > * { break-inside: avoid; margin-bottom: 16px; }
 }
 @media (min-width: 1700px) { .ct-form, .ed-cols { column-count: 3; } }
+
+/* Image size guidance */
+.img-f .rec { font-style: normal; font-weight: 600; font-size: 11.5px; color: var(--accent-ink); background: var(--accent-soft); border-radius: 6px; padding: 2px 7px; margin-left: 4px; white-space: nowrap; }
+.img-f .use { color: var(--muted); font-size: 12px; line-height: 1.4; }
+.prev.sq { aspect-ratio: 1; max-width: 180px; } .prev.wide { aspect-ratio: 21/8; }
+.dim { font-size: 12px; min-height: 16px; } .dim.good { color: #1F7A4D; } .dim.bad { color: #C0392B; font-weight: 600; }
+/* Icon picker */
+.ip-btn { width: 40px; height: 40px; flex: none; border-radius: 10px; border: 1px solid var(--line-2); background: var(--accent-soft); color: var(--accent-ink); display: grid; place-items: center; cursor: pointer; padding: 0; }
+.ip-btn:hover { border-color: var(--accent); } .ip-btn img { width: 22px; height: 22px; object-fit: contain; }
+.ip-btn .auto { font-size: 10px; font-weight: 700; color: var(--muted); }
+.ip-wrap { display: flex; align-items: center; gap: 10px; } .ip-wrap small { color: var(--muted); font-weight: 400; }
+.fi-box { display: grid; gap: 8px; } .fi-box .lbl { font-size: 13px; font-weight: 600; } .fi-box small { font-weight: 400; color: var(--muted); }
+#featIcons { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.fi-row { display: flex; align-items: center; gap: 10px; font-size: 13px; border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px 6px 6px; background: var(--bg); min-width: 0; }
+.fi-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ip-pop { position: fixed; z-index: 1000; background: var(--card); border: 1px solid var(--line-2); border-radius: 14px; box-shadow: 0 18px 50px rgba(0,0,0,.18); padding: 12px; display: grid; gap: 10px; }
+.ip-h { display: flex; justify-content: space-between; align-items: center; }
+.ip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 6px; max-height: 230px; overflow: auto; }
+.ip-grid button { height: 38px; border-radius: 9px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); display: grid; place-items: center; cursor: pointer; }
+.ip-grid button:hover, .ip-grid button.on { border-color: var(--accent); color: var(--accent-ink); background: var(--accent-soft); }
+.ip-f { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; } .ip-f small { color: var(--muted); font-size: 11.5px; width: 100%; }

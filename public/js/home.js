@@ -192,7 +192,7 @@
       return `<div><b data-count="${esc(v)}" data-dec="${dec}" data-suffix="${esc(x.suffix)}"${+v >= 1000 ? ' data-sep="1"' : ''}${i === 0 && !x.value ? ' id="statCount"' : ''}>0</b><span>${esc(x.label)}</span></div>`; }).join('');
     const w = c.why;
     set('#why .wx-head .eyebrow', w.eyebrow); set('#why .wx-head h2', w.title);
-    $('#why .wx-grid').innerHTML = w.items.map((x, i) => `<article class="wx-card"><span class="wx-ic">${svg(IC[i % IC.length])}</span><h3>${esc(x.t)}</h3><p>${esc(x.d)}</p></article>`).join('');
+    $('#why .wx-grid').innerHTML = w.items.map((x, i) => `<article class="wx-card"><span class="wx-ic">${(x.icon && window.RMI && RMI.render(x.icon, 22)) || svg(IC[i % IC.length])}</span><h3>${esc(x.t)}</h3><p>${esc(x.d)}</p></article>`).join('');
     const sp = c.steps;
     set('.lx .wx-head .eyebrow', sp.eyebrow); set('.lx .wx-head h2', sp.title); set('.lx .wx-head p', sp.subtitle);
     $('.lx-track').innerHTML = sp.items.map((x, i) => `<li><span class="lx-n">${String(i + 1).padStart(2, '0')}</span><b>${esc(x.t)}</b><small>${esc(x.d)}</small></li>`).join('');
