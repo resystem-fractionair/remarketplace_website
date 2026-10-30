@@ -58,22 +58,25 @@
 
   /* ---------- Animated hero ---------- */
   function hero(list) {
-    const words = ['fintech', 'identity', 'Web3', 'wallet', 'RWA', 'investment', 'AI'];
+    const words = ['fintech', 'identity', 'Web3', 'wallet', 'investment', 'AI'];
     const rot = $('#hxRot'); let w = 0;
-    /* fixed box = widest word, so nothing around it moves or overlaps */
-    const fit = () => {
-      const m = document.createElement('span'); m.className = 'hx-measure'; rot.appendChild(m);
-      let max = 0; words.forEach(x => { m.textContent = x; max = Math.max(max, m.getBoundingClientRect().width); });
-      m.remove(); rot.style.width = Math.ceil(max + 4) + 'px';
-    };
-    
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!reduce) setInterval(() => {
+    /* measure each word once; the box eases to the next word's width so the line never jumps or overlaps */
+    const widthOf = txt => { const m = document.createElement('span'); m.className = 'hx-measure'; m.textContent = txt; rot.appendChild(m); const x = m.getBoundingClientRect().width; m.remove(); return Math.ceil(x) + 2; };
+    const setW = () => { rot.style.width = widthOf(words[w]) + 'px'; };
+    (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(setW);
+    addEventListener('resize', setW);
+    const step = () => {
+      if (document.hidden) return setTimeout(step, 1000);
       w = (w + 1) % words.length;
-      const n = document.createElement('span'); n.textContent = words[w]; n.className = 'in';
-      [...rot.children].forEach(o => { if (o.className !== 'out') { o.className = 'out'; setTimeout(() => o.remove(), 650); } });
-      rot.appendChild(n);
-    }, 2400);
+      const cur = rot.querySelector('.cur'), n = document.createElement('span');
+      n.textContent = words[w]; n.className = 'cur in';
+      if (cur) { cur.className = 'out'; setTimeout(() => cur.remove(), 700); }
+      rot.appendChild(n); setW();
+      setTimeout(step, 2800);
+    };
+    rot.firstElementChild.className = 'cur';
+    if (!reduce) setTimeout(step, 2800);
     /* count-up */
     $('#statCount').dataset.count = list.length;
     const io = new IntersectionObserver(es => es.forEach(e => {
@@ -128,7 +131,7 @@
     const list = RM.products = home.products;
     cats = ['All', ...home.categories];
     hero(list);
-    $('#homeRows').innerHTML = home.rows.map(r => `
+    $('#homeRows').innerHTML = '' && home.rows.map(r => `
       <section class="wrap hrow">
         <div class="cat-head"><div><h2>${esc(r.title)}</h2>${r.subtitle ? `<p class="muted">${esc(r.subtitle)}</p>` : ''}</div></div>
         <div class="grid">${r.products.map(card).join('')}</div>
