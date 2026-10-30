@@ -150,3 +150,14 @@ input:checked + .sw::after { transform: translateX(16px); }
 .sch { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; }
 .sch.up { background: #FFF4D6; color: #8A6100; } .sch.on { background: #E3F4EA; color: #1F7A4D; } .sch.end { background: #EEE; color: #666; }
 .ct-grid .inline { display: flex; gap: 8px; } .ct-grid .inline input { flex: 1; }
+/* responsive fixes from audit */
+.tabs { overflow-x: auto; scrollbar-width: none; max-width: 100%; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button { flex: none; white-space: nowrap; }
+@media (max-width: 720px) {
+  .a-top { gap: 8px; } .mode { display: none; }
+  .pitem { flex-wrap: wrap; } .pi-t { flex: 1 1 calc(100% - 120px); }
+  .p-tools { width: 100%; } .p-tools input[type=search], .p-tools select { flex: 1; min-width: 0; }
+  .editor { max-width: 100%; }
+  .rc-head input:first-of-type { width: 100%; }
+}
