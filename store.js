@@ -16,7 +16,7 @@ const SEED_SETTINGS = path.join(DATA, 'settings.json');
 const UPLOADS = path.join(__dirname, 'public', 'uploads');
 
 const LIST_FIELDS = ['features', 'whyPoints', 'whatYouCanDo', 'useCases', 'stats'];
-const TEXT_FIELDS = ['name', 'tagline', 'category', 'group', 'status', 'deploy', 'price', 'summary', 'whatItIs',
+const TEXT_FIELDS = ['showFrom', 'showUntil', 'seoTitle', 'seoDescription', 'name', 'tagline', 'category', 'group', 'status', 'deploy', 'price', 'summary', 'whatItIs',
   'image', 'hero', 'mobileImage', 'logo', 'externalUrl', 'demoUrl', 'demoEmail', 'demoPassword', 'demoNote', 'investUrl', 'pdfDesktop', 'pdfMobile', 'tone', 'sourceUrl'];
 
 const slugify = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
@@ -59,7 +59,14 @@ const DEFAULT_SETTINGS = () => {
   };
 };
 const DEFAULT_CONTENT = () => ({
-  seo: { title: 'reMarketplace — Launch fintech & Web3 products in days', description: 'reMarketplace gives businesses pre-built, white-label fintech, Web3, AI and identity products to customise, rebrand and deploy in days, not months.' },
+  seo: { siteName: 'reMarketplace', title: 'reMarketplace — Launch fintech & Web3 products in days', description: 'reMarketplace gives businesses pre-built, white-label fintech, Web3, AI and identity products to customise, rebrand and deploy in days, not months.',
+    keywords: 'white label fintech, white label crypto exchange, white label wallet, tokenization platform, RWA marketplace, digital identity, master label, Dubai, UAE', ogImage: '', twitter: '@Reidentity_net' },
+  header: { announcement: '', announcementLink: '', cta: 'Book a demo', search: 'Search products',
+    links: [{ label: 'Products', href: '/#catalog' }, { label: 'Why us', href: '/#why' }, { label: 'Use cases', href: '/#use-cases' }, { label: 'ReSystem ↗', href: 'https://resystem.org' }] },
+  product: { model: 'Master label · White label', credsTitle: 'Sandbox credentials', credsNote: 'Sandbox data resets nightly. No real funds, KYC records, or on-chain transactions are created.',
+    credsRequest: 'Login credentials are shared on request — usually within one business day.', investTitle: 'Own a share of', investText: 'On-chain shares on INFRA Network via ReSystem Business Opportunity.',
+    investCta: 'View opportunity', brochureTitle: 'Brochure & links', featuredTitle: 'Featured products', bookCta: 'Book a demo', demoCta: 'Try demo' },
+  booking: { railTitle: 'Book a demo', railNote: '30-minute walkthrough with a ReSystem specialist in your language.' },
   hero: { eyebrow: 'White-label concept · ReSystem ecosystem', prefix: 'Launch', words: ['fintech', 'identity', 'Web3', 'wallet', 'investment', 'AI'], line2: 'products in days,', accent: 'not months.',
     subtitle: 'Pre-built infrastructure to build, launch and scale fully functional products — simple to customise, rebrand and deploy under your name.',
     cta1: 'Browse products', cta2: 'Book a demo call',
@@ -82,7 +89,8 @@ const DEFAULT_CONTENT = () => ({
     { q: 'Can I list my own product?', a: 'Yes. Have the ReSystem team build your master label, or upgrade an existing B2C product into one, and list it here for other businesses to license.' },
     { q: 'Do we get the source code?', a: 'Source access and self-hosting are available on enterprise agreements. Most customers stay on the managed deployment, which includes updates, monitoring and support.' },
     { q: 'Can I invest in a product?', a: 'Several products offer on-chain shares through the ReSystem Business Opportunity programme. Each product page links to its investment opportunity where one exists.' }],
-  footer: { tagline: 'Pre-built, white-label products for fintech, Web3, AI and identity. Part of the ReSystem ecosystem.', email: 'info@remarketplace.store',
+  footer: { colTitle: 'ReSystem', links: [{ label: 'resystem.org', href: 'https://resystem.org' }, { label: 'Ecosystem', href: 'https://resystem.org/ecosystem' }, { label: 'Business opportunity', href: 'https://resystem.org/business-opportunity' }, { label: 'Join reID', href: 'https://resystem.org/id' }],
+    tagline: 'Pre-built, white-label products for fintech, Web3, AI and identity. Part of the ReSystem ecosystem.', email: 'info@remarketplace.store',
     linkedin: 'https://www.linkedin.com/company/resystemglobal', x: 'https://x.com/Reidentity_net', company: 'Desert Tech Cloud Services LLC · Dubai, UAE' }
 });
 /* Merge saved content over defaults, keeping shapes; strings capped, lists limited */

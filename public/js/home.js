@@ -199,11 +199,6 @@
     set('.gx-white .gx-tag', g.whiteTitle); set('.gx-white p', g.white); set('.gx-qr b', g.qrTitle); set('.gx-qr div span', g.qrText);
     set('#catalog .cat-head h2', c.catalog.title); set('#catalog > .small', c.catalog.note);
     FAQS = c.faq; renderFaq();
-    const f = c.footer;
-    set('.foot-grid > div:first-child p', f.tagline);
-    const fl = document.querySelectorAll('.foot-grid > div:last-child a');
-    if (fl[0]) { fl[0].textContent = f.email; fl[0].href = 'mailto:' + f.email; } if (fl[1]) fl[1].href = f.linkedin; if (fl[2]) fl[2].href = f.x;
-    const fb = $('.foot-bottom'); if (fb) fb.innerHTML = `© <span id="yr">${new Date().getFullYear()}</span> ${esc(f.company)}`;
   }
 
   fetch('/api/home').then(r => r.json()).then(home => {

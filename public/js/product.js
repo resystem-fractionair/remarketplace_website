@@ -25,6 +25,7 @@
     svg('<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>')
   ];
 
+  let L = {};
   function render(p, all, featuredRow) {
     document.title = `${p.name} — reMarketplace`;
     const md = document.querySelector('meta[name="description"]');
@@ -34,7 +35,7 @@
     const demo = p.demoUrl || p.externalUrl;
     const soon = /soon/i.test(p.status || '');
     const banner = p.image || p.hero;
-    const bookLbl = soon ? 'Join early access' : 'Book a demo';
+    const bookLbl = soon ? 'Join early access' : (L.bookCta || 'Book a demo');
     const related = all.filter(x => x.slug !== p.slug && x.category === p.category)
       .concat(all.filter(x => x.slug !== p.slug && x.category !== p.category && x.group === p.group)).slice(0, 4);
     const featured = (featuredRow || []).filter(x => x.slug !== p.slug);
@@ -64,11 +65,11 @@
         <div class="pa-title">
           <div class="pa-name"><h1>${esc(p.name)}</h1>${p.group ? `<span class="pa-tag t-a">${esc(p.group)}</span>` : ''}${p.category ? `<span class="pa-tag t-d">${esc(p.category)}</span>` : ''}${p.status ? `<span class="pa-tag t-c">${esc(p.status)}</span>` : ''}</div>
           ${p.tagline ? `<p class="pa-sub">${esc(p.tagline)}</p>` : ''}
-          <div class="pa-meta">${p.deploy ? `<span>Live in <b>${esc(p.deploy)}</b></span>` : ''}${live ? `<span>Live site <b>${esc(host(live))}</b></span>` : ''}<span>Model <b>Master label · White label</b></span></div>
+          <div class="pa-meta">${p.deploy ? `<span>Live in <b>${esc(p.deploy)}</b></span>` : ''}${live ? `<span>Live site <b>${esc(host(live))}</b></span>` : ''}${L.model ? `<span>Model <b>${esc(L.model)}</b></span>` : ''}</div>
         </div>
         <div class="pa-actions">
           <button class="btn btn-accent" data-book="${esc(p.name)}">${bookLbl}</button>
-          <button class="btn btn-ghost" data-demo>${I.play} ${hasCreds || demo ? 'Try demo' : 'Request demo'}</button>
+          <button class="btn btn-ghost" data-demo>${I.play} ${hasCreds || demo ? esc(L.demoCta || 'Try demo') : 'Request demo'}</button>
           ${p.investUrl ? `<a class="btn btn-ghost" href="${esc(p.investUrl)}" target="_blank" rel="noopener">Invest ↗</a>` : ''}
         </div>
       </section>
@@ -102,20 +103,20 @@
 
         <aside class="pa-side">
           <div class="pa-card pa-demo" id="demo">
-            <h3><span class="ic">${I.key}</span>Sandbox credentials <em class="pa-badge">Test data</em></h3>
+            <h3><span class="ic">${I.key}</span>${esc(L.credsTitle || 'Sandbox credentials')} <em class="pa-badge">Test data</em></h3>
             <div class="pa-creds">
               ${demo ? `<div class="pa-cred"><span>Demo URL</span><a href="${esc(demo)}" target="_blank" rel="noopener">${esc(demo.replace(/^https?:\/\//, ''))}</a><button class="copy" data-copy="${esc(demo)}">Copy</button></div>` : ''}
               ${(p.demoCreds || []).map(c => cred(esc(c.label), c.value)).join('')}
             </div>
-            ${hasCreds ? `<p class="small muted">${esc(p.demoNote || 'Sandbox data resets nightly. No real funds, KYC records or on-chain transactions are created.')}</p>`
-              : `<p class="small muted">${esc(p.demoNote || 'Login credentials are shared on request — usually within one business day.')}</p>
+            ${hasCreds ? `<p class="small muted">${esc(p.demoNote || L.credsNote || '')}</p>`
+              : `<p class="small muted">${esc(p.demoNote || L.credsRequest || '')}</p>
                  <button class="btn btn-ghost block" data-demo>Request demo credentials</button>`}
             ${demo ? `<a class="btn btn-accent block" href="${esc(demo)}" target="_blank" rel="noopener">Open demo ↗</a>` : ''}
           </div>
 
 
 
-          ${(p.pdfDesktop || pdfMobile || live) ? `<div class="pa-card pa-dl"><h3>Brochure & links</h3>
+          ${(p.pdfDesktop || pdfMobile || live) ? `<div class="pa-card pa-dl"><h3>${esc(L.brochureTitle || 'Brochure & links')}</h3>
             <div class="pa-dlg">
               ${p.pdfDesktop ? `<a href="${esc(p.pdfDesktop)}" target="_blank" rel="noopener" class="pa-dlt"><span class="pa-dli">${I.monitor}<em>PDF</em></span><b>Desktop</b><small>Full-size brochure</small></a>` : ''}
               ${pdfMobile ? `<a href="${esc(pdfMobile)}" target="_blank" rel="noopener" class="pa-dlt"><span class="pa-dli">${I.phone}<em>PDF</em></span><b>Mobile</b><small>Phone-friendly</small></a>` : ''}
@@ -123,8 +124,8 @@
             ${live ? `<a class="pa-res" href="${esc(live)}" target="_blank" rel="noopener"><span class="ic">${I.globe}</span><span><b>Live website</b><small>${esc(host(live))}</small></span><i>↗</i></a>` : ''}
           </div>` : ''}
 
-          ${p.investUrl ? `<div class="pa-invest" id="invest"><span class="ic">${I.chart}</span><b>Own a share of ${esc(p.name)}</b><span>On-chain shares on INFRA Network via ReSystem Business Opportunity.</span>
-            <a class="btn btn-white block" href="${esc(p.investUrl)}" target="_blank" rel="noopener">View opportunity ↗</a></div>` : ''}
+          ${p.investUrl ? `<div class="pa-invest" id="invest"><span class="ic">${I.chart}</span><b>${esc(L.investTitle || 'Own a share of')} ${esc(p.name)}</b><span>${esc(L.investText || '')}</span>
+            <a class="btn btn-white block" href="${esc(p.investUrl)}" target="_blank" rel="noopener">${esc(L.investCta || 'View opportunity')} ↗</a></div>` : ''}
 
           <div class="pa-card pa-qr">
             <img src="/qr/${esc(p.slug)}.svg" alt="QR code for this page" width="60" height="60">
@@ -135,7 +136,7 @@
         </aside>
       </div>
 
-      ${bottom.length ? `<section class="pa-sec"><h2>${featured.length ? 'Featured products' : 'Related products'}</h2><div class="pa-fgrid">${bottom.map(r => `
+      ${bottom.length ? `<section class="pa-sec"><h2>${featured.length ? esc(L.featuredTitle || 'Featured products') : 'Related products'}</h2><div class="pa-fgrid">${bottom.map(r => `
         <a class="card pcard" href="/product/${esc(r.slug)}">${r.image ? `<div class="pc-img"><img src="${esc(r.image)}" alt="" loading="lazy"></div>` : `<div class="pc-img pc-ph">${RM.mark(r)}</div>`}
           <div class="card-top">${RM.mark(r)}<span class="cat-tag">${esc(r.category)}</span>${r.status ? `<span class="badge">${esc(r.status)}</span>` : ''}</div>
           <h3>${esc(r.name)}</h3><p>${esc(r.tagline || r.summary)}</p>
@@ -165,7 +166,7 @@
       <div class="dd-bar"><span>${p.deploy ? 'Live in <b>' + esc(p.deploy) + '</b>' : esc(p.status || 'Master label · White label')}</span><b>${esc(p.price || 'Pricing on request')}</b></div>
       ${banner ? `<div class="dd-img"><img src="${esc(banner)}" alt=""></div>` : ''}
       <p class="d-blurb">${esc(p.tagline ? p.tagline + '. ' : '')}${esc(p.summary || '')}</p>
-      <h4 class="dd-h">Sandbox credentials <em class="pa-badge">Test data</em></h4>
+      <h4 class="dd-h">${esc(L.credsTitle || 'Sandbox credentials')} <em class="pa-badge">Test data</em></h4>
       ${(demo || hasCreds) ? `<div class="creds">${demo ? row('Demo URL', demo) : ''}${(p.demoCreds || []).map(c => row(c.label, c.value)).join('')}</div>
         <p class="muted small">${esc(p.demoNote || 'Sandbox data resets nightly. No real funds, KYC records, or on-chain transactions are created.')}</p>
         ${demo ? `<a class="btn btn-accent block" href="${esc(demo)}" target="_blank" rel="noopener">Open demo ↗</a>` : ''}`
@@ -179,6 +180,7 @@
 
   fetch('/api/home').then(r => r.json()).then(home => {
     const all = RM.products = home.products;
+    L = (home.content && home.content.product) || {};
     const p = all.find(x => x.slug === slug);
     if (!p) { location.replace('/404'); return; }
     render(p, all, home.rows[0] ? home.rows[0].products : []);

@@ -4,6 +4,31 @@
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const RM = window.RM = { $, esc, products: [], me: null };
 
+  /* ---------- Header & footer from Admin → Site content ---------- */
+  RM.content = fetch('/api/content').then(r => r.json()).catch(() => null);
+  RM.content.then(c => {
+    if (!c) return;
+    const go = () => {
+      const hd = c.header, nav = document.querySelector('.nav-links');
+      if (nav && hd.links.length) nav.innerHTML = hd.links.map(l => `<a href="${esc(l.href)}"${/^https?:/.test(l.href) ? ' target="_blank" rel="noopener"' : ''}>${esc(l.label)}</a>`).join('');
+      const cta = document.querySelector('.nav .btn-dark[data-book]'); if (cta && hd.cta) cta.textContent = hd.cta;
+      const q = document.getElementById('q'); if (q && hd.search) q.placeholder = hd.search;
+      if (hd.announcement && !document.querySelector('.announce')) {
+        const a = document.createElement(hd.announcementLink ? 'a' : 'div'); a.className = 'announce';
+        if (hd.announcementLink) { a.href = hd.announcementLink; if (/^https?:/.test(hd.announcementLink)) { a.target = '_blank'; a.rel = 'noopener'; } }
+        a.innerHTML = `<span>${esc(hd.announcement)}</span>${hd.announcementLink ? '<b>→</b>' : ''}`;
+        document.body.prepend(a);
+      }
+      const f = c.footer;
+      const tag = document.querySelector('.foot-grid > div:first-child p'); if (tag) tag.textContent = f.tagline;
+      const cols = document.querySelectorAll('.foot-grid > div');
+      if (cols[1]) cols[1].innerHTML = `<h5>${esc(f.colTitle)}</h5>` + f.links.map(l => `<a href="${esc(l.href)}"${/^https?:/.test(l.href) ? ' target="_blank" rel="noopener"' : ''}>${esc(l.label)}</a>`).join('');
+      if (cols[2]) cols[2].innerHTML = `<h5>Contact</h5><a href="mailto:${esc(f.email)}">${esc(f.email)}</a>${f.linkedin ? `<a href="${esc(f.linkedin)}" target="_blank" rel="noopener">LinkedIn</a>` : ''}${f.x ? `<a href="${esc(f.x)}" target="_blank" rel="noopener">X</a>` : ''}`;
+      const fb = document.querySelector('.foot-bottom'); if (fb) fb.innerHTML = `© ${new Date().getFullYear()} ${esc(f.company)}`;
+    };
+    document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', go) : go();
+  });
+
   RM.loadProducts = () => fetch('/api/products').then(r => r.json()).then(list => (RM.products = list));
   RM.initials = n => String(n).replace(/^re/i, '').replace(/[^A-Za-z0-9 ]/g, '').split(/\s+/).filter(Boolean)
     .map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'RE';
@@ -64,7 +89,7 @@
     const old = $('#bookOv'); if (old) old.remove();
     const ov = document.createElement('div'); ov.className = 'overlay center bk'; ov.id = 'bookOv'; ov.hidden = true;
     ov.innerHTML = `<div class="bk-modal" role="dialog" aria-modal="true" aria-labelledby="bTitle">
-      <aside class="bk-rail"><div class="bk-brand">Book a demo</div><ol id="bRail"></ol><p class="bk-rail-foot">30-minute walkthrough with a ReSystem specialist in your language.</p></aside>
+      <aside class="bk-rail"><div class="bk-brand" id="bkRailT">Book a demo</div><ol id="bRail"></ol><p class="bk-rail-foot" id="bkRailN">30-minute walkthrough with a ReSystem specialist in your language.</p></aside>
       <section class="bk-main">
         <header class="bk-head"><div><span class="muted small" id="bCounter"></span><h3 id="bTitle"></h3></div><button class="x" data-close aria-label="Close">×</button></header>
         <div class="progress"><i id="bProg"></i></div>
@@ -72,6 +97,7 @@
         <footer class="bk-foot" id="bFoot"><span class="bk-sum" id="bSum"></span><button class="btn btn-ghost" id="bBack">Back</button><button class="btn btn-accent" id="bNext">Continue</button></footer>
       </section></div>`;
     document.body.appendChild(ov);
+    RM.content.then(c => { if (c && c.booking) { $('#bkRailT').textContent = c.booking.railTitle; $('#bkRailN').textContent = c.booking.railNote; } });
   }
 
   RM.openBooking = async pre => {

@@ -22,6 +22,9 @@ Import the repo as a new Vercel project; `vercel.json` routes everything through
 
 Bookings are logged and, if `BOOKING_WEBHOOK_URL` is set, POSTed there as JSON.
 
+## SEO & AI discovery
+Server-rendered title, description, canonical, Open Graph, Twitter and JSON-LD (Organization, WebSite, ItemList, FAQPage, SoftwareApplication, BreadcrumbList) on every page. `/robots.txt` welcomes search engines and AI crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, …), `/sitemap.xml` includes images, `/llms.txt` and `/llms-full.txt` summarise the site and products for AI agents, plus `/site.webmanifest`, favicon.ico and app icons. All generated from the admin data.
+
 ## Admin console — `/admin`
 Password: `ADMIN_PASSWORD` env var (dev default `admin` only when NODE_ENV isn't production).
 - **Products:** add / edit / delete, upload images (card, hero, mobile, logo) and PDFs, edit all page content, show/hide toggle, drag to reorder the catalog.

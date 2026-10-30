@@ -46,6 +46,11 @@
   };
 
   /* ---------- Products list ---------- */
+  const todayD = () => new Date(Date.now() + 4 * 3600e3).toISOString().slice(0, 10);
+  const sched = p => { if (!p.showFrom && !p.showUntil) return ''; const t = todayD();
+    if (p.showFrom && p.showFrom > t) return `<span class="sch up">Goes live ${esc(p.showFrom)}</span>`;
+    if (p.showUntil && p.showUntil < t) return `<span class="sch end">Ended ${esc(p.showUntil)}</span>`;
+    return `<span class="sch on">${p.showUntil ? 'Live until ' + esc(p.showUntil) : 'Scheduled · live'}</span>`; };
   function renderProducts() {
     const sel = $('#pcat'); const cur = sel.value;
     sel.innerHTML = '<option value="">All categories</option>' + S.settings.categories.map(c => `<option${c === cur ? ' selected' : ''}>${esc(c)}</option>`).join('');
@@ -56,7 +61,7 @@
         <span class="grip" title="${filtering ? 'Clear search/filter to reorder' : 'Drag to reorder'}">⋮⋮</span>
         ${thumb(p)}
         <div class="pi-t"><b>${esc(p.name)}</b><span>${esc(p.category || 'No category')} · /${esc(p.slug)}${p.status ? ' · ' + esc(p.status) : ''}</span></div>
-        <div class="pi-rows">${inRows(p.slug).map(r => `<span>${r}</span>`).join('')}</div>
+        <div class="pi-rows">${sched(p)}${inRows(p.slug).map(r => `<span>${r}</span>`).join('')}</div>
         <label class="switch" title="Show on site"><input type="checkbox" data-vis="${esc(p.slug)}"${p.visible ? ' checked' : ''}><span class="sw"></span></label>
         <button class="btn btn-ghost sm" data-edit="${esc(p.slug)}">Edit</button>
       </div>`).join('') || '<p class="muted">No products match.</p>';
@@ -102,11 +107,11 @@
   const area = (k, label, v, rows, hint) => `<label>${esc(label)}${hint ? `<small>${esc(hint)}</small>` : ''}<textarea name="${k}" rows="${rows || 4}">${esc(v)}</textarea></label>`;
   const select = (k, label, v, opts) => `<label>${esc(label)}<select name="${k}">${opts.map(o => `<option${o === v ? ' selected' : ''}>${esc(o)}</option>`).join('')}</select></label>`;
 
-  function openEditor(slug) {
-    const p = slug ? S.products.find(x => x.slug === slug) : { name: '', slug: '', visible: false, tone: 'a', category: S.settings.categories[0] || '', group: S.settings.groups[0] || '' };
+  function openEditor(slug, preset) {
+    const p = preset ? preset : slug ? S.products.find(x => x.slug === slug) : { name: '', slug: '', visible: false, tone: 'a', category: S.settings.categories[0] || '', group: S.settings.groups[0] || '' };
     editing = { orig: slug, p };
     $('#edTitle').textContent = slug ? 'Edit ' + p.name : 'New product';
-    $('#edDel').hidden = !slug;
+    $('#edDel').hidden = !slug; $('#edDup').hidden = !slug;
     $('#edView').hidden = !slug; $('#edView').href = '/product/' + (slug || '');
     const cats = [...new Set(['', ...S.settings.categories, p.category || ''])];
     const groups = [...new Set(['', ...S.settings.groups, p.group || ''])];
@@ -121,6 +126,11 @@
         <div class="two"><label class="switch-l"><input type="checkbox" name="visible"${p.visible ? ' checked' : ''}><span class="sw"></span>Visible on site</label>
           <label>Icon colour (used when no logo)<select name="tone">${[['a', 'Orange'], ['b', 'Green'], ['c', 'Gold'], ['d', 'Blue']].map(([v, l]) => `<option value="${v}"${(p.tone || 'a') === v ? ' selected' : ''}>${l}</option>`).join('')}</select></label></div>
       </fieldset>
+      <fieldset><legend>Schedule (optional)</legend><p class="muted small">Plan launches ahead: the product appears automatically from the start date and disappears after the end date (Dubai time). Leave blank to follow the Visible switch only.</p>
+        <div class="two"><label>Show from<input type="date" name="showFrom" value="${esc(p.showFrom || '')}"></label><label>Hide after<input type="date" name="showUntil" value="${esc(p.showUntil || '')}"></label></div></fieldset>
+      <fieldset><legend>SEO & sharing (optional)</legend><p class="muted small">Overrides the page title and search/social description. The card image is used as the share image.</p>
+        ${field('seoTitle', 'SEO title', p.seoTitle || '', 'placeholder="' + esc(p.name || '') + ' — ' + esc(p.tagline || '') + '"')}
+        ${area('seoDescription', 'SEO description (≈155 characters)', p.seoDescription || '', 2)}</fieldset>
       <fieldset><legend>Images</legend><div class="img-grid">${IMAGES.map(([k, l]) => `
         <div class="img-f" data-img="${k}"><span class="lbl">${esc(l)}</span>
           <div class="prev">${p[k] ? `<img src="${esc(p[k])}" alt="">` : '<span>No image</span>'}</div>
@@ -170,7 +180,7 @@
   function readForm() {
     const f = $('#edForm'), v = k => (f.querySelector(`[name="${k}"]`) || {}).value || '';
     const p = Object.assign({}, editing.p);
-    ['name', 'slug', 'tagline', 'category', 'group', 'status', 'deploy', 'price', 'summary', 'whatItIs', 'tone',
+    ['name', 'slug', 'tagline', 'category', 'group', 'status', 'deploy', 'price', 'summary', 'whatItIs', 'tone', 'showFrom', 'showUntil', 'seoTitle', 'seoDescription',
       ...IMAGES.map(x => x[0]), ...LINKS.map(x => x[0])].forEach(k => { p[k] = v(k).trim(); });
     LISTS.forEach(([k]) => { p[k] = v(k).split('\n').map(s => s.trim()).filter(Boolean); });
     p.highlights = v('highlights').split('\n').map(s => s.trim()).filter(Boolean).map(s => { const [t, ...rest] = s.split('|'); return { title: t.trim(), text: rest.join('|').trim() }; });
@@ -188,6 +198,12 @@
       closeEditor(); await boot();
     } catch (err) { toast(err.message); }
     $('#edSave').disabled = false;
+  };
+  $('#edDup').onclick = () => {
+    const src = readForm(), base = (src.slug || 'product') + '-copy';
+    let s = base, n = 2; while (S.products.some(p => p.slug === s)) s = base + '-' + n++;
+    closeEditor(); openEditor(null, Object.assign({}, src, { name: src.name + ' (copy)', slug: s, visible: false, position: S.products.length }));
+    $('#edTitle').textContent = 'New product — copy of ' + src.name; toast('Copy ready — edit and save');
   };
   $('#edDel').onclick = async () => {
     if (!confirm(`Delete "${editing.p.name}" permanently? Tip: hide it instead to keep the data.`)) return;
@@ -309,6 +325,12 @@
   }
   $('#bkFilter').onchange = renderBookings;
   $('#bkRefresh').onclick = loadBookings;
+  $('#bkCsv').onclick = () => {
+    const cols = ['ref', 'status', 'date', 'time', 'name', 'email', 'company', 'phone', 'role', 'lang', 'specialist', 'products', 'notes', 'createdAt'];
+    const val = (b, k) => k === 'specialist' ? (b.specialist && b.specialist.name) : k === 'products' ? (b.products || []).map(p => p.name).join('; ') : b[k];
+    const csv = [cols.join(',')].concat(BK.map(b => cols.map(k => `"${String(val(b, k) == null ? '' : val(b, k)).replace(/"/g, '""')}"`).join(','))).join('\n');
+    const a2 = document.createElement('a'); a2.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a2.download = 'remarketplace-bookings.csv'; a2.click();
+  };
   $('#bkRows').addEventListener('change', async e => {
     const ref = e.target.dataset.bkref; if (!ref) return;
     try { await api('PUT', '/api/admin/bookings/' + encodeURIComponent(ref), { status: e.target.value }); toast('Booking ' + ref + ' → ' + e.target.value); loadBookings(); }
@@ -394,13 +416,14 @@
   $('#saveHome').onclick = () => saveSettings('Default products saved');
 
   /* ---------- Site content (generic form built from the content structure) ---------- */
-  const LABELS = { seo: 'SEO (browser title & search snippet)', hero: 'Hero', why: 'Why reMarketplace cards', steps: 'Listing steps', glossary: 'Glossary & QR card', catalog: 'All products section', faq: 'FAQ', footer: 'Footer' };
-  const pretty = k => ({ cta1: 'Primary button', cta2: 'Secondary button', line2: 'Line 2', accent: 'Orange ending', prefix: 'First word', words: 'Rotating words (comma separated)', t: 'Title', d: 'Text', q: 'Question', a: 'Answer', x: 'X / Twitter URL', linkedin: 'LinkedIn URL', viewAll: '"View all" button' }[k] || k.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()));
+  const LABELS = { seo: 'SEO, social sharing & AI discovery', header: 'Header (menu, button, announcement bar)', product: 'Product page labels', booking: 'Book a demo panel', hero: 'Hero', why: 'Why reMarketplace cards', steps: 'Listing steps', glossary: 'Glossary & QR card', catalog: 'All products section', faq: 'FAQ', footer: 'Footer' };
+  const pretty = k => ({ ogImage: 'Share image (Open Graph)', siteName: 'Site name', twitter: 'X handle', announcementLink: 'Announcement link', announcement: 'Announcement bar text (blank = hidden)', cta: 'Header button', search: 'Search placeholder', href: 'Link (URL or /#section)', label: 'Label', colTitle: 'Footer column title', railTitle: 'Panel title', railNote: 'Panel note', credsNote: 'Note under credentials', credsRequest: 'Note when no credentials', credsTitle: 'Credentials title', investCta: 'Invest button', investTitle: 'Invest title (product name follows)', investText: 'Invest text', brochureTitle: 'Brochure card title', featuredTitle: 'Featured section title', bookCta: 'Book button', demoCta: 'Demo button', model: 'Model label (blank = hidden)', cta1: 'Primary button', cta2: 'Secondary button', line2: 'Line 2', accent: 'Orange ending', prefix: 'First word', words: 'Rotating words (comma separated)', t: 'Title', d: 'Text', q: 'Question', a: 'Answer', x: 'X / Twitter URL', linkedin: 'LinkedIn URL', viewAll: '"View all" button' }[k] || k.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()));
   let CT = null;
   function renderContent() {
     CT = JSON.parse(JSON.stringify(S.settings.content || {}));
     const field = (path, k, v) => {
       const long = String(v).length > 70 || /subtitle|description|master|white|text|tagline|^a$|^d$/.test(k);
+      if (/image|logo/i.test(k)) return `<label>${esc(pretty(k))} <small>(1200×630 recommended; blank = built-in)</small><div class="inline"><input data-cp="${path}" value="${esc(v)}" placeholder="/img/og.png"><label class="btn btn-ghost sm">Upload<input type="file" accept="image/*" data-cup="${path}" hidden></label></div></label>`;
       return `<label>${esc(pretty(k))}${long ? `<textarea data-cp="${path}" rows="2">${esc(v)}</textarea>` : `<input data-cp="${path}" value="${esc(v)}">`}</label>`;
     };
     const obj = (o, base) => Object.entries(o).map(([k, v]) => {
@@ -424,6 +447,11 @@
     else if (d.cmv) { const ks = d.cmv.split('.'), dir = +ks.pop(), i = +ks.pop(), arr = getP(CT, ks.join('.')); [arr[i], arr[i + dir]] = [arr[i + dir], arr[i]]; }
     else return;
     S.settings.content = CT; renderContent();
+  });
+  $('#contentForm').addEventListener('change', async e => {
+    const p = e.target.dataset && e.target.dataset.cup; if (!p || !e.target.files[0]) return;
+    toast('Uploading…');
+    try { const { url } = await api('POST', '/api/admin/upload?name=og-image', null, e.target.files[0]); setP(CT, p, url); S.settings.content = CT; renderContent(); toast('Uploaded — remember to save'); } catch (err) { toast(err.message); }
   });
   $('#saveContent').onclick = async () => { S.settings.content = CT || S.settings.content; await saveSettings('Site content saved — refresh the site to see it'); renderContent(); };
 
