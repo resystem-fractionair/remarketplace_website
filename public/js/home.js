@@ -77,13 +77,6 @@
       requestAnimationFrame(f);
     }));
     document.querySelectorAll('.hx-stats [data-count]').forEach(el => io.observe(el));
-    /* orbiting product cards */
-    const pics = list.filter(p => p.image).slice(0, 8);
-    $('#hxOrbit').innerHTML = pics.map((p, i) => `<span class="hx-slot" style="--i:${i};--n:${pics.length}"><a class="hx-card" href="/product/${esc(p.slug)}" tabindex="-1">
-      <img src="${esc(p.image)}" alt=""><span><b>${esc(p.name)}</b><small>${esc(p.category)}</small></span></a></span>`).join('');
-    /* marquee */
-    const items = list.map(p => `<span class="hx-mi">${RM.mark(p)}<b>${esc(p.name)}</b><small>${esc(p.category)}</small></span>`).join('');
-    $('#hxTrack').innerHTML = items + items;
     /* network canvas background: drifting nodes, links and travelling packets */
     const cv = $('#hxNet'), ctx = cv.getContext('2d');
     let W = 0, H = 0, nodes = [], packets = [], mx = -999, my = -999, dpr = Math.min(2, devicePixelRatio || 1);
@@ -123,12 +116,6 @@
     document.querySelector('.hx').addEventListener('pointerleave', () => { mx = my = -999; });
     requestAnimationFrame(draw);
 
-    /* pointer parallax */
-    const st = $('#hxStage');
-    if (!reduce && matchMedia('(pointer: fine)').matches) document.querySelector('.hx').addEventListener('pointermove', e => {
-      const r = st.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
-      st.style.setProperty('--rx', (-y * 10).toFixed(2) + 'deg'); st.style.setProperty('--ry', (x * 14).toFixed(2) + 'deg');
-    });
   }
   fetch('/api/home').then(r => r.json()).then(home => {
     const list = RM.products = home.products;
