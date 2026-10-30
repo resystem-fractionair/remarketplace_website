@@ -56,6 +56,20 @@
 
   renderFaq();
 
+  /* ---------- Section motion: reveal on scroll + running step highlight ---------- */
+  (() => {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const els = document.querySelectorAll('.wx-card, .lx-track li, .gx-card, .gx-arrow, .gx-qr, .wx-head');
+    els.forEach((el, i) => { el.classList.add('rv'); el.style.setProperty('--d', (([...el.parentNode.children].indexOf(el)) * 90) + 'ms'); });
+    if (reduce) { els.forEach(el => el.classList.add('in')); return; }
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .2 });
+    els.forEach(el => io.observe(el));
+    const track = document.querySelector('.lx-track'); if (!track) return;
+    const items = [...track.children]; let k = 0, timer = null;
+    const run = () => { items.forEach((li, i) => li.classList.toggle('lx-act', i === k)); items.forEach((li, i) => li.classList.toggle('lx-done', i < k)); k = (k + 1) % (items.length + 1); };
+    new IntersectionObserver(([e]) => { if (e.isIntersecting && !timer) { run(); timer = setInterval(run, 1100); } else if (!e.isIntersecting && timer) { clearInterval(timer); timer = null; } }, { threshold: .3 }).observe(track);
+  })();
+
   /* ---------- Animated hero ---------- */
   function hero(list) {
     const words = ['fintech', 'identity', 'Web3', 'wallet', 'investment', 'AI'];
