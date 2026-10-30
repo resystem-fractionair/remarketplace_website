@@ -32,6 +32,8 @@ module.exports = function (app, store) {
   app.put('/api/admin/products/:slug', wrap(async (req, res) => res.json(await store.saveProduct(req.body || {}, req.params.slug))));
   app.delete('/api/admin/products/:slug', wrap(async (req, res) => { await store.deleteProduct(req.params.slug); res.json({ ok: true }); }));
   app.put('/api/admin/order', wrap(async (req, res) => { await store.reorder((req.body && req.body.slugs) || []); res.json({ ok: true }); }));
+  app.get('/api/admin/bookings', wrap(async (_req, res) => res.json(await store.listBookings(500))));
+  app.put('/api/admin/bookings/:ref', wrap(async (req, res) => { await store.setBookingStatus(req.params.ref, req.body && req.body.status); res.json({ ok: true }); }));
   app.put('/api/admin/settings', wrap(async (req, res) => res.json(await store.saveSettings(req.body || {}))));
   app.post('/api/admin/upload', express.raw({ type: () => true, limit: '8mb' }), wrap(async (req, res) => {
     if (!req.body || !req.body.length) return res.status(400).json({ error: 'Empty file' });

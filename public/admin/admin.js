@@ -38,7 +38,8 @@
   $('#tabs').onclick = e => {
     const b = e.target.closest('[data-tab]'); if (!b) return;
     document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
-    ['products', 'rows', 'cats'].forEach(t => { $('#tab-' + t).hidden = t !== b.dataset.tab; });
+    ['products', 'rows', 'cats', 'bookings'].forEach(t => { $('#tab-' + t).hidden = t !== b.dataset.tab; });
+    if (b.dataset.tab === 'bookings') loadBookings();
   };
 
   /* ---------- Products list ---------- */
@@ -284,6 +285,56 @@
       S.renames = {};
       await saveSettings(ren.length ? `Saved — ${ren.length} rename(s) applied to products` : 'Categories saved');
     } catch (err) { toast(err.message); }
+  };
+
+  /* ---------- Bookings ---------- */
+  let BK = [];
+  async function loadBookings() {
+    try { BK = await api('GET', '/api/admin/bookings'); } catch (err) { toast(err.message); }
+    renderBookings(); renderBkForm();
+  }
+  function renderBookings() {
+    const f = $('#bkFilter').value, rows = BK.filter(x => !f || x.status === f);
+    $('#bkRows').innerHTML = rows.map(x => `<tr>
+      <td><b>${esc(x.date)}</b><br>${esc(x.time)}</td>
+      <td><b>${esc(x.name)}</b><br><a href="mailto:${esc(x.email)}">${esc(x.email)}</a><br><span class="muted small">${esc(x.company)}${x.phone ? ' · ' + esc(x.phone) : ''}</span>${x.notes ? `<div class="muted small bk-note">${esc(x.notes)}</div>` : ''}</td>
+      <td>${(x.products || []).map(p => esc(p.name)).join(', ')}</td>
+      <td>${esc(x.lang)}<br><span class="muted small">${esc(x.specialist && x.specialist.name)}</span></td>
+      <td class="small">${esc(x.ref)}</td>
+      <td><select data-bkref="${esc(x.ref)}">${['confirmed', 'completed', 'cancelled', 'no_show'].map(s => `<option value="${s}"${s === x.status ? ' selected' : ''}>${s.replace('_', '-')}</option>`).join('')}</select></td></tr>`).join('')
+      || '<tr><td colspan="6" class="muted">No bookings yet.</td></tr>';
+  }
+  $('#bkFilter').onchange = renderBookings;
+  $('#bkRefresh').onclick = loadBookings;
+  $('#bkRows').addEventListener('change', async e => {
+    const ref = e.target.dataset.bkref; if (!ref) return;
+    try { await api('PUT', '/api/admin/bookings/' + encodeURIComponent(ref), { status: e.target.value }); toast('Booking ' + ref + ' → ' + e.target.value); loadBookings(); }
+    catch (err) { toast(err.message); }
+  });
+  const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  function renderBkForm() {
+    const c = S.settings.booking || {};
+    $('#bkForm').innerHTML = `
+      <div class="two"><label>Notification email<input name="notifyEmail" value="${esc(c.notifyEmail)}"></label><label>Time zone<input name="timezone" value="${esc(c.timezone)}"></label></div>
+      <div class="three"><label>Call length (min)<input name="durationMin" type="number" value="${esc(c.durationMin)}"></label><label>Bookable days ahead<input name="daysAhead" type="number" value="${esc(c.daysAhead)}"></label><label>Minimum notice (hours)<input name="minNoticeHours" type="number" value="${esc(c.minNoticeHours)}"></label></div>
+      <label>Working days<div class="wd">${DAYS.map((d, i) => `<label class="wdi"><input type="checkbox" name="wd" value="${i}"${(c.workDays || []).includes(i) ? ' checked' : ''}>${d}</label>`).join('')}</div></label>
+      <label>Time slots (HH:MM, comma separated)<input name="slots" value="${esc((c.slots || []).join(', '))}"></label>
+      <label>Call languages (comma separated)<input name="languages" value="${esc((c.languages || []).join(', '))}"></label>
+      <label>Specialists<small>One per line: Name | what they cover | languages (comma separated)</small><textarea name="specialists" rows="5">${esc((c.specialists || []).map(s => [s.name, s.role, s.langs.join(', ')].join(' | ')).join('\n'))}</textarea></label>`;
+  }
+  $('#saveBk').onclick = async () => {
+    const f = $('#bkForm'), v = n => f.querySelector(`[name="${n}"]`).value, list = n => v(n).split(',').map(x => x.trim()).filter(Boolean);
+    const old = (S.settings.booking || {}).specialists || [];
+    S.settings.booking = {
+      notifyEmail: v('notifyEmail').trim(), timezone: v('timezone').trim(), durationMin: +v('durationMin'), daysAhead: +v('daysAhead'), minNoticeHours: +v('minNoticeHours'),
+      workDays: [...f.querySelectorAll('[name=wd]:checked')].map(x => +x.value), slots: list('slots'), languages: list('languages'),
+      specialists: v('specialists').split('\n').map(l => l.split('|').map(x => x.trim())).filter(x => x[0]).map(([name, role, langs]) => {
+        const prev = old.find(o => o.name === name);
+        return { id: prev ? prev.id : '', name, role: role || '', langs: (langs || '').split(',').map(x => x.trim()).filter(Boolean) };
+      })
+    };
+    await saveSettings('Booking settings saved');
+    renderBkForm();
   };
 
   boot();

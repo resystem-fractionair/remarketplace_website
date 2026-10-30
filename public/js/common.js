@@ -42,90 +42,176 @@
     await fetch('/api/auth/logout', { method: 'POST' }); RM.me = null; loadMe(); RM.toast('Signed out.');
   });
 
-  /* ---------- Booking wizard ---------- */
-  const LANGUAGES = ['English', 'Arabic', 'Hindi', 'Spanish', 'French', 'Mandarin'];
-  const SLOTS = ['09:00', '09:30', '10:00', '11:00', '11:30', '13:00', '14:00', '14:30', '15:30', '16:00', '16:30'];
-  const LABELS = ['Products', 'Date & time', 'Call language', 'Your details', 'Review'];
-  const DAYS = (() => {
-    const out = [], d = new Date(); d.setDate(d.getDate() + 1);
-    while (out.length < 12) {
-      if (d.getDay() % 6 !== 0) out.push({
-        key: d.toISOString().slice(0, 10), dow: d.toLocaleDateString('en-GB', { weekday: 'short' }), day: d.getDate(),
-        month: d.toLocaleDateString('en-GB', { month: 'short' }),
-        full: d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
-      });
-      d.setDate(d.getDate() + 1);
-    }
-    return out;
-  })();
-  let b;
-  const pill = (on, attr, val, label) => `<button class="pill${on ? ' on' : ''}" ${attr}="${esc(val)}">${esc(label)}</button>`;
-  const refOf = () => 'RMK-' + (b.date ? b.date.replace(/-/g, '').slice(2) : '000000') + '-' + Math.max(1, b.picked.length) + 'P';
+  /* ---------- Book a demo: Products → Date & time → Language & specialist → Details → Review ---------- */
+  const STEPS = ['Products', 'Date & time', 'Language & specialist', 'Your details', 'Review'];
+  const VTZ = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch (_) { return ''; } })();
+  let CFG = null, b = null;
+  const loadCfg = () => CFG ? Promise.resolve(CFG) : fetch('/api/booking/config').then(r => r.json()).then(c => (CFG = c));
+  const loadProducts = () => RM.products.length ? Promise.resolve(RM.products) : RM.loadProducts();
+  const ymd = d => d.toISOString().slice(0, 10);
+  /* Wall-clock in CFG.timezone -> Date */
+  function zoned(date, time) {
+    const g = new Date(`${date}T${time}:00Z`);
+    const p = new Intl.DateTimeFormat('en-US', { timeZone: CFG.timezone, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+      .formatToParts(g).reduce((o, x) => (o[x.type] = x.value, o), {});
+    return new Date(g.getTime() - (Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute) - g.getTime()));
+  }
+  const fmt = (d, o, tz) => new Intl.DateTimeFormat('en-GB', Object.assign({ timeZone: tz || CFG.timezone }, o)).format(d);
+  const localDiffers = () => VTZ && VTZ !== CFG.timezone && fmt(new Date(), { hour: '2-digit' }, VTZ) !== fmt(new Date(), { hour: '2-digit' });
+
+  function ensureModal() {
+    if ($('#bookOv') && $('#bookOv').classList.contains('bk')) return;
+    const old = $('#bookOv'); if (old) old.remove();
+    const ov = document.createElement('div'); ov.className = 'overlay center bk'; ov.id = 'bookOv'; ov.hidden = true;
+    ov.innerHTML = `<div class="bk-modal" role="dialog" aria-modal="true" aria-labelledby="bTitle">
+      <aside class="bk-rail"><div class="bk-brand">Book a demo</div><ol id="bRail"></ol><p class="bk-rail-foot">30-minute walkthrough with a ReSystem specialist in your language.</p></aside>
+      <section class="bk-main">
+        <header class="bk-head"><div><span class="muted small" id="bCounter"></span><h3 id="bTitle"></h3></div><button class="x" data-close aria-label="Close">×</button></header>
+        <div class="progress"><i id="bProg"></i></div>
+        <div class="bk-body" id="bBody"></div>
+        <footer class="bk-foot" id="bFoot"><span class="bk-sum" id="bSum"></span><button class="btn btn-ghost" id="bBack">Back</button><button class="btn btn-accent" id="bNext">Continue</button></footer>
+      </section></div>`;
+    document.body.appendChild(ov);
+  }
+
+  RM.openBooking = async pre => {
+    ensureModal();
+    document.querySelectorAll('.overlay').forEach(o => { o.hidden = true; });
+    RM.openOv('#bookOv');
+    $('#bBody').innerHTML = '<p class="muted">Loading…</p>';
+    await Promise.all([loadCfg(), loadProducts()]);
+    const preSlug = pre && (RM.products.find(p => p.name === pre || p.slug === pre) || {}).slug;
+    b = { step: preSlug ? 2 : 1, done: null, picked: preSlug ? [preSlug] : [], q: '', cat: 'All', month: null, date: '', time: '', taken: [], lang: '', specialist: '',
+      name: (RM.me && RM.me.name) || '', email: (RM.me && RM.me.email) || '', company: '', phone: '', role: '', notes: '', consent: false, sending: false, err: '' };
+    render();
+  };
+
+  /* availability: a slot is open if at least one specialist is free */
+  const freeAgents = (time, lang) => CFG.specialists.filter(s => (!lang || s.langs.includes(lang)) && !b.taken.includes(`${s.id}|${b.date}|${time}`));
+  const slotOpen = t => zoned(b.date, t).getTime() > Date.now() + CFG.minNoticeHours * 3600e3 && freeAgents(t).length > 0;
+  async function pickDate(d) {
+    b.date = d; b.time = ''; b.taken = []; render();
+    try { b.taken = (await fetch('/api/booking/availability?date=' + d).then(r => r.json())).taken || []; } catch (_) {}
+    render();
+  }
   function valid(s) {
     if (s === 1) return b.picked.length > 0;
     if (s === 2) return !!b.date && !!b.time;
-    if (s === 3) return !!b.lang;
-    if (s === 4) return b.name.trim().length > 1 && /.+@.+\..+/.test(b.email) && b.company.trim().length > 1;
+    if (s === 3) return !!b.lang && !!b.specialist;
+    if (s === 4) return b.name.trim().length > 1 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(b.email.trim()) && b.company.trim().length > 1 && b.consent;
     return true;
   }
-  RM.openBooking = pre => {
-    b = { step: pre ? 2 : 1, done: false, picked: pre ? [pre] : [], date: '', time: '', lang: '', name: (RM.me && RM.me.name) || '', email: (RM.me && RM.me.email) || '', company: '', notes: '' };
-    document.querySelectorAll('.overlay').forEach(o => { o.hidden = true; });
-    RM.openOv('#bookOv'); render();
-  };
+  const pickedProducts = () => b.picked.map(s => RM.products.find(p => p.slug === s)).filter(Boolean);
+  const agent = () => CFG.specialists.find(s => s.id === b.specialist);
+  const whenLabel = () => b.date && b.time ? fmt(zoned(b.date, b.time), { weekday: 'short', day: 'numeric', month: 'short' }) + ' · ' + b.time + ' GST' : '';
+  const thumb = p => p.image ? `<span class="bk-th"><img src="${esc(p.image)}" alt="" loading="lazy"></span>` : `<span class="bk-th">${RM.mark(p)}</span>`;
+
   function render() {
-    const body = $('#bBody'), day = DAYS.find(d => d.key === b.date);
+    const body = $('#bBody');
+    $('#bRail').innerHTML = STEPS.map((l, i) => `<li class="${b.done ? 'ok' : i + 1 < b.step ? 'ok' : i + 1 === b.step ? 'on' : ''}"><span>${(b.done || i + 1 < b.step) ? '✓' : i + 1}</span>${l}</li>`).join('');
     $('#bCounter').textContent = b.done ? 'Confirmed' : `Step ${b.step} of 5`;
-    $('#bTitle').textContent = b.done ? 'You’re booked in' : LABELS[b.step - 1];
+    $('#bTitle').textContent = b.done ? 'You’re booked in' : ['Which products should we show you?', 'Pick a date and time', 'Language and specialist', 'Your details', 'Review and confirm'][b.step - 1];
     $('#bProg').style.width = (b.done ? 100 : b.step * 20) + '%';
-    $('#bFoot').hidden = b.done;
+    $('#bFoot').hidden = !!b.done;
     $('#bBack').hidden = b.step === 1;
-    $('#bNext').textContent = b.step === 5 ? 'Confirm booking' : 'Continue';
-    $('#bNext').disabled = !valid(b.step);
+    $('#bNext').textContent = b.sending ? 'Booking…' : b.step === 5 ? 'Confirm booking' : 'Continue';
+    $('#bNext').disabled = b.sending || !valid(b.step);
+    $('#bSum').innerHTML = [b.picked.length ? `${b.picked.length} product${b.picked.length > 1 ? 's' : ''}` : '', whenLabel(), b.lang].filter(Boolean).map(esc).join(' · ');
+
     if (b.done) {
-      body.innerHTML = `<div class="done"><div class="tick">✓</div>
-        <p>Our team will send a calendar invite to <b>${esc(b.email)}</b>.</p>
-        <div class="summary"><div><span>Reference</span><b>${refOf()}</b></div><div><span>When</span><b>${esc(day.full)}, ${esc(b.time)} GST</b></div>
-        <div><span>Products</span><b>${b.picked.map(esc).join(', ')}</b></div><div><span>Duration</span><b>${b.picked.length > 2 ? '45' : '30'} minutes</b></div></div>
+      const s = new Date(b.done.start), e = new Date(b.done.end), st = s.toISOString().replace(/[-:]|\.\d{3}/g, ''), en = e.toISOString().replace(/[-:]|\.\d{3}/g, '');
+      const title = 'reMarketplace demo — ' + pickedProducts().map(p => p.name).join(', ');
+      const gcal = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${st}/${en}&details=${encodeURIComponent('Reference ' + b.done.ref)}`;
+      const icsTxt = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//reMarketplace//EN', 'BEGIN:VEVENT', `UID:${b.done.ref}@remarketplace.store`, `DTSTAMP:${st}`, `DTSTART:${st}`, `DTEND:${en}`, `SUMMARY:${title}`, `DESCRIPTION:Reference ${b.done.ref}`, 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+      const ics = URL.createObjectURL(new Blob([icsTxt], { type: 'text/calendar' }));
+      body.innerHTML = `<div class="bk-done"><div class="tick">✓</div>
+        <p>${b.done.emailed ? `A confirmation and calendar invite were sent to <b>${esc(b.email)}</b>.` : `Your booking is saved. The team will confirm by email at <b>${esc(b.email)}</b>.`}</p>
+        <div class="summary"><div><span>Reference</span><b>${esc(b.done.ref)}</b></div>
+          <div><span>When</span><b>${esc(fmt(s, { weekday: 'long', day: 'numeric', month: 'long' }))}, ${esc(b.time)} GST${localDiffers() ? `<small>Your time: ${esc(fmt(s, { weekday: 'short', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }, VTZ))}</small>` : ''}</b></div>
+          <div><span>With</span><b>${esc(agent().name)} · ${esc(b.lang)}</b></div>
+          <div><span>Products</span><b>${pickedProducts().map(p => esc(p.name)).join(', ')}</b></div></div>
+        <div class="bk-cal"><a class="btn btn-accent" href="${gcal}" target="_blank" rel="noopener">Add to Google Calendar</a><a class="btn btn-ghost" href="${ics}" download="remarketplace-demo.ics">Download .ics</a></div>
         <button class="btn btn-dark block" data-close>Done</button></div>`;
       return;
     }
+
     if (b.step === 1) {
-      body.innerHTML = `<p class="muted small">${b.picked.length} product${b.picked.length === 1 ? '' : 's'} selected</p><div class="rows">` +
-        RM.products.map(p => { const on = b.picked.includes(p.name); return `
-          <button class="row${on ? ' on' : ''}" data-pick="${esc(p.name)}"><span class="box">${on ? '✓' : ''}</span>${RM.mark(p)}
-          <span class="row-t"><b>${esc(p.name)}</b><span>${esc(p.category)}</span></span></button>`; }).join('') + '</div>';
+      const cats = ['All', ...new Set(RM.products.map(p => p.category).filter(Boolean))];
+      const q = b.q.toLowerCase();
+      const list = RM.products.filter(p => (b.cat === 'All' || p.category === b.cat) && (!q || (p.name + ' ' + p.tagline + ' ' + p.category).toLowerCase().includes(q)));
+      body.innerHTML = `<div class="bk-tools"><input type="search" data-f="q" value="${esc(b.q)}" placeholder="Search products" aria-label="Search products">
+        <div class="chips">${cats.map(c => `<button class="chip${c === b.cat ? ' on' : ''}" data-bcat="${esc(c)}">${esc(c)}</button>`).join('')}</div></div>
+        <p class="muted small">Select one or more — we’ll tailor the walkthrough. <b>${b.picked.length} selected</b></p>
+        <div class="bk-grid">${list.map(p => { const on = b.picked.includes(p.slug); return `
+          <button class="bk-prod${on ? ' on' : ''}" data-pick="${esc(p.slug)}" aria-pressed="${on}">${p.image ? `<span class="bk-img"><img src="${esc(p.image)}" alt="" loading="lazy"></span>` : `<span class="bk-img bk-noimg">${RM.mark(p)}</span>`}
+            <span class="bk-check">${on ? '✓' : ''}</span><span class="bk-pt"><b>${esc(p.name)}</b><small>${esc(p.category || '')}</small></span></button>`; }).join('')}</div>`;
     } else if (b.step === 2) {
-      body.innerHTML = (b.picked.length ? `<p class="muted small">For: ${b.picked.map(esc).join(', ')}</p>` : '') +
-        `<h5>Pick a day</h5><div class="days">` + DAYS.map(d => `
-        <button class="day${b.date === d.key ? ' on' : ''}" data-date="${d.key}"><span>${d.dow}</span><b>${d.day}</b><span>${d.month}</span></button>`).join('') +
-        `</div><h5>Pick a time (Dubai, GST)</h5><div class="pills">` + SLOTS.map(t => pill(b.time === t, 'data-time', t, t)).join('') + '</div>';
+      const today = new Date(); const first = new Date(today.getFullYear(), today.getMonth(), 1);
+      if (!b.month) {
+        let d0 = new Date(); for (let i = 0; i <= CFG.daysAhead; i++) { const k = ymd(d0); if (CFG.workDays.includes(d0.getDay()) && zoned(k, CFG.slots[CFG.slots.length - 1]).getTime() > Date.now() + CFG.minNoticeHours * 3600e3) break; d0 = new Date(d0.getTime() + 864e5); }
+        b.month = new Date(d0.getFullYear(), d0.getMonth(), 1);
+      }
+      const lastDay = new Date(Date.now() + CFG.daysAhead * 864e5);
+      const m = b.month, mStart = new Date(m.getFullYear(), m.getMonth(), 1), pad = (mStart.getDay() + 6) % 7, nDays = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate();
+      const cells = [];
+      for (let i = 0; i < pad; i++) cells.push('<span></span>');
+      for (let d = 1; d <= nDays; d++) {
+        const dt = new Date(m.getFullYear(), m.getMonth(), d), key = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+        const end = zoned(key, CFG.slots[CFG.slots.length - 1]).getTime();
+        const ok = CFG.workDays.includes(dt.getDay()) && end > Date.now() + CFG.minNoticeHours * 3600e3 && dt <= lastDay;
+        cells.push(`<button class="bk-day${key === b.date ? ' on' : ''}${key === ymd(new Date(Date.now() + 0)) ? ' today' : ''}" data-date="${key}"${ok ? '' : ' disabled'}>${d}</button>`);
+      }
+      const canPrev = m > first, canNext = new Date(m.getFullYear(), m.getMonth() + 1, 1) <= lastDay;
+      const slots = b.date ? CFG.slots.map(t => { const open = slotOpen(t); const loc = localDiffers() ? fmt(zoned(b.date, t), { hour: '2-digit', minute: '2-digit' }, VTZ) : '';
+        return `<button class="bk-slot${b.time === t ? ' on' : ''}" data-time="${t}"${open ? '' : ' disabled'}><b>${t}</b>${loc ? `<small>${loc} yours</small>` : ''}</button>`; }).join('') : '';
+      body.innerHTML = `<div class="bk-dt">
+        <div class="bk-cal-box"><div class="bk-mhead"><button class="icon-b" data-mon="-1"${canPrev ? '' : ' disabled'} aria-label="Previous month">‹</button><b>${m.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</b><button class="icon-b" data-mon="1"${canNext ? '' : ' disabled'} aria-label="Next month">›</button></div>
+          <div class="bk-dow">${['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(x => `<span>${x}</span>`).join('')}</div><div class="bk-days">${cells.join('')}</div></div>
+        <div class="bk-slots-box"><h5>${b.date ? fmt(zoned(b.date, '12:00'), { weekday: 'long', day: 'numeric', month: 'long' }) : 'Choose a day'}</h5>
+          <p class="muted small">Times in Dubai (GST)${localDiffers() ? ` · your time zone: ${esc(VTZ)}` : ''} · ${CFG.durationMin} min</p>
+          ${b.date ? `<div class="bk-slots">${slots}</div>` : '<p class="muted small">Available days are highlighted on the calendar.</p>'}</div></div>`;
     } else if (b.step === 3) {
-      body.innerHTML = `<h5>Which language should the call be in?</h5><div class="pills">` + LANGUAGES.map(l => pill(b.lang === l, 'data-lang', l, l)).join('') + '</div>';
+      const list = b.lang ? CFG.specialists.filter(s => s.langs.includes(b.lang)) : [];
+      body.innerHTML = `<h5>Which language should the call be in?</h5>
+        <div class="pills">${CFG.languages.map(l => `<button class="pill${b.lang === l ? ' on' : ''}" data-lang="${esc(l)}">${esc(l)}</button>`).join('')}</div>
+        ${b.lang ? `<h5>Choose your specialist</h5><div class="bk-agents">${list.map(s => { const busy = b.taken.includes(`${s.id}|${b.date}|${b.time}`); return `
+          <button class="bk-agent${b.specialist === s.id ? ' on' : ''}" data-agent="${esc(s.id)}"${busy ? ' disabled' : ''}>
+            <span class="avatar">${esc(s.name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase())}</span>
+            <span class="bk-at"><b>${esc(s.name)}</b><small>${esc(s.role)}</small><span class="bk-langs">${s.langs.map(l => `<em${l === b.lang ? ' class="hit"' : ''}>${esc(l)}</em>`).join('')}</span></span>
+            <span class="bk-free">${busy ? 'Busy at ' + esc(b.time) : 'Available'}</span></button>`; }).join('') || '<p class="muted small">No specialist speaks this language yet — please choose another.</p>'}</div>` : '<p class="muted small">Pick a language to see the specialists available at your time.</p>'}`;
     } else if (b.step === 4) {
-      body.innerHTML = `<div class="form">
-        <label>Full name<input data-f="name" value="${esc(b.name)}" placeholder="Jane Doe" autocomplete="name"></label>
-        <label>Work email<input data-f="email" type="email" value="${esc(b.email)}" placeholder="jane@company.com" autocomplete="email"></label>
-        <label>Company<input data-f="company" value="${esc(b.company)}" placeholder="Company name" autocomplete="organization"></label>
-        <label>Notes (optional)<textarea data-f="notes" rows="3" placeholder="What would you like to cover?">${esc(b.notes)}</textarea></label></div>`;
+      body.innerHTML = `<div class="form bk-form">
+        <label>Full name *<input data-f="name" value="${esc(b.name)}" placeholder="Jane Doe" autocomplete="name"></label>
+        <label>Work email *<input data-f="email" type="email" value="${esc(b.email)}" placeholder="jane@company.com" autocomplete="email"></label>
+        <label>Company *<input data-f="company" value="${esc(b.company)}" placeholder="Company name" autocomplete="organization"></label>
+        <label>Phone / WhatsApp<input data-f="phone" type="tel" value="${esc(b.phone)}" placeholder="+971 …" autocomplete="tel"></label>
+        <label>Your role<input data-f="role" value="${esc(b.role)}" placeholder="e.g. CEO, Head of Product" autocomplete="organization-title"></label>
+        <label class="wide">What would you like to cover?<textarea data-f="notes" rows="3" placeholder="Use case, timeline, questions…">${esc(b.notes)}</textarea></label>
+        <label class="bk-consent wide"><input type="checkbox" data-f="consent"${b.consent ? ' checked' : ''}> I agree to be contacted by the ReSystem team about this booking.</label></div>`;
     } else {
-      body.innerHTML = `<div class="summary">
-        <div><span>Products</span><b>${b.picked.map(esc).join(', ')}</b></div>
-        <div><span>Date</span><b>${esc(day.full)}</b></div><div><span>Time</span><b>${esc(b.time)} GST</b></div>
-        <div><span>Language</span><b>${esc(b.lang)}</b></div>
-        <div><span>Name</span><b>${esc(b.name)}</b></div><div><span>Email</span><b>${esc(b.email)}</b></div><div><span>Company</span><b>${esc(b.company)}</b></div>
-        <div><span>Notes</span><b>${esc(b.notes || 'No additional notes.')}</b></div></div>`;
+      const s = zoned(b.date, b.time);
+      body.innerHTML = `<div class="bk-review">
+        <div class="bk-rv"><div class="bk-rvh"><b>Products</b><button class="link" data-goto="1">Edit</button></div><div class="bk-rvp">${pickedProducts().map(p => `<span>${thumb(p)}${esc(p.name)}</span>`).join('')}</div></div>
+        <div class="bk-rv"><div class="bk-rvh"><b>Date & time</b><button class="link" data-goto="2">Edit</button></div><p>${esc(fmt(s, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }))} · ${esc(b.time)} GST · ${CFG.durationMin} min${localDiffers() ? `<br><small class="muted">Your time: ${esc(fmt(s, { weekday: 'short', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' }, VTZ))}</small>` : ''}</p></div>
+        <div class="bk-rv"><div class="bk-rvh"><b>Language & specialist</b><button class="link" data-goto="3">Edit</button></div><p>${esc(b.lang)} · ${esc(agent().name)}</p></div>
+        <div class="bk-rv"><div class="bk-rvh"><b>Your details</b><button class="link" data-goto="4">Edit</button></div><p>${esc(b.name)} · ${esc(b.email)}<br>${esc(b.company)}${b.phone ? ' · ' + esc(b.phone) : ''}</p>${b.notes ? `<p class="muted small">${esc(b.notes)}</p>` : ''}</div>
+        ${b.err ? `<p class="bk-err">${esc(b.err)}</p>` : ''}</div>`;
     }
   }
+
   async function submit() {
-    const btn = $('#bNext'); btn.disabled = true; btn.textContent = 'Booking…';
+    b.sending = true; b.err = ''; render();
     try {
       const r = await fetch('/api/bookings', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ref: refOf(), products: b.picked, date: b.date, time: b.time + ' GST', lang: b.lang, name: b.name, email: b.email, company: b.company, notes: b.notes }) });
-      if (!r.ok) throw new Error();
-      b.done = true;
-    } catch (_) { RM.toast('Could not save the booking. Please try again.'); }
-    render();
+        body: JSON.stringify({ products: b.picked, date: b.date, time: b.time, lang: b.lang, specialist: b.specialist, name: b.name, email: b.email, company: b.company,
+          phone: b.phone, role: b.role, notes: b.notes, consent: b.consent, visitorTz: VTZ }) });
+      const j = await r.json().catch(() => ({}));
+      if (r.status === 409) { b.err = j.error; b.time = ''; b.step = 2; await pickDate(b.date); }
+      else if (!r.ok) b.err = j.error || 'Could not save the booking. Please try again.';
+      else b.done = j;
+    } catch (_) { b.err = 'Network error — please try again.'; }
+    b.sending = false; render();
+    if (b.err) RM.toast(b.err);
   }
 
   document.addEventListener('click', e => {
@@ -140,17 +226,24 @@
       const old = t.textContent; t.textContent = 'Copied'; t.classList.add('ok');
       return setTimeout(() => { t.textContent = old; t.classList.remove('ok'); }, 1400);
     }
-    if (!b || $('#bookOv').hidden) return;
+    if (!b || !$('#bookOv') || $('#bookOv').hidden || t.disabled) return;
     if (d.pick) { const i = b.picked.indexOf(d.pick); i > -1 ? b.picked.splice(i, 1) : b.picked.push(d.pick); return render(); }
-    if (d.date) { b.date = d.date; return render(); }
-    if (d.time) { b.time = d.time; return render(); }
-    if (d.lang) { b.lang = d.lang; return render(); }
+    if (d.bcat) { b.cat = d.bcat; return render(); }
+    if (d.mon) { b.month = new Date(b.month.getFullYear(), b.month.getMonth() + +d.mon, 1); return render(); }
+    if (d.date) return pickDate(d.date);
+    if (d.time) { b.time = d.time; if (b.specialist && b.taken.includes(`${b.specialist}|${b.date}|${b.time}`)) b.specialist = ''; return render(); }
+    if (d.lang) { b.lang = d.lang; const free = freeAgents(b.time, b.lang); b.specialist = free.length === 1 ? free[0].id : (free.some(s => s.id === b.specialist) ? b.specialist : ''); return render(); }
+    if (d.agent) { b.specialist = d.agent; return render(); }
+    if (d.goto) { b.step = +d.goto; return render(); }
     if (t.id === 'bBack') { b.step = Math.max(1, b.step - 1); return render(); }
-    if (t.id === 'bNext' && valid(b.step)) { if (b.step === 5) return submit(); b.step++; return render(); }
+    if (t.id === 'bNext' && valid(b.step)) { if (b.step === 5) return submit(); b.step++; $('#bBody').scrollTop = 0; return render(); }
   });
   document.addEventListener('input', e => {
     const f = e.target.dataset && e.target.dataset.f;
-    if (f && b) { b[f] = e.target.value; $('#bNext').disabled = !valid(b.step); }
+    if (!f || !b) return;
+    b[f] = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    if (f === 'q') { const pos = e.target.selectionStart; render(); const el = $('[data-f="q"]'); el.focus(); el.setSelectionRange(pos, pos); return; }
+    $('#bNext').disabled = !valid(b.step);
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.overlay').forEach(o => RM.closeOv('#' + o.id)); });
   document.addEventListener('DOMContentLoaded', () => {

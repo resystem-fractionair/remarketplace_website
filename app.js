@@ -59,20 +59,54 @@ app.get('/qr/:name.:ext(svg|png)', wrap(async (req, res) => {
 }));
 
 /* ---------- Demo bookings ---------- */
-app.post('/api/bookings', async (req, res) => {
-  const b = req.body || {};
-  const ok = Array.isArray(b.products) && b.products.length && b.date && b.time &&
-    typeof b.email === 'string' && /.+@.+\..+/.test(b.email) && b.name && b.company;
-  if (!ok) return res.status(400).json({ error: 'invalid_booking' });
-  const booking = Object.assign({}, b, { receivedAt: new Date().toISOString(), user: req.session.user || null });
-  console.log('[booking]', JSON.stringify(booking));
-  if (process.env.BOOKING_WEBHOOK_URL) {
-    try {
-      await fetch(process.env.BOOKING_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(booking) });
-    } catch (e) { console.error('[booking webhook]', e.message); }
-  }
-  res.json({ ok: true, ref: b.ref });
-});
+const { sendBookingEmails, zonedToUtc } = require('./mailer');
+app.get('/api/booking/config', wrap(async (_req, res) => {
+  const { settings } = await store.load();
+  const b = settings.booking;
+  res.json({ timezone: b.timezone, durationMin: b.durationMin, daysAhead: b.daysAhead, minNoticeHours: b.minNoticeHours,
+    workDays: b.workDays, slots: b.slots, languages: b.languages, specialists: b.specialists });
+}));
+app.get('/api/booking/availability', wrap(async (req, res) => {
+  const date = String(req.query.date || '');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return res.status(400).json({ error: 'bad_date' });
+  res.json({ taken: await store.takenSlots(date) });
+}));
+const BOOK_LIMIT = new Map();
+app.post('/api/bookings', wrap(async (req, res) => {
+  const ip = req.ip, now = Date.now(), hits = (BOOK_LIMIT.get(ip) || []).filter(t => now - t < 3600e3);
+  if (hits.length >= 8) return res.status(429).json({ error: 'Too many bookings from this connection. Please email info@remarketplace.store.' });
+  const { settings, products } = await store.load();
+  const cfg = settings.booking, b = req.body || {};
+  const str = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
+  const picked = (Array.isArray(b.products) ? b.products : []).map(String);
+  const prods = products.filter(p => p.visible && picked.includes(p.slug)).map(p => ({ slug: p.slug, name: p.name, category: p.category, tagline: p.tagline, image: p.image }));
+  const sp = cfg.specialists.find(x => x.id === b.specialist);
+  const date = str(b.date, 10), time = str(b.time, 5);
+  const start = /^\d{4}-\d{2}-\d{2}$/.test(date) && cfg.slots.includes(time) ? zonedToUtc(date, time, cfg.timezone) : null;
+  const dow = start ? new Date(date + 'T12:00:00Z').getUTCDay() : -1;
+  const errs = [];
+  if (!prods.length) errs.push('Pick at least one product.');
+  if (!start || !cfg.workDays.includes(dow)) errs.push('Pick an available date and time.');
+  else if (start.getTime() < now + cfg.minNoticeHours * 3600e3 || start.getTime() > now + (cfg.daysAhead + 1) * 864e5) errs.push('That time is outside the booking window.');
+  if (!cfg.languages.includes(b.lang)) errs.push('Pick a call language.');
+  if (!sp || !sp.langs.includes(b.lang)) errs.push('Pick a specialist who speaks that language.');
+  if (str(b.name, 100).length < 2) errs.push('Enter your full name.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(str(b.email, 160))) errs.push('Enter a valid work email.');
+  if (str(b.company, 120).length < 2) errs.push('Enter your company.');
+  if (!b.consent) errs.push('Please accept to be contacted about this booking.');
+  if (errs.length) return res.status(400).json({ error: errs[0], errors: errs });
+  const ref = 'RMK-' + date.replace(/-/g, '').slice(2) + '-' + require('crypto').randomBytes(2).toString('hex').toUpperCase();
+  const booking = { ref, slotKey: `${sp.id}|${date}|${time}`, date, time, timezone: cfg.timezone, durationMin: cfg.durationMin,
+    products: prods, lang: b.lang, specialist: { id: sp.id, name: sp.name, role: sp.role },
+    name: str(b.name, 100), email: str(b.email, 160), company: str(b.company, 120), phone: str(b.phone, 40), role: str(b.role, 80), notes: str(b.notes, 1500),
+    visitorTz: str(b.visitorTz, 60), user: req.session.user || null, receivedAt: new Date().toISOString() };
+  await store.addBooking(booking);
+  hits.push(now); BOOK_LIMIT.set(ip, hits);
+  let mail = { sent: false };
+  try { mail = await sendBookingEmails(booking, cfg); } catch (e) { console.error('[mail]', e.message); }
+  if (process.env.BOOKING_WEBHOOK_URL) fetch(process.env.BOOKING_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(booking) }).catch(() => {});
+  res.json({ ok: true, ref, emailed: mail.sent, start: zonedToUtc(date, time, cfg.timezone).toISOString(), end: new Date(zonedToUtc(date, time, cfg.timezone).getTime() + cfg.durationMin * 60000).toISOString() });
+}));
 
 /* ---------- reID sign-in (OAuth 2.0 / OIDC authorization-code + PKCE) ---------- */
 const R = {

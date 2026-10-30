@@ -51,15 +51,53 @@ const DEFAULT_SETTINGS = () => {
       { id: 'featured', title: 'Featured', subtitle: 'Flagship products of the ReSystem ecosystem', slugs: ['remarketplace', 'infra-reaed', 'reid', 'rewallet'] },
       { id: 'invest', title: 'Invest & own', subtitle: 'Wealth, fractional ownership and real-world assets', slugs: ['reinvest', 'fractionaire', 'cet', 'infra-global'] },
       { id: 'partners', title: 'Partner products', subtitle: 'Live businesses ready to white-label', slugs: ['redomain', 'tunetailor', 'mine', 'prohandover', 'hostick'] }
-    ]
+    ],
+    booking: DEFAULT_BOOKING()
   };
 };
+const DEFAULT_BOOKING = () => ({
+  notifyEmail: 'info@remarketplace.store',
+  timezone: 'Asia/Dubai',
+  durationMin: 30,
+  daysAhead: 21,
+  minNoticeHours: 12,
+  workDays: [1, 2, 3, 4, 5],
+  slots: ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'],
+  languages: ['English', 'Arabic', 'Hindi', 'Spanish', 'French', 'Russian'],
+  specialists: [
+    { id: 'identity-payments', name: 'Identity & Payments desk', role: 'reID, reWALLET, INFRA', langs: ['English', 'Arabic', 'Hindi'] },
+    { id: 'rwa-invest', name: 'RWA & Investment desk', role: 'Fractionaire, reINVEST, CET', langs: ['English', 'Arabic', 'Russian'] },
+    { id: 'white-label', name: 'White-label & Partners desk', role: 'reMARKETPLACE, partner products', langs: ['English', 'Spanish', 'French', 'Hindi'] }
+  ]
+});
+function cleanBooking(b) {
+  const d = DEFAULT_BOOKING(); b = b || {};
+  const strList = (a, n) => (Array.isArray(a) ? a : []).map(x => String(x).trim()).filter(Boolean).slice(0, n || 50);
+  const num = (v, lo, hi, df) => Number.isFinite(+v) ? Math.min(hi, Math.max(lo, Math.round(+v))) : df;
+  const slots = strList(b.slots, 48).filter(t => /^([01]\d|2[0-3]):[0-5]\d$/.test(t)).sort();
+  const sp = (Array.isArray(b.specialists) ? b.specialists : d.specialists).slice(0, 20).map((x, i) => ({
+    id: slugify(x.id || x.name) || 'agent-' + (i + 1), name: String(x.name || '').trim().slice(0, 80),
+    role: String(x.role || '').trim().slice(0, 120), langs: strList(x.langs, 12)
+  })).filter(x => x.name && x.langs.length);
+  return {
+    notifyEmail: /.+@.+\..+/.test(b.notifyEmail || '') ? String(b.notifyEmail).trim() : d.notifyEmail,
+    timezone: String(b.timezone || d.timezone),
+    durationMin: num(b.durationMin, 15, 120, d.durationMin),
+    daysAhead: num(b.daysAhead, 3, 90, d.daysAhead),
+    minNoticeHours: num(b.minNoticeHours, 0, 168, d.minNoticeHours),
+    workDays: [...new Set((Array.isArray(b.workDays) ? b.workDays : d.workDays).map(Number).filter(n => n >= 0 && n <= 6))].sort(),
+    slots: slots.length ? [...new Set(slots)] : d.slots,
+    languages: strList(b.languages, 20).length ? [...new Set(strList(b.languages, 20))] : d.languages,
+    specialists: sp.length ? sp : d.specialists
+  };
+}
 function cleanSettings(s) {
   const strList = a => (Array.isArray(a) ? a : []).map(x => String(x).trim()).filter(Boolean).slice(0, 50);
   return {
     categories: [...new Set(strList(s.categories))],
     groups: [...new Set(strList(s.groups))],
     showCatalog: s.showCatalog !== false,
+    booking: cleanBooking(s.booking),
     rows: (Array.isArray(s.rows) ? s.rows : []).slice(0, 12).map((r, i) => ({
       id: slugify(r.id || r.title) || 'row-' + (i + 1),
       title: String(r.title || '').trim().slice(0, 80),
@@ -189,4 +227,41 @@ async function upload(buf, type, name) {
   return '/uploads/' + file;
 }
 
-module.exports = { MODE, load, saveProduct, deleteProduct, reorder, saveSettings, upload, slugify };
+/* ---------- Bookings ---------- */
+const BOOKINGS = path.join(DATA, 'bookings.json');
+async function listBookings(limit) {
+  if (MODE === 'supabase') return (await sb('/rest/v1/rm_bookings?select=*&order=created_at.desc&limit=' + (limit || 500))).map(r => Object.assign({}, r.data, { ref: r.ref, status: r.status, createdAt: r.created_at }));
+  return readJson(BOOKINGS, []).slice().reverse().slice(0, limit || 500);
+}
+async function takenSlots(date) {
+  if (MODE === 'supabase') return (await sb('/rest/v1/rm_bookings?select=slot_key&slot_key=like.' + encodeURIComponent('*|' + date + '|*'))).map(r => r.slot_key);
+  return readJson(BOOKINGS, []).filter(b => b.slotKey && b.date === date).map(b => b.slotKey);
+}
+async function addBooking(b) {
+  const conflict = () => Object.assign(new Error('That time was just booked. Please pick another slot.'), { status: 409 });
+  if (MODE === 'supabase') {
+    const r = await fetch(SB + '/rest/v1/rm_bookings', { method: 'POST', headers: Object.assign({}, AUTH, { 'Content-Type': 'application/json', Prefer: 'return=minimal' }),
+      body: JSON.stringify({ ref: b.ref, slot_key: b.slotKey, status: 'confirmed', data: b }) });
+    if (r.status === 409) throw conflict();
+    if (!r.ok) throw new Error('supabase ' + r.status + ': ' + (await r.text()).slice(0, 200));
+    return b;
+  }
+  const all = readJson(BOOKINGS, []);
+  if (all.some(x => x.slotKey === b.slotKey)) throw conflict();
+  all.push(Object.assign({ status: 'confirmed', createdAt: new Date().toISOString() }, b));
+  writeJson(BOOKINGS, all);
+  return b;
+}
+async function setBookingStatus(ref, status) {
+  if (!['confirmed', 'completed', 'cancelled', 'no_show'].includes(status)) throw Object.assign(new Error('Bad status'), { status: 400 });
+  const free = status === 'cancelled';
+  if (MODE === 'supabase') {
+    const patch = { status }; if (free) patch.slot_key = null;
+    return sb('/rest/v1/rm_bookings?ref=eq.' + encodeURIComponent(ref), { method: 'PATCH', body: JSON.stringify(patch) });
+  }
+  const all = readJson(BOOKINGS, []);
+  all.forEach(b => { if (b.ref === ref) { b.status = status; if (free) b.slotKey = null; } });
+  writeJson(BOOKINGS, all);
+}
+
+module.exports = { MODE, load, saveProduct, deleteProduct, reorder, saveSettings, upload, slugify, listBookings, takenSlots, addBooking, setBookingStatus, cleanBooking };
