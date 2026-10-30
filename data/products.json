@@ -326,88 +326,6 @@
   "position": 3
  },
  {
-  "slug": "recorporate",
-  "name": "reCorporate",
-  "tagline": "The corporate & merchant portal for reID",
-  "category": "Identity",
-  "group": "ReSuit",
-  "status": "",
-  "deploy": "2 weeks",
-  "price": "",
-  "summary": "reCorporate is the business side of reID: a desktop portal where companies verify themselves, onboard their teams, run a merchant shop and accept reAED payments, all linked to their customers' reID identities.",
-  "whatItIs": "A white-label corporate and merchant portal on top of reID, giving businesses KYB-verified company accounts, staff roles, bulk onboarding and a merchant shop.",
-  "image": "/img/products/recorporate.jpg",
-  "hero": "",
-  "mobileImage": "",
-  "logo": "",
-  "externalUrl": "https://corporate.reidentity.net",
-  "demoUrl": "",
-  "demoEmail": "",
-  "demoPassword": "",
-  "demoNote": "Sandbox data resets nightly. No real funds, KYC records, or on-chain transactions are created.",
-  "investUrl": "",
-  "pdfDesktop": "",
-  "pdfMobile": "",
-  "tone": "a",
-  "sourceUrl": "",
-  "features": [
-   "KYB verification",
-   "Team roles & permissions",
-   "Bulk staff invite",
-   "Merchant shop",
-   "reAED payments",
-   "Loyalty & cashback"
-  ],
-  "whyPoints": [
-   "One verified company identity across the whole ReSystem ecosystem",
-   "Onboard hundreds of staff in minutes with bulk invite",
-   "Sell to every reID user through a built-in merchant shop",
-   "Payments, rewards and compliance in one place"
-  ],
-  "whatYouCanDo": [
-   "Verify your company with KYB and get a trusted business profile",
-   "Invite staff in bulk and assign roles such as Admin, Finance and Cashier",
-   "Publish products and services in your merchant shop",
-   "Accept reAED and track sales, payouts and cashback"
-  ],
-  "useCases": [
-   "Corporate onboarding for reID",
-   "Merchant payments & loyalty",
-   "Enterprise staff identity",
-   "Government & public-sector entities"
-  ],
-  "stats": [],
-  "highlights": [
-   {
-    "title": "KYB verification",
-    "text": "Company verification with documents and ownership checks."
-   },
-   {
-    "title": "Team roles & permissions",
-    "text": "Admins, finance, cashiers and custom roles with fine-grained access."
-   },
-   {
-    "title": "Bulk staff invite",
-    "text": "Upload a CSV and onboard your whole team to reID at once."
-   },
-   {
-    "title": "Merchant shop",
-    "text": "List products and services that every reID user can buy."
-   }
-  ],
-  "demoCreds": [],
-  "featureIcons": [
-   "shield",
-   "users",
-   "mail",
-   "store",
-   "coin",
-   "gift"
-  ],
-  "visible": true,
-  "position": 4
- },
- {
   "slug": "rewallet",
   "name": "reWALLET",
   "tagline": "One wallet. Every network. Complete control.",
@@ -496,7 +414,7 @@
   ],
   "demoCreds": [],
   "visible": true,
-  "position": 5
+  "position": 4
  },
  {
   "slug": "reinvest",
@@ -585,7 +503,7 @@
    }
   ],
   "visible": true,
-  "position": 6
+  "position": 5
  },
  {
   "slug": "fractionaire",
@@ -679,7 +597,7 @@
    }
   ],
   "visible": true,
-  "position": 7
+  "position": 6
  },
  {
   "slug": "cet",
@@ -770,7 +688,7 @@
    }
   ],
   "visible": true,
-  "position": 8
+  "position": 7
  },
  {
   "slug": "rechain",
@@ -823,7 +741,7 @@
   "highlights": [],
   "demoCreds": [],
   "visible": true,
-  "position": 9
+  "position": 8
  },
  {
   "slug": "redomain",
@@ -906,7 +824,7 @@
    }
   ],
   "visible": true,
-  "position": 10
+  "position": 9
  },
  {
   "slug": "mine",
@@ -965,7 +883,7 @@
   ],
   "demoCreds": [],
   "visible": true,
-  "position": 11
+  "position": 10
  },
  {
   "slug": "tunetailor",
@@ -1048,7 +966,7 @@
    }
   ],
   "visible": true,
-  "position": 12
+  "position": 11
  },
  {
   "slug": "prohandover",
@@ -1105,7 +1023,7 @@
   "highlights": [],
   "demoCreds": [],
   "visible": true,
-  "position": 13
+  "position": 12
  },
  {
   "slug": "hostick",
@@ -1162,7 +1080,7 @@
   "highlights": [],
   "demoCreds": [],
   "visible": true,
-  "position": 14
+  "position": 13
  },
  {
   "slug": "rediscover",
@@ -1197,7 +1115,7 @@
   "highlights": [],
   "demoCreds": [],
   "visible": true,
-  "position": 15
+  "position": 14
  },
  {
   "slug": "aiconcierge",
@@ -1232,7 +1150,7 @@
   "highlights": [],
   "demoCreds": [],
   "visible": true,
-  "position": 16
+  "position": 15
  },
  {
   "slug": "ico-platform",
@@ -1267,6 +1185,6 @@
   "highlights": [],
   "demoCreds": [],
   "visible": true,
-  "position": 17
+  "position": 16
  }
 ]
