@@ -596,3 +596,4 @@ a.pa-res i { font-style: normal; color: var(--accent); font-weight: 700; }
 .hx-rot > span { left: 0; right: 0; text-align: center; }
 .hx-rot > .hx-measure { right: auto; }
 .hx-l1 { white-space: nowrap; }
+.hx-rot, .hx-rot > span { text-align: left; }
