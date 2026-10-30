@@ -71,9 +71,9 @@
       </section>
 
       <section class="pa-hero">
-        ${banner ? `<div class="pa-banner"><img src="${esc(banner)}" alt="${esc(p.name)} product preview"></div>` : ''}
+        ${banner ? `<div class="pa-banner" style="--bg:url('${esc(banner)}')"><img src="${esc(banner)}" alt="${esc(p.name)} product preview"></div>` : ''}
         <div class="pa-facts">${facts.map(([l, v]) => `<div><span>${l}</span><b>${esc(v)}</b></div>`).join('')}
-          ${has(p.stats) ? p.stats.slice(0, 3).map(s => `<div class="acc"><span>Highlight</span><b>${esc(s)}</b></div>`).join('') : ''}</div>
+          ${has(p.stats) ? p.stats.slice(0, facts.length % 2 ? 1 : 2).map(s => `<div class="acc"><span>Highlight</span><b>${esc(s)}</b></div>`).join('') : ''}</div>
       </section>
 
       <nav class="pa-tabs" id="paTabs">${tabs.map(([id, l], i) => `<a href="#${id}"${i ? '' : ' class="on"'}>${l}</a>`).join('')}</nav>
