@@ -153,5 +153,9 @@
     if (f && b) { b[f] = e.target.value; $('#bNext').disabled = !valid(b.step); }
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.overlay').forEach(o => RM.closeOv('#' + o.id)); });
-  document.addEventListener('DOMContentLoaded', () => { const y = $('#yr'); if (y) y.textContent = new Date().getFullYear(); });
+  document.addEventListener('DOMContentLoaded', () => {
+    const y = $('#yr'); if (y) y.textContent = new Date().getFullYear();
+    const fx = document.createElement('div'); fx.className = 'bg-fx'; fx.setAttribute('aria-hidden', 'true'); fx.innerHTML = '<i></i><i></i><i></i>';
+    document.body.prepend(fx);
+  });
 })();
