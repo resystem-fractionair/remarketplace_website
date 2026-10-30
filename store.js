@@ -8,6 +8,8 @@ const SB = (process.env.SUPABASE_URL || '').replace(/\/$/, '');
 const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const BUCKET = process.env.SUPABASE_BUCKET || 'rm-images';
 const MODE = SB && KEY ? 'supabase' : 'file';
+// New sb_secret_ keys go in the apikey header only; legacy JWT service_role keys also go in Authorization.
+const AUTH = KEY.startsWith('eyJ') ? { apikey: KEY, Authorization: 'Bearer ' + KEY } : { apikey: KEY };
 const DATA = path.join(__dirname, 'data');
 const SEED_PRODUCTS = path.join(DATA, 'products.json');
 const SEED_SETTINGS = path.join(DATA, 'settings.json');
@@ -66,7 +68,7 @@ function writeJson(f, v) { fs.writeFileSync(f, JSON.stringify(v, null, 1)); }
 /* ---------- Supabase REST helpers ---------- */
 async function sb(pathname, opts = {}) {
   const r = await fetch(SB + pathname, Object.assign({}, opts, {
-    headers: Object.assign({ apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' }, opts.headers || {})
+    headers: Object.assign({}, AUTH, { 'Content-Type': 'application/json' }, opts.headers || {})
   }));
   if (!r.ok) throw new Error(`supabase ${r.status}: ${(await r.text()).slice(0, 200)}`);
   const t = await r.text();
@@ -171,7 +173,7 @@ async function upload(buf, type, name) {
   if (!ext) throw Object.assign(new Error('Only PNG, JPG, WEBP, GIF, SVG or PDF files'), { status: 415 });
   const file = `${slugify(name) || 'file'}-${crypto.randomBytes(4).toString('hex')}.${ext}`;
   if (MODE === 'supabase') {
-    const r = await fetch(`${SB}/storage/v1/object/${BUCKET}/${file}`, { method: 'POST', headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': type, 'x-upsert': 'true' }, body: buf });
+    const r = await fetch(`${SB}/storage/v1/object/${BUCKET}/${file}`, { method: 'POST', headers: Object.assign({}, AUTH, { 'Content-Type': type, 'x-upsert': 'true' }), body: buf });
     if (!r.ok) throw new Error('upload failed: ' + r.status);
     return `${SB}/storage/v1/object/public/${BUCKET}/${file}`;
   }
