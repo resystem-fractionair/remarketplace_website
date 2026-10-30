@@ -491,3 +491,5 @@ a.pa-res i { font-style: normal; color: var(--accent); font-weight: 700; }
 .bk-rva { display: flex; align-items: center; gap: 10px; }
 .bk-rva img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
 @media (max-width: 560px) { .bk-agent { flex-wrap: wrap; } .bk-agent .bk-free { width: 100%; padding-left: 68px; } }
+.pa-resgrid { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
+.pa-resgrid a.pa-res { background: var(--card); padding: 12px 14px; }

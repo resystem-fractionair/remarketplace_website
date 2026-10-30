@@ -96,6 +96,8 @@
           </div>` : ''}
 
           ${has(p.useCases) ? `<section id="use-cases" class="pa-sec"><h2>Use cases</h2><div class="pa-uc">${p.useCases.map((u, i) => `<div><span>${String(i + 1).padStart(2, '0')}</span>${esc(u)}</div>`).join('')}</div></section>` : ''}
+          ${res.length ? `<section id="resources" class="pa-sec"><h2>Resources</h2><div class="pa-resgrid">${res.map(r => `
+            <a class="pa-res" href="${esc(r.href)}" target="_blank" rel="noopener"><span class="ic">${r.icon}</span><span><b>${esc(r.t)}</b><small>${esc(r.s)}</small></span><i>${r.ext ? '↗' : '↓'}</i></a>`).join('')}</div></section>` : ''}
         </main>
 
         <aside class="pa-side">
@@ -111,8 +113,7 @@
             ${demo ? `<a class="btn btn-accent block" href="${esc(demo)}" target="_blank" rel="noopener">Open demo ↗</a>` : ''}
           </div>
 
-          ${res.length ? `<div class="pa-card"><h3>Resources</h3>${res.map(r => `
-            <a class="pa-res" href="${esc(r.href)}" target="_blank" rel="noopener"><span class="ic">${r.icon}</span><span><b>${esc(r.t)}</b><small>${esc(r.s)}</small></span><i>${r.ext ? '↗' : '↓'}</i></a>`).join('')}</div>` : ''}
+
 
           ${p.investUrl ? `<div class="pa-invest" id="invest"><span class="ic">${I.chart}</span><b>Own a share of ${esc(p.name)}</b><span>On-chain shares on INFRA Network via ReSystem Business Opportunity.</span>
             <a class="btn btn-white block" href="${esc(p.investUrl)}" target="_blank" rel="noopener">View opportunity ↗</a></div>` : ''}
@@ -122,8 +123,7 @@
             <div><b>Share this product</b><span>Scan to open on another device</span>
               <div><a href="/qr/${esc(p.slug)}.png" download="${esc(p.slug)}-qr.png">Download QR</a> · <button class="link" data-copy="${esc(pageUrl)}">Copy link</button></div></div>
           </div>
-          ${featured.length ? `<div class="pa-card pa-featside"><h3>Featured products</h3>${featured.slice(0, 4).map(r => `
-            <a class="pa-fs" href="/product/${esc(r.slug)}">${r.image ? `<span class="ri"><img src="${esc(r.image)}" alt="" loading="lazy"></span>` : RM.mark(r)}<span class="rt"><b>${esc(r.name)}</b><small>${esc(r.tagline || r.category)}</small></span></a>`).join('')}</div>` : ''}
+
         </aside>
       </div>
 
