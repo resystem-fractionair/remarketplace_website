@@ -52,9 +52,54 @@ const DEFAULT_SETTINGS = () => {
       { id: 'invest', title: 'Invest & own', subtitle: 'Wealth, fractional ownership and real-world assets', slugs: ['reinvest', 'fractionaire', 'cet', 'infra-global'] },
       { id: 'partners', title: 'Partner products', subtitle: 'Live businesses ready to white-label', slugs: ['redomain', 'tunetailor', 'mine', 'prohandover', 'hostick'] }
     ],
-    booking: DEFAULT_BOOKING()
+    booking: DEFAULT_BOOKING(),
+    home: { defaultSlugs: ['remarketplace', 'reid', 'rewallet', 'reinvest', 'fractionaire', 'infra-reaed'], limit: 6 },
+    qr: { mainUrl: '' },
+    content: DEFAULT_CONTENT()
   };
 };
+const DEFAULT_CONTENT = () => ({
+  seo: { title: 'reMarketplace — Launch fintech & Web3 products in days', description: 'reMarketplace gives businesses pre-built, white-label fintech, Web3, AI and identity products to customise, rebrand and deploy in days, not months.' },
+  hero: { eyebrow: 'White-label concept · ReSystem ecosystem', prefix: 'Launch', words: ['fintech', 'identity', 'Web3', 'wallet', 'investment', 'AI'], line2: 'products in days,', accent: 'not months.',
+    subtitle: 'Pre-built infrastructure to build, launch and scale fully functional products — simple to customise, rebrand and deploy under your name.',
+    cta1: 'Browse products', cta2: 'Book a demo call',
+    stats: [{ value: '', suffix: '', label: 'ecosystem products' }, { value: '3', suffix: ' wks', label: 'to a vertical marketplace' }, { value: '99.9', suffix: '%', label: 'uptime · 38ms latency' }, { value: '1200', suffix: '', label: 'TPS on ReSystem backend' }] },
+  why: { eyebrow: 'Why reMarketplace', title: 'Everything you need to launch, own and scale.', items: [
+    { t: 'Affordable entry', d: 'Own a share of assets that are normally out of reach.' }, { t: 'Fast resale', d: 'Sell or trade in a built-in marketplace — no waiting for buyers.' },
+    { t: 'Provable ownership', d: 'Every holding and transfer is recorded on-chain.' }, { t: 'Live in 3 weeks', d: 'White-label a vertical marketplace under your brand.' }] },
+  steps: { eyebrow: 'For product builders', title: 'Everyone gets a chance to be listed.', subtitle: 'From idea to a licensed product other businesses can deploy — in six steps.', items: [
+    { t: 'Get it built', d: 'The ReSystem team builds your master label.' }, { t: 'List it', d: 'Publish your master label in the pre-built marketplace.' },
+    { t: 'Promote it', d: 'Advertise your product to the whole ecosystem.' }, { t: 'Upgrade B2C', d: 'Turn an existing consumer product into a master label.' },
+    { t: 'Stay compliant', d: 'Audit-ready with KYC, logs and controls by default.' }, { t: 'Scale globally', d: 'Run on the ReSystem backend from day one.' }] },
+  glossary: { masterTitle: 'Master label', master: 'Software or a B2B-licensed product built to be scaled and customised.', arrow: 'rebrand & sub-license',
+    whiteTitle: 'White label', white: 'A sub-licensed product created and rebranded from a master label.', qrTitle: 'Scan to explore', qrText: 'Open the catalog on your phone. Every product page has its own QR code too.' },
+  catalog: { title: 'All products', note: 'Open any product for full details, its live demo, brochure, QR code and investment opportunity.', viewAll: 'View all products' },
+  faq: [
+    { q: 'What does “pre-built” actually mean?', a: 'Each product is a running system — backend, admin console, APIs and front-end — already built, tested and deployed. You configure it, apply your brand, connect your data and go live.' },
+    { q: 'How long until we are live?', a: 'Between three days and three weeks depending on the product. A white-label vertical marketplace takes about three weeks.' },
+    { q: 'Whose brand does the customer see?', a: 'Yours only. Domains, logo, colours, emails and documentation all ship under your brand name.' },
+    { q: 'Can we run more than one product together?', a: 'Yes. Products share one identity layer (reID), one ledger on INFRA Network and one admin console, so they behave like a single platform.' },
+    { q: 'Can I list my own product?', a: 'Yes. Have the ReSystem team build your master label, or upgrade an existing B2C product into one, and list it here for other businesses to license.' },
+    { q: 'Do we get the source code?', a: 'Source access and self-hosting are available on enterprise agreements. Most customers stay on the managed deployment, which includes updates, monitoring and support.' },
+    { q: 'Can I invest in a product?', a: 'Several products offer on-chain shares through the ReSystem Business Opportunity programme. Each product page links to its investment opportunity where one exists.' }],
+  footer: { tagline: 'Pre-built, white-label products for fintech, Web3, AI and identity. Part of the ReSystem ecosystem.', email: 'info@remarketplace.store',
+    linkedin: 'https://www.linkedin.com/company/resystemglobal', x: 'https://x.com/Reidentity_net', company: 'Desert Tech Cloud Services LLC · Dubai, UAE' }
+});
+/* Merge saved content over defaults, keeping shapes; strings capped, lists limited */
+function cleanContent(c) {
+  const d = DEFAULT_CONTENT(); c = c && typeof c === 'object' ? c : {};
+  const str = (v, df, n) => typeof v === 'string' ? v.trim().slice(0, n || 400) : df;
+  const merge = (dv, v) => {
+    if (Array.isArray(dv)) {
+      if (!Array.isArray(v)) return dv;
+      if (typeof dv[0] === 'string') return v.map(x => String(x).trim()).filter(Boolean).slice(0, 20);
+      return v.slice(0, 20).map(x => Object.fromEntries(Object.keys(dv[0]).map(k => [k, str(x && x[k], '', 1200)]))).filter(x => Object.values(x).some(Boolean));
+    }
+    if (dv && typeof dv === 'object') return Object.fromEntries(Object.keys(dv).map(k => [k, merge(dv[k], v && v[k])]));
+    return str(v, dv, 1200);
+  };
+  return merge(d, c);
+}
 const DEFAULT_BOOKING = () => ({
   notifyEmail: 'info@remarketplace.store',
   timezone: 'Asia/Dubai',
@@ -106,6 +151,9 @@ function cleanSettings(s) {
     groups: [...new Set(strList(s.groups))],
     showCatalog: s.showCatalog !== false,
     booking: cleanBooking(s.booking),
+    home: { defaultSlugs: [...new Set(strList(s.home && s.home.defaultSlugs).map(slugify))].slice(0, 24), limit: Math.min(24, Math.max(1, +(s.home && s.home.limit) || 6)) },
+    qr: { mainUrl: /^https?:\/\//.test(String(s.qr && s.qr.mainUrl || '')) ? String(s.qr.mainUrl).trim().slice(0, 300) : '' },
+    content: cleanContent(s.content),
     rows: (Array.isArray(s.rows) ? s.rows : []).slice(0, 12).map((r, i) => ({
       id: slugify(r.id || r.title) || 'row-' + (i + 1),
       title: String(r.title || '').trim().slice(0, 80),
@@ -272,4 +320,4 @@ async function setBookingStatus(ref, status) {
   writeJson(BOOKINGS, all);
 }
 
-module.exports = { MODE, load, saveProduct, deleteProduct, reorder, saveSettings, upload, slugify, listBookings, takenSlots, addBooking, setBookingStatus, cleanBooking };
+module.exports = { DEFAULT_CONTENT, MODE, load, saveProduct, deleteProduct, reorder, saveSettings, upload, slugify, listBookings, takenSlots, addBooking, setBookingStatus, cleanBooking };

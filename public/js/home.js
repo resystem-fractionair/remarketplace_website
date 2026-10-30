@@ -9,17 +9,9 @@
         <p>${esc(p.tagline || p.summary)}</p>
         <div class="card-foot"><span>${p.deploy ? 'Live in ' + esc(p.deploy) : esc(p.group || '')}</span><span class="view">View product →</span></div>
       </a>`;
-  const FAQS = [
-    { q: 'What does “pre-built” actually mean?', a: 'Each product is a running system — backend, admin console, APIs and front-end — already built, tested and deployed. You configure it, apply your brand, connect your data and go live. Nothing is written from scratch.' },
-    { q: 'How long until we are live?', a: 'Between three days and three weeks depending on the product. A white-label vertical marketplace takes about three weeks.' },
-    { q: 'Whose brand does the customer see?', a: 'Yours only. Domains, logo, colours, emails and documentation all ship under your brand name.' },
-    { q: 'Can we run more than one product together?', a: 'Yes. Products share one identity layer (reID), one ledger on INFRA Network and one admin console, so they behave like a single platform.' },
-    { q: 'Can I list my own product?', a: 'Yes. Have the ReSystem team build your master label, or upgrade an existing B2C product into one, and list it here for other businesses to license.' },
-    { q: 'Do we get the source code?', a: 'Source access and self-hosting are available on enterprise agreements. Most customers stay on the managed deployment, which includes updates, monitoring and support.' },
-    { q: 'Can I invest in a product?', a: 'Several products offer on-chain shares through the ReSystem Business Opportunity programme. Each product page links to its investment opportunity where one exists.' }
-  ];
+  let FAQS = [], C = null, HOME = { defaultSlugs: [], limit: 6 };
   const days = s => (parseInt(s, 10) || 99) * (/week/.test(s || '') ? 7 : 1);
-  const st = { q: '', cat: 'All', sort: 'Featured', faq: 0 };
+  const st = { q: '', cat: 'All', sort: 'Featured', faq: 0, all: false };
   let cats = ['All'];
 
   function renderChips() {
@@ -32,9 +24,18 @@
       (!q || [p.name, p.category, p.tagline, p.summary].join(' ').toLowerCase().includes(q)));
     if (st.sort === 'A–Z') list.sort((a, b) => a.name.localeCompare(b.name));
     else if (st.sort === 'Fastest to deploy') list.sort((a, b) => days(a.deploy) - days(b.deploy));
-    $('#count').textContent = `${list.length} of ${all.length} products`;
+    /* default view: the products chosen in Admin → Homepage, in that order */
+    const curated = st.cat === 'All' && !q && !st.all && HOME.defaultSlugs.length;
+    if (curated) {
+      const pick = HOME.defaultSlugs.map(s => all.find(p => p.slug === s)).filter(Boolean).slice(0, HOME.limit);
+      if (pick.length) list = st.sort === 'Featured' ? pick : list.filter(p => pick.includes(p)).slice(0, HOME.limit);
+    }
+    $('#count').textContent = curated ? `Showing ${list.length} of ${all.length} products` : `${list.length} of ${all.length} products`;
     $('#empty').hidden = list.length > 0;
     $('#grid').innerHTML = list.map(card).join('');
+    const va = $('#viewAll');
+    if (va) { va.hidden = !(curated && list.length < all.length) && !(st.all && st.cat === 'All' && !q && HOME.defaultSlugs.length);
+      va.textContent = st.all ? 'Show featured only' : `${(C && C.catalog.viewAll) || 'View all products'} (${all.length})`; }
   }
   function renderFaq() {
     $('#faqs').innerHTML = FAQS.map((f, i) => `
@@ -47,6 +48,7 @@
   document.addEventListener('click', e => {
     const t = e.target.closest('button'); if (!t) return;
     const d = t.dataset;
+    if (t.id === 'viewAll') { st.all = !st.all; renderGrid(); if (!st.all) document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' }); return; }
     if (d.cat) { st.cat = d.cat; renderChips(); renderGrid(); }
     else if (d.sort) { st.sort = d.sort; renderChips(); renderGrid(); }
     else if (d.faq) { st.faq = st.faq === +d.faq ? -1 : +d.faq; renderFaq(); }
@@ -57,7 +59,7 @@
   renderFaq();
 
   /* ---------- Section motion: reveal on scroll + running step highlight ---------- */
-  (() => {
+  const motion = () => {
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const els = document.querySelectorAll('.wx-card, .lx-track li, .gx-card, .gx-arrow, .gx-qr, .wx-head');
     els.forEach((el, i) => { el.classList.add('rv'); el.style.setProperty('--d', (([...el.parentNode.children].indexOf(el)) * 90) + 'ms'); });
@@ -68,11 +70,11 @@
     const items = [...track.children]; let k = 0, timer = null;
     const run = () => { items.forEach((li, i) => li.classList.toggle('lx-act', i === k)); items.forEach((li, i) => li.classList.toggle('lx-done', i < k)); k = (k + 1) % (items.length + 1); };
     new IntersectionObserver(([e]) => { if (e.isIntersecting && !timer) { run(); timer = setInterval(run, 1100); } else if (!e.isIntersecting && timer) { clearInterval(timer); timer = null; } }, { threshold: .3 }).observe(track);
-  })();
+  };
 
   /* ---------- Animated hero ---------- */
   function hero(list) {
-    const words = ['fintech', 'identity', 'Web3', 'wallet', 'investment', 'AI'];
+    const words = (C && C.hero.words.length) ? C.hero.words : ['fintech'];
     const rot = $('#hxRot'); let w = 0;
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     /* measure each word once; the box eases to the next word's width so the line never jumps or overlaps */
@@ -93,7 +95,7 @@
     rot.firstElementChild.className = 'cur';
     if (!reduce) setTimeout(step, 2800);
     /* count-up */
-    $('#statCount').dataset.count = list.length;
+    if ($('#statCount')) $('#statCount').dataset.count = list.length;
     const io = new IntersectionObserver(es => es.forEach(e => {
       if (!e.isIntersecting) return; io.unobserve(e.target);
       const el = e.target, to = +el.dataset.count, dec = +(el.dataset.dec || 0), t0 = performance.now(), dur = reduce ? 1 : 1400;
@@ -166,15 +168,51 @@
     requestAnimationFrame(draw);
 
   }
+  /* ---------- Site content from Admin → Site content ---------- */
+  const IC = [
+    '<path d="M12 3v18M17 7H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6"/>', '<path d="M4 17l5-5 4 4 7-8"/><path d="M15 8h5v5"/>',
+    '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>', '<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>',
+    '<path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/>', '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'];
+  const svg = d => `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const set = (sel, v) => { const el = $(sel); if (el && v != null) el.textContent = v; };
+  function apply(c, count) {
+    if (!c) return;
+    if (c.seo.title) document.title = c.seo.title;
+    const md = document.querySelector('meta[name="description"]'); if (md && c.seo.description) md.setAttribute('content', c.seo.description);
+    const h = c.hero;
+    set('.hx-copy > .eyebrow', h.eyebrow);
+    $('#hxRot').innerHTML = `<span>${esc(h.words[0] || '')}</span>`;
+    const l1 = $('.hx-l1'); if (l1) l1.firstChild.textContent = h.prefix + ' ';
+    const h1 = $('.hx h1'); if (h1) { h1.childNodes.forEach(n => { if (n.nodeType === 3 && n.textContent.trim()) n.textContent = h.line2 + ' '; }); }
+    set('.hx h1 em', h.accent); set('.hx-copy > p', h.subtitle);
+    const ctas = document.querySelectorAll('.hx-copy .hero-cta .btn'); if (ctas[0]) ctas[0].textContent = h.cta1; if (ctas[1]) ctas[1].textContent = h.cta2;
+    $('.hx-stats').innerHTML = h.stats.map((x, i) => { const v = x.value || (i === 0 ? String(count) : '0'); const dec = (v.split('.')[1] || '').length;
+      return `<div><b data-count="${esc(v)}" data-dec="${dec}" data-suffix="${esc(x.suffix)}"${+v >= 1000 ? ' data-sep="1"' : ''}${i === 0 && !x.value ? ' id="statCount"' : ''}>0</b><span>${esc(x.label)}</span></div>`; }).join('');
+    const w = c.why;
+    set('#why .wx-head .eyebrow', w.eyebrow); set('#why .wx-head h2', w.title);
+    $('#why .wx-grid').innerHTML = w.items.map((x, i) => `<article class="wx-card"><span class="wx-ic">${svg(IC[i % IC.length])}</span><h3>${esc(x.t)}</h3><p>${esc(x.d)}</p></article>`).join('');
+    const sp = c.steps;
+    set('.lx .wx-head .eyebrow', sp.eyebrow); set('.lx .wx-head h2', sp.title); set('.lx .wx-head p', sp.subtitle);
+    $('.lx-track').innerHTML = sp.items.map((x, i) => `<li><span class="lx-n">${String(i + 1).padStart(2, '0')}</span><b>${esc(x.t)}</b><small>${esc(x.d)}</small></li>`).join('');
+    const g = c.glossary;
+    set('.gx-master .gx-tag', g.masterTitle); set('.gx-master p', g.master); set('.gx-arrow em', g.arrow);
+    set('.gx-white .gx-tag', g.whiteTitle); set('.gx-white p', g.white); set('.gx-qr b', g.qrTitle); set('.gx-qr div span', g.qrText);
+    set('#catalog .cat-head h2', c.catalog.title); set('#catalog > .small', c.catalog.note);
+    FAQS = c.faq; renderFaq();
+    const f = c.footer;
+    set('.foot-grid > div:first-child p', f.tagline);
+    const fl = document.querySelectorAll('.foot-grid > div:last-child a');
+    if (fl[0]) { fl[0].textContent = f.email; fl[0].href = 'mailto:' + f.email; } if (fl[1]) fl[1].href = f.linkedin; if (fl[2]) fl[2].href = f.x;
+    const fb = $('.foot-bottom'); if (fb) fb.innerHTML = `© <span id="yr">${new Date().getFullYear()}</span> ${esc(f.company)}`;
+  }
+
   fetch('/api/home').then(r => r.json()).then(home => {
     const list = RM.products = home.products;
+    C = home.content; HOME = home.home || HOME;
     cats = ['All', ...home.categories];
+    apply(C, list.length);
     hero(list);
-    $('#homeRows').innerHTML = '' && home.rows.map(r => `
-      <section class="wrap hrow">
-        <div class="cat-head"><div><h2>${esc(r.title)}</h2>${r.subtitle ? `<p class="muted">${esc(r.subtitle)}</p>` : ''}</div></div>
-        <div class="grid">${r.products.map(card).join('')}</div>
-      </section>`).join('');
+    motion();
     $('#catalog').hidden = !home.showCatalog;
     renderChips(); renderGrid();
   });

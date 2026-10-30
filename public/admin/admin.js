@@ -30,7 +30,7 @@
       $('#login').hidden = true; $('#app').hidden = false;
       $('#mode').textContent = S.mode === 'supabase' ? '● Live database' : '● Local files (dev)';
       $('#mode').className = 'mode ' + S.mode;
-      renderProducts(); renderRows(); renderCats();
+      renderProducts(); renderRows(); renderCats(); renderHome();
     } catch (_) { showLogin(); }
   }
 
@@ -38,8 +38,11 @@
   $('#tabs').onclick = e => {
     const b = e.target.closest('[data-tab]'); if (!b) return;
     document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
-    ['products', 'rows', 'cats', 'bookings'].forEach(t => { $('#tab-' + t).hidden = t !== b.dataset.tab; });
+    ['products', 'rows', 'content', 'cats', 'bookings', 'qr'].forEach(t => { $('#tab-' + t).hidden = t !== b.dataset.tab; });
     if (b.dataset.tab === 'bookings') loadBookings();
+    if (b.dataset.tab === 'qr') renderQR();
+    if (b.dataset.tab === 'content') renderContent();
+    if (b.dataset.tab === 'rows') renderHome();
   };
 
   /* ---------- Products list ---------- */
@@ -375,6 +378,76 @@
     await saveSettings('Booking settings saved');
     AG = []; renderAgents.init = false; renderBkForm();
   };
+
+  /* ---------- Homepage default products ---------- */
+  function renderHome() {
+    const h = S.settings.home || (S.settings.home = { defaultSlugs: [], limit: 6 });
+    $('#homeLimit').value = h.limit;
+    $('#homeChips').innerHTML = h.defaultSlugs.map((s, i) => { const p = pBy(s); return p ? `<div class="pchip${p.visible ? '' : ' off'}${i >= h.limit ? ' over' : ''}" draggable="true" data-s="${esc(s)}"><span class="pn">${i + 1}</span>${thumb(p)}<span>${esc(p.name)}${p.visible ? '' : ' <em>(hidden)</em>'}</span><button data-hrem="${esc(s)}" title="Remove">×</button></div>` : ''; }).join('')
+      || '<span class="muted small">No default products — the homepage will show every product.</span>';
+    $('#homeAdd').innerHTML = '<option value="">+ Add a product…</option>' + S.products.filter(p => !h.defaultSlugs.includes(p.slug)).map(p => `<option value="${esc(p.slug)}">${esc(p.name)} — ${esc(p.category)}</option>`).join('');
+  }
+  sortable($('#homeChips'), '.pchip', () => { S.settings.home.defaultSlugs = [...document.querySelectorAll('#homeChips .pchip')].map(el => el.dataset.s); renderHome(); });
+  $('#homeAdd').onchange = e => { if (e.target.value) { S.settings.home.defaultSlugs.push(e.target.value); renderHome(); } };
+  $('#homeChips').addEventListener('click', e => { const b = e.target.closest('[data-hrem]'); if (b) { S.settings.home.defaultSlugs = S.settings.home.defaultSlugs.filter(s => s !== b.dataset.hrem); renderHome(); } });
+  $('#homeLimit').oninput = e => { S.settings.home.limit = Math.max(1, Math.min(24, +e.target.value || 6)); renderHome(); };
+  $('#saveHome').onclick = () => saveSettings('Default products saved');
+
+  /* ---------- Site content (generic form built from the content structure) ---------- */
+  const LABELS = { seo: 'SEO (browser title & search snippet)', hero: 'Hero', why: 'Why reMarketplace cards', steps: 'Listing steps', glossary: 'Glossary & QR card', catalog: 'All products section', faq: 'FAQ', footer: 'Footer' };
+  const pretty = k => ({ cta1: 'Primary button', cta2: 'Secondary button', line2: 'Line 2', accent: 'Orange ending', prefix: 'First word', words: 'Rotating words (comma separated)', t: 'Title', d: 'Text', q: 'Question', a: 'Answer', x: 'X / Twitter URL', linkedin: 'LinkedIn URL', viewAll: '"View all" button' }[k] || k.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()));
+  let CT = null;
+  function renderContent() {
+    CT = JSON.parse(JSON.stringify(S.settings.content || {}));
+    const field = (path, k, v) => {
+      const long = String(v).length > 70 || /subtitle|description|master|white|text|tagline|^a$|^d$/.test(k);
+      return `<label>${esc(pretty(k))}${long ? `<textarea data-cp="${path}" rows="2">${esc(v)}</textarea>` : `<input data-cp="${path}" value="${esc(v)}">`}</label>`;
+    };
+    const obj = (o, base) => Object.entries(o).map(([k, v]) => {
+      const p = base ? base + '.' + k : k;
+      if (Array.isArray(v) && (typeof v[0] === 'string' || !v.length && k === 'words')) return `<label class="wide">${esc(pretty(k))}<input data-cp="${p}" data-list="1" value="${esc(v.join(', '))}"></label>`;
+      if (Array.isArray(v)) return `<div class="ct-list wide"><div class="ct-lh"><b>${esc(pretty(k))}</b><button type="button" class="btn btn-ghost sm" data-cadd="${p}">+ Add</button></div>
+        ${v.map((it, i) => `<div class="ct-item"><span class="pn">${i + 1}</span><div class="ct-if">${Object.entries(it).map(([kk, vv]) => field(`${p}.${i}.${kk}`, kk, vv)).join('')}</div>
+          <div class="ct-ia"><button type="button" class="icon" data-cmv="${p}.${i}.-1" title="Up"${i ? '' : ' disabled'}>↑</button><button type="button" class="icon" data-cmv="${p}.${i}.1" title="Down"${i < v.length - 1 ? '' : ' disabled'}>↓</button><button type="button" class="icon danger" data-cdel="${p}.${i}" title="Remove">✕</button></div></div>`).join('')}</div>`;
+      if (v && typeof v === 'object') return obj(v, p);
+      return field(p, k, v);
+    }).join('');
+    $('#contentForm').innerHTML = Object.entries(CT).map(([k, v]) => `<fieldset class="box-card"><legend>${esc(LABELS[k] || k)}</legend><div class="ct-grid">${Array.isArray(v) ? obj({ [k]: v }, '').replace(/data-cp="\./g, 'data-cp="').replace(/data-c(add|mv|del)="\./g, 'data-c$1="') : obj(v, k)}</div></fieldset>`).join('');
+  }
+  const getP = (o, p) => p.split('.').reduce((x, k) => x[k], o);
+  const setP = (o, p, v) => { const ks = p.split('.'), last = ks.pop(); ks.reduce((x, k) => x[k], o)[last] = v; };
+  $('#contentForm').addEventListener('input', e => { const p = e.target.dataset.cp; if (!p) return; setP(CT, p, e.target.dataset.list ? e.target.value.split(',').map(x => x.trim()).filter(Boolean) : e.target.value); });
+  $('#contentForm').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return; const d = b.dataset;
+    if (d.cadd) { const arr = getP(CT, d.cadd); arr.push(Object.fromEntries(Object.keys(arr[0] || { t: '', d: '' }).map(k => [k, '']))); }
+    else if (d.cdel) { const ks = d.cdel.split('.'), i = +ks.pop(); getP(CT, ks.join('.')).splice(i, 1); }
+    else if (d.cmv) { const ks = d.cmv.split('.'), dir = +ks.pop(), i = +ks.pop(), arr = getP(CT, ks.join('.')); [arr[i], arr[i + dir]] = [arr[i + dir], arr[i]]; }
+    else return;
+    S.settings.content = CT; renderContent();
+  });
+  $('#saveContent').onclick = async () => { S.settings.content = CT || S.settings.content; await saveSettings('Site content saved — refresh the site to see it'); renderContent(); };
+
+  /* ---------- QR codes ---------- */
+  let SITE = null;
+  async function renderQR() {
+    if (!SITE) try { SITE = await fetch('/api/site').then(r => r.json()); } catch (_) { SITE = { siteUrl: location.origin }; }
+    const q = S.settings.qr || (S.settings.qr = { mainUrl: '' }), v = Date.now();
+    const target = q.mainUrl || SITE.siteUrl + '/';
+    const dl = name => `<a class="btn btn-ghost sm" href="/qr/${name}.png?dl=1">PNG</a><a class="btn btn-ghost sm" href="/qr/${name}.svg?dl=1">SVG</a>`;
+    $('#qrMain').innerHTML = `<img src="/qr/home.svg?v=${v}" alt="Main QR" width="150" height="150">
+      <div class="qr-mi"><b>Main QR code</b><span class="muted small">Used on the homepage "Scan to explore" card.</span>
+        <label>Points to<input id="qrMainUrl" value="${esc(q.mainUrl)}" placeholder="${esc(SITE.siteUrl)}/  (default: homepage)"></label>
+        <span class="small">Current target: <a href="${esc(target)}" target="_blank">${esc(target)}</a></span>
+        <div class="qr-acts">${dl('home')}<button class="btn btn-ghost sm" data-copy="${esc(target)}">Copy link</button><button class="btn btn-accent sm" id="saveQr">Save target</button></div></div>`;
+    $('#qrGrid').innerHTML = S.products.map(p => { const url = `${SITE.siteUrl}/product/${p.slug}`; return `<div class="qr-card${p.visible ? '' : ' off'}">
+      <img src="/qr/${esc(p.slug)}.svg?v=${v}" alt="" width="120" height="120" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'qr-na',textContent:'Hidden — QR off'}))">
+      <b>${esc(p.name)}</b><a class="small" href="${esc(url)}" target="_blank">/product/${esc(p.slug)}</a>
+      <div class="qr-acts">${p.visible ? dl(esc(p.slug)) : '<span class="muted small">Show the product to enable</span>'}</div></div>`; }).join('');
+  }
+  document.addEventListener('click', async e => {
+    if (e.target.id === 'saveQr') { S.settings.qr = { mainUrl: $('#qrMainUrl').value.trim() }; await saveSettings('Main QR target saved'); renderQR(); }
+    const c = e.target.closest('[data-copy]'); if (c && $('#tab-qr') && !$('#tab-qr').hidden) { try { navigator.clipboard.writeText(c.dataset.copy); toast('Link copied'); } catch (_) {} }
+  });
 
   boot();
 })();

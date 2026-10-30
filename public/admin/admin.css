@@ -119,3 +119,30 @@ input:checked + .sw::after { transform: translateX(16px); }
 .ag-time { display: grid; gap: 10px; grid-template-columns: 1fr; }
 @media (min-width: 700px) { .ag-time { grid-template-columns: 1fr 120px 120px; align-items: end; } }
 .ag-foot { display: flex; justify-content: space-between; align-items: center; }
+
+.inline-num { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.inline-num input { width: 64px; }
+.pchip .pn, .ct-item .pn { font: 700 11px var(--head); color: #fff; background: var(--accent); border-radius: 6px; padding: 2px 6px; }
+.pchip.over { opacity: .45; }
+.pchip.over .pn { background: var(--muted); }
+.ct-form { display: grid; gap: 16px; max-width: 1000px; }
+.ct-form fieldset { margin: 0; }
+.ct-form legend { font: 700 15px var(--head); padding: 0 6px; }
+.ct-grid { display: grid; gap: 12px; }
+@media (min-width: 760px) { .ct-grid { grid-template-columns: 1fr 1fr; } .ct-grid .wide { grid-column: span 2; } }
+.ct-grid label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.ct-list { display: grid; gap: 8px; }
+.ct-lh { display: flex; justify-content: space-between; align-items: center; }
+.ct-item { display: flex; gap: 10px; align-items: flex-start; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+.ct-if { flex: 1; min-width: 0; display: grid; gap: 8px; }
+@media (min-width: 760px) { .ct-if { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); } }
+.ct-ia { display: flex; gap: 4px; }
+.qr-main { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+.qr-main img, .qr-card img { background: #fff; padding: 6px; border-radius: 10px; border: 1px solid var(--line); }
+.qr-mi { flex: 1 1 320px; display: grid; gap: 8px; }
+.qr-mi label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.qr-acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.qr-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.qr-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 6px; justify-items: center; text-align: center; }
+.qr-card.off { opacity: .6; }
+.qr-na { width: 120px; height: 120px; display: grid; place-items: center; font-size: 12px; color: var(--muted); border: 1px dashed var(--line-2); border-radius: 10px; }

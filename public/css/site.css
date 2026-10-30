@@ -762,3 +762,6 @@ a.pa-res i { font-style: normal; color: var(--accent); font-weight: 700; }
 .gx-qr::after { content: ''; position: absolute; left: 22px; width: 112px; height: 2px; top: 22px; background: linear-gradient(90deg, transparent, var(--accent), transparent); box-shadow: 0 0 10px rgba(247,84,29,.7); animation: gxScan 2.6s ease-in-out infinite; }
 @keyframes gxScan { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(108px); } }
 .gx-qr { overflow: hidden; }
+
+.cat-more { display: flex; justify-content: center; margin-top: 22px; }
+.cat-more .btn { padding: 12px 26px; }

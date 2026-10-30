@@ -26,6 +26,7 @@ const visible = async () => (await store.load()).products.filter(p => p.visible)
 const bySlug = async s => (await visible()).find(p => p.slug === s);
 
 /* ---------- Public data API ---------- */
+app.get('/api/site', wrap(async (_req, res) => { const { settings } = await store.load(); res.json({ siteUrl: SITE_URL, qr: settings.qr }); }));
 app.get('/api/products', wrap(async (_req, res) => res.json(await visible())));
 app.get('/api/products/:slug', wrap(async (req, res) => {
   const p = await bySlug(req.params.slug);
@@ -38,6 +39,8 @@ app.get('/api/home', wrap(async (_req, res) => {
   const used = new Set(list.map(p => p.category));
   res.json({
     showCatalog: settings.showCatalog,
+    content: settings.content,
+    home: settings.home,
     categories: settings.categories.filter(c => used.has(c)).concat([...used].filter(c => c && !settings.categories.includes(c))),
     rows: settings.rows.map(r => ({ id: r.id, title: r.title, subtitle: r.subtitle, products: r.slugs.map(s => map.get(s)).filter(Boolean) })).filter(r => r.products.length),
     products: list
@@ -48,9 +51,11 @@ app.get('/api/home', wrap(async (_req, res) => {
 app.get('/qr/:name.:ext(svg|png)', wrap(async (req, res) => {
   const { name, ext } = req.params;
   if (name !== 'home' && !(await bySlug(name))) return res.status(404).end();
-  const url = name === 'home' ? SITE_URL + '/' : `${SITE_URL}/product/${name}`;
+  const { settings } = await store.load();
+  const url = name === 'home' ? (settings.qr.mainUrl || SITE_URL + '/') : `${SITE_URL}/product/${name}`;
   const opts = { margin: 1, errorCorrectionLevel: 'M', color: { dark: '#141317', light: '#FFFFFF' } };
-  res.set('Cache-Control', 'public, max-age=86400');
+  res.set('Cache-Control', 'no-cache');
+  if (req.query.dl) res.attachment(`${name === 'home' ? 'remarketplace' : name}-qr.${ext}`);
   if (ext === 'svg') {
     res.type('image/svg+xml').send(await QRCode.toString(url, Object.assign({ type: 'svg' }, opts)));
   } else {
