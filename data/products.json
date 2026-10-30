@@ -326,6 +326,88 @@
   "position": 3
  },
  {
+  "slug": "recorporate",
+  "name": "reCorporate",
+  "tagline": "The corporate & merchant portal for reID",
+  "category": "Identity",
+  "group": "ReSuit",
+  "status": "",
+  "deploy": "2 weeks",
+  "price": "",
+  "summary": "reCorporate is the business side of reID: a desktop portal where companies verify themselves, onboard their teams, run a merchant shop and accept reAED payments, all linked to their customers' reID identities.",
+  "whatItIs": "A white-label corporate and merchant portal on top of reID, giving businesses KYB-verified company accounts, staff roles, bulk onboarding and a merchant shop.",
+  "image": "/img/products/recorporate.jpg",
+  "hero": "",
+  "mobileImage": "",
+  "logo": "",
+  "externalUrl": "https://corporate.reidentity.net",
+  "demoUrl": "",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": "Sandbox data resets nightly. No real funds, KYC records, or on-chain transactions are created.",
+  "investUrl": "",
+  "pdfDesktop": "",
+  "pdfMobile": "",
+  "tone": "a",
+  "sourceUrl": "",
+  "features": [
+   "KYB verification",
+   "Team roles & permissions",
+   "Bulk staff invite",
+   "Merchant shop",
+   "reAED payments",
+   "Loyalty & cashback"
+  ],
+  "whyPoints": [
+   "One verified company identity across the whole ReSystem ecosystem",
+   "Onboard hundreds of staff in minutes with bulk invite",
+   "Sell to every reID user through a built-in merchant shop",
+   "Payments, rewards and compliance in one place"
+  ],
+  "whatYouCanDo": [
+   "Verify your company with KYB and get a trusted business profile",
+   "Invite staff in bulk and assign roles such as Admin, Finance and Cashier",
+   "Publish products and services in your merchant shop",
+   "Accept reAED and track sales, payouts and cashback"
+  ],
+  "useCases": [
+   "Corporate onboarding for reID",
+   "Merchant payments & loyalty",
+   "Enterprise staff identity",
+   "Government & public-sector entities"
+  ],
+  "stats": [],
+  "highlights": [
+   {
+    "title": "KYB verification",
+    "text": "Company verification with documents and ownership checks."
+   },
+   {
+    "title": "Team roles & permissions",
+    "text": "Admins, finance, cashiers and custom roles with fine-grained access."
+   },
+   {
+    "title": "Bulk staff invite",
+    "text": "Upload a CSV and onboard your whole team to reID at once."
+   },
+   {
+    "title": "Merchant shop",
+    "text": "List products and services that every reID user can buy."
+   }
+  ],
+  "demoCreds": [],
+  "featureIcons": [
+   "shield",
+   "users",
+   "mail",
+   "store",
+   "coin",
+   "gift"
+  ],
+  "visible": true,
+  "position": 4
+ },
+ {
   "slug": "rewallet",
   "name": "reWALLET",
   "tagline": "One wallet. Every network. Complete control.",
@@ -336,7 +418,7 @@
   "price": "",
   "summary": "reWALLET is a non-custodial multi-network wallet for assets, swaps, bridges, NFTs, identity and cashback. Users keep their own keys while managing everything in one app linked to reID.",
   "whatItIs": "A secure self-custody wallet supporting INFRA, Ethereum, BNB Smart Chain and TRON, with built-in swaps, cross-chain bridging, NFTs and reID-powered cashback.",
-  "image": "",
+  "image": "/img/products/rewallet.jpg",
   "hero": "",
   "mobileImage": "",
   "logo": "",
@@ -414,7 +496,7 @@
   ],
   "demoCreds": [],
   "visible": true,
-  "position": 4
+  "position": 5
  },
  {
   "slug": "reinvest",
@@ -503,7 +585,7 @@
    }
   ],
   "visible": true,
-  "position": 5
+  "position": 6
  },
  {
   "slug": "fractionaire",
@@ -597,7 +679,7 @@
    }
   ],
   "visible": true,
-  "position": 6
+  "position": 7
  },
  {
   "slug": "cet",
@@ -688,7 +770,7 @@
    }
   ],
   "visible": true,
-  "position": 7
+  "position": 8
  },
  {
   "slug": "rechain",
@@ -741,7 +823,7 @@
   "highlights": [],
   "demoCreds": [],
   "visible": true,
-  "position": 8
+  "position": 9
  },
  {
   "slug": "redomain",
@@ -824,7 +906,7 @@
    }
   ],
   "visible": true,
-  "position": 9
+  "position": 10
  },
  {
   "slug": "mine",
@@ -837,7 +919,7 @@
   "price": "",
   "summary": "21 Mine offers hosted crypto mining on high-efficiency machines in UAE facilities. Customers own their miners, pay fixed monthly power costs, monitor performance 24/7 and receive daily payouts.",
   "whatItIs": "A hosted mining service run by miners active since 2017, with 500+ machines installed, payouts in BTC, DOGE, LTC or stablecoins, and PPS+/PPLNS payout models.",
-  "image": "",
+  "image": "/img/products/mine.jpg",
   "hero": "",
   "mobileImage": "",
   "logo": "",
@@ -883,7 +965,7 @@
   ],
   "demoCreds": [],
   "visible": true,
-  "position": 10
+  "position": 11
  },
  {
   "slug": "tunetailor",
@@ -966,7 +1048,7 @@
    }
   ],
   "visible": true,
-  "position": 11
+  "position": 12
  },
  {
   "slug": "prohandover",
@@ -1023,7 +1105,7 @@
   "highlights": [],
   "demoCreds": [],
   "visible": true,
-  "position": 12
+  "position": 13
  },
  {
   "slug": "hostick",
@@ -1080,7 +1162,7 @@
   "highlights": [],
   "demoCreds": [],
   "visible": true,
-  "position": 13
+  "position": 14
  },
  {
   "slug": "rediscover",
@@ -1093,7 +1175,7 @@
   "price": "",
   "summary": "reDiscover brings AI-curated news and insights into the ReSystem ecosystem. Download the brochure or book a call for early access.",
   "whatItIs": "",
-  "image": "",
+  "image": "/img/products/rediscover.jpg",
   "hero": "",
   "mobileImage": "",
   "logo": "",
@@ -1115,7 +1197,7 @@
   "highlights": [],
   "demoCreds": [],
   "visible": true,
-  "position": 14
+  "position": 15
  },
  {
   "slug": "aiconcierge",
@@ -1128,7 +1210,7 @@
   "price": "",
   "summary": "AI Concierge is an AI assistant that guides users, recommends products and simplifies tasks across the ReSystem ecosystem. Download the brochure or book a call for early access.",
   "whatItIs": "",
-  "image": "",
+  "image": "/img/products/aiconcierge.jpg",
   "hero": "",
   "mobileImage": "",
   "logo": "",
@@ -1150,7 +1232,7 @@
   "highlights": [],
   "demoCreds": [],
   "visible": true,
-  "position": 15
+  "position": 16
  },
  {
   "slug": "ico-platform",
@@ -1163,7 +1245,7 @@
   "price": "",
   "summary": "The ICO Platform will let projects design, issue and distribute tokens on INFRA Network. Book a call to join early access.",
   "whatItIs": "",
-  "image": "",
+  "image": "/img/products/ico-platform.jpg",
   "hero": "",
   "mobileImage": "",
   "logo": "",
@@ -1185,6 +1267,6 @@
   "highlights": [],
   "demoCreds": [],
   "visible": true,
-  "position": 16
+  "position": 17
  }
 ]
