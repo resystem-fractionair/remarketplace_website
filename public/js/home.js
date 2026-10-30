@@ -3,7 +3,7 @@
   const SORTS = ['Featured', 'Fastest to deploy', 'A–Z'];
   const card = (p, i) => `
       <a class="card pcard" href="/product/${esc(p.slug)}" style="animation-delay:${i * 40}ms">
-        ${p.image ? `<div class="pc-img"><img src="${esc(p.image)}" alt="" loading="lazy"></div>` : ''}
+        ${p.image ? `<div class="pc-img"><img src="${esc(p.image)}" alt="" loading="lazy"></div>` : `<div class="pc-img pc-ph">${RM.mark(p)}</div>`}
         <div class="card-top">${RM.mark(p)}<span class="cat-tag">${esc(p.category)}</span>${p.status ? `<span class="badge">${esc(p.status)}</span>` : ''}</div>
         <h3>${esc(p.name)}</h3>
         <p>${esc(p.tagline || p.summary)}</p>

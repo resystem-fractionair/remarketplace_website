@@ -8,6 +8,7 @@
   const I = {
     globe: svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'),
     pdf: svg('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>'),
+    monitor: svg('<rect x="2.5" y="4" width="19" height="12.5" rx="2"/><path d="M8 20.5h8M12 16.5v4"/>'),
     phone: svg('<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18h2"/>'),
     key: svg('<circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/>'),
     play: svg('<circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5z"/>'),
@@ -96,8 +97,7 @@
           </div>` : ''}
 
           ${has(p.useCases) ? `<section id="use-cases" class="pa-sec"><h2>Use cases</h2><div class="pa-uc">${p.useCases.map((u, i) => `<div><span>${String(i + 1).padStart(2, '0')}</span>${esc(u)}</div>`).join('')}</div></section>` : ''}
-          ${res.length ? `<section id="resources" class="pa-sec"><h2>Resources</h2><div class="pa-resgrid">${res.map(r => `
-            <a class="pa-res" href="${esc(r.href)}" target="_blank" rel="noopener"><span class="ic">${r.icon}</span><span><b>${esc(r.t)}</b><small>${esc(r.s)}</small></span><i>${r.ext ? '↗' : '↓'}</i></a>`).join('')}</div></section>` : ''}
+
         </main>
 
         <aside class="pa-side">
@@ -115,6 +115,14 @@
 
 
 
+          ${(p.pdfDesktop || pdfMobile || live) ? `<div class="pa-card pa-dl"><h3>Brochure & links</h3>
+            <div class="pa-dlg">
+              ${p.pdfDesktop ? `<a href="${esc(p.pdfDesktop)}" target="_blank" rel="noopener" class="pa-dlt"><span class="pa-dli">${I.monitor}<em>PDF</em></span><b>Desktop</b><small>Full-size brochure</small></a>` : ''}
+              ${pdfMobile ? `<a href="${esc(pdfMobile)}" target="_blank" rel="noopener" class="pa-dlt"><span class="pa-dli">${I.phone}<em>PDF</em></span><b>Mobile</b><small>Phone-friendly</small></a>` : ''}
+            </div>
+            ${live ? `<a class="pa-res" href="${esc(live)}" target="_blank" rel="noopener"><span class="ic">${I.globe}</span><span><b>Live website</b><small>${esc(host(live))}</small></span><i>↗</i></a>` : ''}
+          </div>` : ''}
+
           ${p.investUrl ? `<div class="pa-invest" id="invest"><span class="ic">${I.chart}</span><b>Own a share of ${esc(p.name)}</b><span>On-chain shares on INFRA Network via ReSystem Business Opportunity.</span>
             <a class="btn btn-white block" href="${esc(p.investUrl)}" target="_blank" rel="noopener">View opportunity ↗</a></div>` : ''}
 
@@ -128,7 +136,7 @@
       </div>
 
       ${bottom.length ? `<section class="pa-sec"><h2>${featured.length ? 'Featured products' : 'Related products'}</h2><div class="pa-fgrid">${bottom.map(r => `
-        <a class="card pcard" href="/product/${esc(r.slug)}">${r.image ? `<div class="pc-img"><img src="${esc(r.image)}" alt="" loading="lazy"></div>` : ''}
+        <a class="card pcard" href="/product/${esc(r.slug)}">${r.image ? `<div class="pc-img"><img src="${esc(r.image)}" alt="" loading="lazy"></div>` : `<div class="pc-img pc-ph">${RM.mark(r)}</div>`}
           <div class="card-top">${RM.mark(r)}<span class="cat-tag">${esc(r.category)}</span>${r.status ? `<span class="badge">${esc(r.status)}</span>` : ''}</div>
           <h3>${esc(r.name)}</h3><p>${esc(r.tagline || r.summary)}</p>
           <div class="card-foot"><span>${esc(r.group || '')}</span><span class="view">View product →</span></div></a>`).join('')}</div></section>` : ''}
