@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Admin — reMarketplace</title>
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<script src="/js/theme.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+<div class="toast" id="toast" hidden></div>
+
+<!-- Login -->
+<main class="login" id="login" hidden>
+  <form class="login-card" id="loginForm">
+    <img class="lg-light" src="/img/logo-light.png" alt="reMarketplace" height="28"><img class="lg-dark" src="/img/logo-dark.png" alt="" height="28">
+    <h1>Admin console</h1>
+    <label>Password<input type="password" id="pw" autocomplete="current-password" required></label>
+    <p class="err" id="loginErr" hidden></p>
+    <button class="btn btn-accent block">Sign in</button>
+  </form>
+</main>
+
+<!-- Console -->
+<div class="app" id="app" hidden>
+  <header class="a-top">
+    <a class="logo" href="/" target="_blank"><img class="lg-light" src="/img/logo-light.png" alt="reMarketplace" height="26"><img class="lg-dark" src="/img/logo-dark.png" alt="" height="26"></a>
+    <span class="a-badge">Admin</span>
+    <nav class="tabs" id="tabs">
+      <button data-tab="products" class="on">Products</button>
+      <button data-tab="rows">Homepage rows</button>
+      <button data-tab="cats">Categories</button>
+    </nav>
+    <span class="mode" id="mode"></span>
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode"><span class="sun">☀</span><span class="moon">☾</span></button>
+    <button class="btn btn-ghost sm" id="logout">Sign out</button>
+  </header>
+
+  <!-- Products -->
+  <section class="panel" id="tab-products">
+    <div class="p-head">
+      <div><h2>Products</h2><p class="muted small">Drag ⋮⋮ to set catalog order. Toggle to show or hide on the site.</p></div>
+      <div class="p-tools">
+        <input type="search" id="pq" placeholder="Search">
+        <select id="pcat"><option value="">All categories</option></select>
+        <button class="btn btn-accent sm" id="newProd">+ New product</button>
+      </div>
+    </div>
+    <div class="plist" id="plist"></div>
+  </section>
+
+  <!-- Rows -->
+  <section class="panel" id="tab-rows" hidden>
+    <div class="p-head">
+      <div><h2>Homepage rows</h2><p class="muted small">Choose which products appear in each row on the homepage, and in what order. Hidden products are skipped automatically.</p></div>
+      <div class="p-tools">
+        <label class="switch-l"><input type="checkbox" id="showCatalog"><span class="sw"></span>Show full catalog below rows</label>
+        <button class="btn btn-ghost sm" id="addRow">+ Add row</button>
+        <button class="btn btn-accent sm" id="saveRows">Save rows</button>
+      </div>
+    </div>
+    <div id="rows"></div>
+  </section>
+
+  <!-- Categories -->
+  <section class="panel" id="tab-cats" hidden>
+    <div class="p-head">
+      <div><h2>Categories</h2><p class="muted small">Order sets the filter chips on the homepage. Renaming a category updates every product in it.</p></div>
+      <div class="p-tools"><button class="btn btn-accent sm" id="saveCats">Save categories</button></div>
+    </div>
+    <div class="cat-grid">
+      <div class="box-card"><h4>Categories</h4><div id="cats"></div><form class="add-line" id="addCat"><input placeholder="New category" id="newCat"><button class="btn btn-ghost sm">Add</button></form></div>
+      <div class="box-card"><h4>Groups</h4><div id="groups"></div><form class="add-line" id="addGroup"><input placeholder="New group" id="newGroup"><button class="btn btn-ghost sm">Add</button></form></div>
+    </div>
+  </section>
+</div>
+
+<!-- Product editor -->
+<div class="overlay" id="edOv" hidden>
+  <aside class="editor" role="dialog" aria-modal="true">
+    <div class="ed-head"><h3 id="edTitle">Edit product</h3><button class="x" data-close aria-label="Close">×</button></div>
+    <form id="edForm" class="ed-body"></form>
+    <div class="ed-foot">
+      <button class="btn btn-ghost danger" id="edDel" type="button">Delete</button>
+      <a class="btn btn-ghost" id="edView" target="_blank">View page ↗</a>
+      <button class="btn btn-accent grow" id="edSave" type="button">Save product</button>
+    </div>
+  </aside>
+</div>
+
+<script src="/admin/admin.js"></script>
+</body>
+</html>

@@ -21,3 +21,11 @@ All product content lives in `data/products.json` (sourced from resystem.org/sui
 Import the repo as a new Vercel project; `vercel.json` routes everything through `api/index.js`. Set the env vars from `.env.example`, add the domain `remarketplace.store`, and register `https://remarketplace.store/api/auth/reid/callback` as the reID redirect URI.
 
 Bookings are logged and, if `BOOKING_WEBHOOK_URL` is set, POSTed there as JSON.
+
+## Admin console — `/admin`
+Password: `ADMIN_PASSWORD` env var (dev default `admin` only when NODE_ENV isn't production).
+- **Products:** add / edit / delete, upload images (card, hero, mobile, logo) and PDFs, edit all page content, show/hide toggle, drag to reorder the catalog.
+- **Homepage rows:** create rows, pick which products go in each row and their order (drag), reorder/delete rows, toggle the full catalog.
+- **Categories & groups:** add, rename (applied to all products), reorder (sets the homepage filter order).
+
+Storage: set `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` and run `supabase/schema.sql` once. The first load seeds the database from `data/products.json`. Without Supabase, edits are written to `data/*.json` (local dev only).

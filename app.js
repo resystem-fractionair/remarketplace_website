@@ -5,14 +5,14 @@ const express = require('express');
 const cookieSession = require('cookie-session');
 const QRCode = require('qrcode');
 
-const PRODUCTS = require('./data/products.json');
+const store = require('./store');
 const SITE_URL = (process.env.SITE_URL || 'https://remarketplace.store').replace(/\/$/, '');
 const PUB = path.join(__dirname, 'public');
 
 const app = express();
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
-app.use(express.json({ limit: '50kb' }));
+app.use(express.json({ limit: '300kb' }));
 app.use(cookieSession({
   name: 'rm_sess',
   keys: [process.env.SESSION_SECRET || 'dev-only-change-me'],
@@ -21,19 +21,33 @@ app.use(cookieSession({
   secure: process.env.NODE_ENV === 'production'
 }));
 
-const bySlug = s => PRODUCTS.find(p => p.slug === s);
+const wrap = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
+const visible = async () => (await store.load()).products.filter(p => p.visible);
+const bySlug = async s => (await visible()).find(p => p.slug === s);
 
-/* ---------- Data API ---------- */
-app.get('/api/products', (_req, res) => res.json(PRODUCTS));
-app.get('/api/products/:slug', (req, res) => {
-  const p = bySlug(req.params.slug);
+/* ---------- Public data API ---------- */
+app.get('/api/products', wrap(async (_req, res) => res.json(await visible())));
+app.get('/api/products/:slug', wrap(async (req, res) => {
+  const p = await bySlug(req.params.slug);
   p ? res.json(p) : res.status(404).json({ error: 'not_found' });
-});
+}));
+app.get('/api/home', wrap(async (_req, res) => {
+  const { settings } = await store.load();
+  const list = await visible();
+  const map = new Map(list.map(p => [p.slug, p]));
+  const used = new Set(list.map(p => p.category));
+  res.json({
+    showCatalog: settings.showCatalog,
+    categories: settings.categories.filter(c => used.has(c)).concat([...used].filter(c => c && !settings.categories.includes(c))),
+    rows: settings.rows.map(r => ({ id: r.id, title: r.title, subtitle: r.subtitle, products: r.slugs.map(s => map.get(s)).filter(Boolean) })).filter(r => r.products.length),
+    products: list
+  });
+}));
 
 /* ---------- QR codes: /qr/home.svg, /qr/<slug>.svg|.png ---------- */
-app.get('/qr/:name.:ext(svg|png)', async (req, res) => {
+app.get('/qr/:name.:ext(svg|png)', wrap(async (req, res) => {
   const { name, ext } = req.params;
-  if (name !== 'home' && !bySlug(name)) return res.status(404).end();
+  if (name !== 'home' && !(await bySlug(name))) return res.status(404).end();
   const url = name === 'home' ? SITE_URL + '/' : `${SITE_URL}/product/${name}`;
   const opts = { margin: 1, errorCorrectionLevel: 'M', color: { dark: '#141317', light: '#FFFFFF' } };
   res.set('Cache-Control', 'public, max-age=86400');
@@ -42,7 +56,7 @@ app.get('/qr/:name.:ext(svg|png)', async (req, res) => {
   } else {
     res.type('image/png').send(await QRCode.toBuffer(url, Object.assign({ width: 640 }, opts)));
   }
-});
+}));
 
 /* ---------- Demo bookings ---------- */
 app.post('/api/bookings', async (req, res) => {
@@ -112,13 +126,23 @@ app.get('/api/auth/reid/callback', async (req, res) => {
 app.get('/api/me', (req, res) => res.json({ user: req.session.user || null }));
 app.post('/api/auth/logout', (req, res) => { req.session = null; res.json({ ok: true }); });
 
+/* ---------- Admin console ---------- */
+require('./admin')(app, store);
+
 /* ---------- Pages ---------- */
-app.use(express.static(PUB, { extensions: ['html'], maxAge: '1h' }));
-app.get('/product/:slug', (req, res, next) => bySlug(req.params.slug) ? res.sendFile(path.join(PUB, 'product.html')) : next());
-app.get('/sitemap.xml', (_req, res) => {
-  const urls = ['/', ...PRODUCTS.map(p => '/product/' + p.slug)];
+app.get(['/admin', '/admin/'], (_req, res) => res.sendFile(path.join(PUB, 'admin', 'index.html')));
+app.use(express.static(PUB, { extensions: ['html'], maxAge: '5m' }));
+app.get('/product/:slug', wrap(async (req, res, next) => (await bySlug(req.params.slug)) ? res.sendFile(path.join(PUB, 'product.html')) : next()));
+app.get('/sitemap.xml', wrap(async (_req, res) => {
+  const urls = ['/', ...(await visible()).map(p => '/product/' + p.slug)];
   res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.map(u => `<url><loc>${SITE_URL}${u}</loc></url>`).join('')}</urlset>`);
-});
+}));
 app.use((_req, res) => res.status(404).sendFile(path.join(PUB, '404.html')));
+app.use((err, req, res, _next) => {
+  console.error('[error]', err.message);
+  const status = err.status || 500;
+  if (req.path.startsWith('/api/')) return res.status(status).json({ error: status === 500 ? 'server_error' : err.message });
+  res.status(status).send('Something went wrong.');
+});
 
 module.exports = app;

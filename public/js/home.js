@@ -1,6 +1,14 @@
 (function () {
   const { $, esc } = RM;
   const SORTS = ['Featured', 'Fastest to deploy', 'A–Z'];
+  const card = (p, i) => `
+      <a class="card pcard" href="/product/${esc(p.slug)}" style="animation-delay:${i * 40}ms">
+        ${p.image ? `<div class="pc-img"><img src="${esc(p.image)}" alt="" loading="lazy"></div>` : ''}
+        <div class="card-top">${RM.mark(p)}<span class="cat-tag">${esc(p.category)}</span>${p.status ? `<span class="badge">${esc(p.status)}</span>` : ''}</div>
+        <h3>${esc(p.name)}</h3>
+        <p>${esc(p.tagline || p.summary)}</p>
+        <div class="card-foot"><span>${p.deploy ? 'Live in ' + esc(p.deploy) : esc(p.group || '')}</span><span class="view">View product →</span></div>
+      </a>`;
   const FAQS = [
     { q: 'What does “pre-built” actually mean?', a: 'Each product is a running system — backend, admin console, APIs and front-end — already built, tested and deployed. You configure it, apply your brand, connect your data and go live. Nothing is written from scratch.' },
     { q: 'How long until we are live?', a: 'Between three days and three weeks depending on the product. A white-label vertical marketplace takes about three weeks.' },
@@ -26,14 +34,7 @@
     else if (st.sort === 'Fastest to deploy') list.sort((a, b) => days(a.deploy) - days(b.deploy));
     $('#count').textContent = `${list.length} of ${all.length} products`;
     $('#empty').hidden = list.length > 0;
-    $('#grid').innerHTML = list.map((p, i) => `
-      <a class="card pcard" href="/product/${esc(p.slug)}" style="animation-delay:${i * 40}ms">
-        ${p.image ? `<div class="pc-img"><img src="${esc(p.image)}" alt="" loading="lazy"></div>` : ''}
-        <div class="card-top">${RM.mark(p)}<span class="cat-tag">${esc(p.category)}</span>${p.status ? `<span class="badge">${esc(p.status)}</span>` : ''}</div>
-        <h3>${esc(p.name)}</h3>
-        <p>${esc(p.tagline || p.summary)}</p>
-        <div class="card-foot"><span>${p.deploy ? 'Live in ' + esc(p.deploy) : esc(p.group || '')}</span><span class="view">View product →</span></div>
-      </a>`).join('');
+    $('#grid').innerHTML = list.map(card).join('');
   }
   function renderFaq() {
     $('#faqs').innerHTML = FAQS.map((f, i) => `
@@ -54,9 +55,16 @@
   $('#q').addEventListener('focus', () => { if (scrollY < 200) document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' }); });
 
   renderFaq();
-  RM.loadProducts().then(list => {
-    cats = ['All', ...new Set(list.map(p => p.category))];
+  fetch('/api/home').then(r => r.json()).then(home => {
+    const list = RM.products = home.products;
+    cats = ['All', ...home.categories];
     $('#statCount').textContent = list.length;
+    $('#homeRows').innerHTML = home.rows.map(r => `
+      <section class="wrap hrow">
+        <div class="cat-head"><div><h2>${esc(r.title)}</h2>${r.subtitle ? `<p class="muted">${esc(r.subtitle)}</p>` : ''}</div></div>
+        <div class="grid">${r.products.map(card).join('')}</div>
+      </section>`).join('');
+    $('#catalog').hidden = !home.showCatalog;
     renderChips(); renderGrid();
   });
 })();

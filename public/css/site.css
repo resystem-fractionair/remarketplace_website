@@ -130,3 +130,21 @@
 .nf { padding: 96px 0; display: grid; gap: 14px; justify-items: start; }
 .nf h1 { font-size: clamp(32px, 5vw, 56px); }
 .cta-band.wrap { width: auto; margin: 0 clamp(16px, 3vw, 56px) 56px; padding: 32px; }
+.hrow { padding-top: 56px; } .hrow .cat-head p { margin: 4px 0 0; }
+/* Product page v2 */
+.p-hero.no-art { grid-template-columns: 1fr; }
+.p-hero h1 .badge { font: 600 12px var(--body); vertical-align: middle; letter-spacing: 0; }
+.p-hero-art { border-radius: 20px; overflow: hidden; border: 1px solid var(--line); background: var(--card); aspect-ratio: 16/10; }
+.p-hero-art img { width: 100%; height: 100%; object-fit: cover; border: 0; border-radius: 0; }
+.lead { font-size: 16px; line-height: 1.7; }
+.p-cols { display: grid; gap: 28px; }
+@media (min-width: 760px) { .p-cols { grid-template-columns: 1fr 1fr; } }
+.p-cols h2 { font-size: 20px; }
+.p-stats { margin: 14px 0 0; }
+.soon-box { background: var(--card); border: 1px dashed var(--accent-line); border-radius: 16px; padding: 28px; display: grid; gap: 14px; justify-items: start; }
+.qr-mini { grid-template-columns: 84px 1fr; align-items: center; gap: 14px; }
+.qr-mini img { background: #fff; padding: 4px; border-radius: 8px; border: 1px solid var(--line); }
+.qr-mini b { display: block; font-size: 14px; }
+.qr-mini .muted { display: block; }
+.qr-acts { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 6px; font-size: 13px; font-weight: 600; }
+.qr-acts .link.ok { color: var(--accent-ink); }
