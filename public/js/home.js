@@ -61,7 +61,7 @@
   /* ---------- Section motion: reveal on scroll + running step highlight ---------- */
   const motion = () => {
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const els = document.querySelectorAll('.wx-card, .lx-track li, .gx-card, .gx-arrow, .gx-qr, .wx-head');
+    const els = document.querySelectorAll('.wx-card, .lx-track li, .gx-card, .gx-arrow, .gx-qr, .wx-head, .ux-card, .ux-mq');
     els.forEach((el, i) => { el.classList.add('rv'); el.style.setProperty('--d', (([...el.parentNode.children].indexOf(el)) * 90) + 'ms'); });
     if (reduce) { els.forEach(el => el.classList.add('in')); return; }
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .2 });
@@ -197,6 +197,16 @@
     const g = c.glossary;
     set('.gx-master .gx-tag', g.masterTitle); set('.gx-master p', g.master); set('.gx-arrow em', g.arrow);
     set('.gx-white .gx-tag', g.whiteTitle); set('.gx-white p', g.white); set('.gx-qr b', g.qrTitle); set('.gx-qr div span', g.qrText);
+    const u = c.usecases;
+    if (u) {
+      set('#uxEye', u.eyebrow); set('#uxTitle', u.title);
+      u.cards.slice(0, 3).forEach((x, i) => { set(`#uxC${i} h3`, x.t); set(`#uxC${i} p`, x.d); });
+      const bl = document.querySelectorAll('#uxC2 .ux-bl'), bv = document.querySelectorAll('#uxC2 .ux-bv');
+      if (bl[0]) { bl[0].textContent = u.compare.slowLabel; bv[0].textContent = u.compare.slowValue; bl[1].textContent = u.compare.fastLabel; bv[1].textContent = u.compare.fastValue; }
+      const chip = (x, i) => `<span class="ux-chip"><em>${String(i + 1).padStart(2, '0')}</em>${esc(x)}</span>`;
+      const half = Math.ceil(u.industries.length / 2), a = u.industries.slice(0, half), b = u.industries.slice(half);
+      $('#uxR1').innerHTML = (a.map(chip).join('')).repeat(3); $('#uxR2').innerHTML = (b.map((x, i) => chip(x, i + half)).join('')).repeat(3);
+    }
     set('#catalog .cat-head h2', c.catalog.title); set('#catalog > .small', c.catalog.note);
     FAQS = c.faq; renderFaq();
   }

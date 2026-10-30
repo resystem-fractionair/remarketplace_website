@@ -80,6 +80,12 @@ const DEFAULT_CONTENT = () => ({
     { t: 'Stay compliant', d: 'Audit-ready with KYC, logs and controls by default.' }, { t: 'Scale globally', d: 'Run on the ReSystem backend from day one.' }] },
   glossary: { masterTitle: 'Master label', master: 'Software or a B2B-licensed product built to be scaled and customised.', arrow: 'rebrand & sub-license',
     whiteTitle: 'White label', white: 'A sub-licensed product created and rebranded from a master label.', qrTitle: 'Scan to explore', qrText: 'Open the catalog on your phone. Every product page has its own QR code too.' },
+  usecases: { eyebrow: 'Use cases & target market', title: 'Built for every industry that moves money or identity.',
+    cards: [{ t: 'List your product', d: 'Put your master label in front of businesses ready to license and deploy. List once, sell repeatedly.' },
+      { t: 'Skip the 12-month build', d: 'Ready-to-deploy products with compliance, payments and blockchain built in. You focus on brand and customers.' },
+      { t: 'Why white-label from us', d: 'You own the brand, we carry the infrastructure.' }],
+    compare: { slowLabel: 'Build from scratch', slowValue: '$200K+ · 6–12 months', fastLabel: 'reMarketplace', fastValue: '3 weeks' },
+    industries: ['Real estate', 'Fintech & neobanks', 'Investment platforms', 'Retail & e-commerce', 'Crypto exchanges', 'Payroll', 'Web3 wallets', 'Healthcare', 'Education', 'Logistics', 'Government', 'Hospitality', 'Insurance', 'Gaming'] },
   catalog: { title: 'All products', note: 'Open any product for full details, its live demo, brochure, QR code and investment opportunity.', viewAll: 'View all products' },
   faq: [
     { q: 'What does “pre-built” actually mean?', a: 'Each product is a running system — backend, admin console, APIs and front-end — already built, tested and deployed. You configure it, apply your brand, connect your data and go live.' },
