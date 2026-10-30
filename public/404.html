@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found — reMarketplace</title>
+<meta name="description" content="reMarketplace gives businesses pre-built, white-label fintech, Web3, AI and identity products to customise, rebrand and deploy in days, not months.">
+<meta name="theme-color" content="#F7541D">
+<meta property="og:title" content="reMarketplace — Launch fintech & Web3 products in days, not months">
+<meta property="og:description" content="Pre-built infrastructure to build, launch and scale products under your brand. Part of the ReSystem ecosystem.">
+<meta property="og:url" content="https://remarketplace.store/">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<script src="/js/theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="logo" href="/" aria-label="reMarketplace home"><img class="lg-light" src="/img/logo-light.png" alt="reMarketplace" width="225" height="30"><img class="lg-dark" src="/img/logo-dark.png" alt="" width="225" height="30"></a>
+    <a class="back-link" href="/#catalog">← All products</a>
+    <nav class="nav-links"><a href="/#catalog">Products</a><a href="/#why">Why us</a><a href="/#use-cases">Use cases</a><a href="https://resystem.org" target="_blank" rel="noopener">ReSystem ↗</a></nav>
+    <a class="btn btn-ghost signin" id="signin" href="/api/auth/reid/start"><span class="reid-dot">re</span><span class="lbl">Sign in with reID</span></a>
+    <div class="user" id="user" hidden><span class="avatar" id="uAv"></span><span class="u-name" id="uName"></span><button class="link" id="signout">Sign out</button></div>
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode"><span class="sun">☀</span><span class="moon">☾</span></button>
+    <button class="btn btn-dark" data-book>Book a demo</button>
+  </div>
+</header>
+<div class="toast" id="toast" hidden></div>
+
+<main class="wrap nf"><span class="eyebrow">404</span><h1>That page isn’t listed.</h1><p class="muted">The product may have moved. Browse the full catalog instead.</p><a class="btn btn-accent" href="/#catalog">Browse products</a></main>
+
+
+<footer class="foot">
+  <div class="wrap foot-grid">
+    <div>
+      <a class="logo" href="/" aria-label="reMarketplace home"><img class="lg-light" src="/img/logo-light.png" alt="reMarketplace" width="225" height="30"><img class="lg-dark" src="/img/logo-dark.png" alt="" width="225" height="30"></a>
+      <p class="muted small">Pre-built, white-label products for fintech, Web3, AI and identity. Part of the ReSystem ecosystem.</p>
+    </div>
+    <div><h5>ReSystem</h5><a href="https://resystem.org" target="_blank" rel="noopener">resystem.org</a><a href="https://resystem.org/ecosystem" target="_blank" rel="noopener">Ecosystem</a><a href="https://resystem.org/business-opportunity" target="_blank" rel="noopener">Business opportunity</a><a href="https://resystem.org/id" target="_blank" rel="noopener">Join reID</a></div>
+    <div><h5>Contact</h5><a href="mailto:info@resystem.org">info@resystem.org</a><a href="https://www.linkedin.com/company/resystemglobal" target="_blank" rel="noopener">LinkedIn</a><a href="https://x.com/Reidentity_net" target="_blank" rel="noopener">X</a></div>
+  </div>
+  <div class="wrap foot-bottom muted small">© <span id="yr"></span> Desert Tech Cloud Services LLC · Dubai, UAE</div>
+</footer>
+
+<div class="overlay center" id="bookOv" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="bTitle">
+    <div class="modal-head"><div><span class="muted small" id="bCounter"></span><h3 id="bTitle"></h3></div><button class="x" data-close aria-label="Close">×</button></div>
+    <div class="progress"><i id="bProg"></i></div>
+    <div class="modal-body" id="bBody"></div>
+    <div class="modal-foot" id="bFoot"><button class="btn btn-ghost" id="bBack">Back</button><button class="btn btn-accent grow" id="bNext">Continue</button></div>
+  </div>
+</div>
+
+<script src="/js/common.js"></script>
+
+</body>
+</html>

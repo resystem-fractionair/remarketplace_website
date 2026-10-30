@@ -1,0 +1,901 @@
+[
+ {
+  "slug": "remarketplace",
+  "name": "reMARKETPLACE",
+  "tagline": "Launch fintech and Web3 products instantly",
+  "group": "ReSuit",
+  "summary": "reMARKETPLACE is ReSystem's white-label infrastructure for building, rebranding and scaling digital products. Teams can go from idea to a live branded marketplace in weeks without assembling a development team.",
+  "whatItIs": "A white-label platform with pre-built fintech and Web3 infrastructure, letting businesses customise, rebrand and deploy products quickly with low development overhead.",
+  "features": [
+   "Launch-ready fintech & Web3 products",
+   "White-label marketplace in 3 weeks",
+   "On-chain compliance & ownership",
+   "Scale with the ReSystem backend",
+   "Master label & ecosystem growth"
+  ],
+  "whyPoints": [
+   "Affordable access to high-value asset markets",
+   "Fast resale through a built-in marketplace",
+   "Ownership and transactions verified on-chain",
+   "Branded vertical marketplace live in about 3 weeks"
+  ],
+  "whatYouCanDo": [
+   "Have the ReSystem team build your Master Label",
+   "List it in a ready-made global marketplace",
+   "Promote to the ReSystem user base",
+   "Upgrade an existing B2C product into a scalable Master Label",
+   "Stay compliant and audit-ready",
+   "Scale globally on ReSystem's backend"
+  ],
+  "highlights": [
+   {
+    "title": "Scalable & Compliant",
+    "text": "Blockchain-based with built-in KYC and audit logs."
+   },
+   {
+    "title": "Modular by Design",
+    "text": "Add, remove or customise features as the product grows."
+   },
+   {
+    "title": "Enterprise-Grade Performance",
+    "text": "38ms latency, 99.9% uptime and 1,200 TPS."
+   },
+   {
+    "title": "Master Label",
+    "text": "A licensed B2B product built to be scaled, customised and resold."
+   },
+   {
+    "title": "White Label",
+    "text": "A sub-licensed, rebranded deployment of a Master Label."
+   }
+  ],
+  "useCases": [
+   "Fractional Asset Marketplaces",
+   "Brand-Owned Loyalty & Rewards Platforms",
+   "Digital Asset & Token Trading Platforms",
+   "Enterprise Payment & Payout Networks"
+  ],
+  "stats": [
+   "3 weeks to launch",
+   "38ms latency",
+   "99.9% uptime",
+   "1,200 TPS"
+  ],
+  "investUrl": "https://resystem.org/business-opportunity/remarketplace",
+  "pdfDesktop": "https://drive.google.com/uc?export=download&id=1KqAZeEO07ozj23-h6SCnaQ7IPJhbJabI",
+  "pdfMobile": "https://drive.google.com/uc?export=download&id=1WQf5RcfgWZTiDt-v55sZdXHtlYc4MZKc",
+  "mobileImage": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a31b4a8d498abbe4cd6adfb_reMarketplace_pdf_mobile.png",
+  "sourceUrl": "https://resystem.org/suit/remarketplace",
+  "category": "White label",
+  "tone": "a",
+  "deploy": "3 weeks",
+  "externalUrl": "",
+  "demoUrl": "",
+  "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96b8b2bc6a8b111e68866a_reMarketplace.jpg",
+  "status": "",
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a31b4a335fdf7bce6df9bb2_reMarketplace_Desktop.png"
+ },
+ {
+  "slug": "infra-global",
+  "name": "INFRA Global",
+  "tagline": "Multi-currency stablecoin-pegged assets",
+  "group": "ReSuit",
+  "summary": "Multi-currency accounts, card issuing and QR/link payments on INFRA Network, with stablecoin-pegged assets and built-in reconciliation.",
+  "whatItIs": "",
+  "features": [
+   "Multi-currency accounts and ledger",
+   "Card issuing",
+   "QR and link payments",
+   "Reconciliation and statements"
+  ],
+  "whyPoints": [],
+  "whatYouCanDo": [],
+  "highlights": [],
+  "useCases": [
+   "Neobanks",
+   "Cross-border payments",
+   "Merchant payouts"
+  ],
+  "stats": [
+   "38ms latency",
+   "99.9% uptime",
+   "1,200 TPS"
+  ],
+  "investUrl": "https://resystem.org/business-opportunity/infra-global",
+  "pdfDesktop": "",
+  "pdfMobile": "",
+  "mobileImage": "",
+  "sourceUrl": "",
+  "category": "Finance / DeFi",
+  "tone": "d",
+  "deploy": "2 weeks",
+  "externalUrl": "",
+  "demoUrl": "",
+  "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96b0a9500376d3547114f2_GLOBAL.jpg",
+  "status": "",
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96b0a9500376d3547114f2_GLOBAL.jpg"
+ },
+ {
+  "slug": "infra-reaed",
+  "name": "INFRA reAED",
+  "tagline": "UAE Dirham-pegged stablecoin",
+  "group": "ReSuit",
+  "summary": "reAED is the AED-pegged stablecoin on INFRA Network, the ReSystem EVM-compatible L1 — with SSO, multi-chain wallets and KYC/AML hooks.",
+  "whatItIs": "",
+  "features": [
+   "AED-pegged stablecoin",
+   "Passwordless SSO via reID",
+   "Multi-chain wallets",
+   "KYC/AML hooks",
+   "Admin roles console"
+  ],
+  "whyPoints": [],
+  "whatYouCanDo": [],
+  "highlights": [],
+  "useCases": [
+   "AED settlement",
+   "Payroll",
+   "Merchant payments"
+  ],
+  "stats": [
+   "38ms latency",
+   "99.9% uptime",
+   "1,200 TPS"
+  ],
+  "investUrl": "https://resystem.org/business-opportunity/infra-reaed",
+  "pdfDesktop": "",
+  "pdfMobile": "",
+  "mobileImage": "",
+  "sourceUrl": "",
+  "category": "Finance / DeFi",
+  "tone": "d",
+  "deploy": "2 weeks",
+  "externalUrl": "",
+  "demoUrl": "",
+  "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96aef1500376d3546eb6b0_INFRAreAED.jpg",
+  "status": "",
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96aef1500376d3546eb6b0_INFRAreAED.jpg"
+ },
+ {
+  "slug": "reid",
+  "name": "reID",
+  "tagline": "One identity for everything",
+  "group": "ReSuit",
+  "summary": "reID is a single digital identity that links apps, wallets and services. It gives users secure sign-in, verification and control over their own data, across both crypto and traditional platforms.",
+  "whatItIs": "One ID used to log in, verify, pay and earn across apps, money and connections, spanning Web3 and conventional services.",
+  "features": [
+   "SSO",
+   "Built-in Wallet",
+   "Global Verification",
+   "Chat & Pay",
+   "Contact Sharing",
+   "Legacy Earnings",
+   "Privacy by Default"
+  ],
+  "whyPoints": [
+   "Acts as an earning passport into Web3, not just a login",
+   "Makes compliance simpler and builds trust",
+   "Brings users, creators and investors into one verified ecosystem",
+   "Works across countries, platforms and industries"
+  ],
+  "whatYouCanDo": [
+   "Sign in anywhere with passkey, wallet or social login",
+   "Hold crypto, stablecoins, cash and rewards",
+   "Verify via staking or passport scan to raise limits",
+   "Message, send funds and settle trades from one dashboard",
+   "Share a verified profile with people and businesses",
+   "Earn commissions from your network's activity"
+  ],
+  "highlights": [
+   {
+    "title": "SSO",
+    "text": "Passwordless one-tap sign-in via passkey, wallet or social account."
+   },
+   {
+    "title": "Built-in Wallet",
+    "text": "Stores crypto, stablecoins, cash and rewards in one place."
+   },
+   {
+    "title": "Global Verification",
+    "text": "Lift limits by staking tokens or scanning a passport."
+   },
+   {
+    "title": "Privacy by Default",
+    "text": "Zero-knowledge checks and encryption share only what is required."
+   }
+  ],
+  "useCases": [
+   "Unified Access for Multi-App Ecosystems",
+   "Compliant User Onboarding & Verification",
+   "Social & Transactional Identity Layer",
+   "Reputation & Earning-Based Identity"
+  ],
+  "stats": [],
+  "investUrl": "https://resystem.org/business-opportunity/reid",
+  "pdfDesktop": "https://drive.google.com/uc?export=download&id=1tiqU9ONdccQ0gz_IoBXBw3z55zSVzMjy",
+  "pdfMobile": "https://drive.google.com/uc?export=download&id=1dGbbXy1M7KYQSB40UtHMP1kmDawZC5Md",
+  "mobileImage": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a31b2d25b913ec200810174_reID_pdf_mobile.png",
+  "sourceUrl": "https://resystem.org/suit/reid",
+  "category": "Identity",
+  "tone": "a",
+  "deploy": "3 days",
+  "externalUrl": "https://app.reidentity.net",
+  "demoUrl": "",
+  "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96b2f977b35e9ae7a923e0_reID.jpg",
+  "status": "",
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb632642ed9e671d79c8b_reID.png"
+ },
+ {
+  "slug": "rewallet",
+  "name": "reWALLET",
+  "tagline": "One wallet. Every network. Complete control.",
+  "group": "ReSuit",
+  "summary": "reWALLET is a non-custodial multi-network wallet for assets, swaps, bridges, NFTs, identity and cashback. Users keep their own keys while managing everything in one app linked to reID.",
+  "whatItIs": "A secure self-custody wallet supporting INFRA, Ethereum, BNB Smart Chain and TRON, with built-in swaps, cross-chain bridging, NFTs and reID-powered cashback.",
+  "features": [
+   "Multi-Network Wallet",
+   "Instant Token Swaps",
+   "Cross-Chain Bridge",
+   "Non-Custodial Security",
+   "Identity & Cashback"
+  ],
+  "whyPoints": [
+   "One wallet instead of many fragmented ones",
+   "Simple cross-chain transfers",
+   "Swaps built in",
+   "Unified portfolio dashboard",
+   "Identity via reID",
+   "Cashback tracked automatically",
+   "True self-custody"
+  ],
+  "whatYouCanDo": [
+   "Create or import wallets",
+   "Connect your reID",
+   "Manage multiple blockchain networks",
+   "Swap tokens",
+   "Transfer assets",
+   "Collect NFTs",
+   "Track your full portfolio"
+  ],
+  "highlights": [
+   {
+    "title": "Multi-Network Support",
+    "text": "INFRA, Ethereum, BNB Smart Chain and TRON, plus custom RPC networks and token import."
+   },
+   {
+    "title": "Instant Token Swaps",
+    "text": "Shows rates, fees, price impact, minimum received and timing."
+   },
+   {
+    "title": "Cross-Chain Bridge",
+    "text": "TRON, Ethereum and BNB Chain to INFRA; Polygon, Avalanche and Arbitrum coming soon."
+   },
+   {
+    "title": "Multi-Currency Portfolio",
+    "text": "Fiat and crypto display with total wallet value."
+   },
+   {
+    "title": "NFT Support",
+    "text": "View, send, receive and import NFTs with metadata."
+   },
+   {
+    "title": "Cashback Powered by reID",
+    "text": "Pending, available and claimed cashback with analytics."
+   },
+   {
+    "title": "reID Integration",
+    "text": "Import verified identity and access connected apps."
+   }
+  ],
+  "useCases": [
+   "Digital Payments & Transfers",
+   "Multi-Chain Asset Management",
+   "Cashback & Loyalty",
+   "Web3 & Digital Asset Access"
+  ],
+  "stats": [],
+  "investUrl": "",
+  "pdfDesktop": "https://drive.google.com/uc?export=download&id=1q5wq_TZWdZxGmu6kkaKAxCJjZQWpVWW7",
+  "pdfMobile": "https://drive.google.com/uc?export=download&id=1teNIg0qrimHJni56icgTk1FqcukKB__X",
+  "mobileImage": "",
+  "sourceUrl": "https://resystem.org/suit/rewallet",
+  "category": "Finance / DeFi",
+  "tone": "d",
+  "deploy": "1 week",
+  "externalUrl": "https://rewallet.online",
+  "demoUrl": "",
+  "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb6fe1d2430055f5b19fb_reWALLET.png",
+  "status": "",
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb6fe1d2430055f5b19fb_reWALLET.png"
+ },
+ {
+  "slug": "reinvest",
+  "name": "reINVEST",
+  "tagline": "Private wealth platform for personalised portfolio growth",
+  "group": "ReSuit",
+  "summary": "reINVEST is a private wealth service offering curated investment access and dedicated financial guidance. Clients start with a private consultation and receive a tailored portfolio across premium and tokenised assets.",
+  "whatItIs": "A private-client wealth platform pairing curated access to premium and tokenised assets with a dedicated relationship manager.",
+  "features": [
+   "Access premium global assets",
+   "Diversify through fractional ownership",
+   "Personalised onboarding and priority support",
+   "Secure, tokenised wealth infrastructure"
+  ],
+  "whyPoints": [
+   "Speak with an expert who understands your profile",
+   "Explore opportunities matched to your goals",
+   "Priority access to verified assets",
+   "Ongoing portfolio guidance"
+  ],
+  "whatYouCanDo": [
+   "Book a call and pick a time and advisor",
+   "Discuss portfolio, risk and goals in a consultation",
+   "Invest in verified private opportunities",
+   "Join private forums and wealth events"
+  ],
+  "highlights": [
+   {
+    "title": "Smart Portfolio Growth",
+    "text": "Diversify across premium asset classes with expert-reviewed options."
+   },
+   {
+    "title": "Tailored Market Access",
+    "text": "Curated private deals with transparent execution and liquidity."
+   },
+   {
+    "title": "Dedicated Relationship Manager",
+    "text": "A personal contact for strategy and optimisation."
+   },
+   {
+    "title": "Priority Support",
+    "text": "Round-the-clock client care."
+   }
+  ],
+  "useCases": [
+   "Access to traditionally inaccessible assets",
+   "Fractional ownership for portfolio diversification",
+   "Bespoke wealth management and private client services",
+   "Tokenised wealth infrastructure for long-term growth"
+  ],
+  "stats": [],
+  "investUrl": "https://resystem.org/business-opportunity/reinvest",
+  "pdfDesktop": "https://drive.google.com/uc?export=download&id=1yKmF6An-1NIeiWlBTaD5OZdpvRyMnRTl",
+  "pdfMobile": "https://drive.google.com/uc?export=download&id=1H6QzQWrVKy5TxM4aHOx16S6rxBjp2WRC",
+  "mobileImage": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a31af46d10933942ef86689_reINVEST_pdf_mobile.png",
+  "sourceUrl": "https://resystem.org/suit/reinvest",
+  "category": "Finance / DeFi",
+  "tone": "b",
+  "deploy": "2 weeks",
+  "externalUrl": "https://resystem.org/reinvest",
+  "demoUrl": "",
+  "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96b95b5d1b1243be1870b5_reINVEST.jpg",
+  "status": "",
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb015899d2c4143f1e3ad_invest.png"
+ },
+ {
+  "slug": "fractionaire",
+  "name": "Fractionaire",
+  "tagline": "Own verified, tokenised fractions of real-world assets",
+  "group": "RePartner",
+  "summary": "Fractionaire turns real-world assets into on-chain tokens that can be bought, held, resold or used. Each token is a tradable ownership share, giving low-cost entry to assets like property, diamonds and mining farms.",
+  "whatItIs": "A fractional ownership platform that tokenises real-world assets so investors can own, trade and earn from small verified shares.",
+  "features": [
+   "Invest in verified fractions of real-world assets",
+   "Low entry cost, high liquidity",
+   "Earn rental yields, payouts and rewards",
+   "Fixed ROI and buy-back options available",
+   "Fully transparent, on-chain ownership"
+  ],
+  "whyPoints": [
+   "Affordable entry into otherwise out-of-reach assets",
+   "Fast resale via a built-in marketplace",
+   "Provable on-chain ownership",
+   "White-label vertical marketplace in 3 weeks"
+  ],
+  "whatYouCanDo": [
+   "Buy fractions of real estate, watches, handbags, diamonds, mining farms and more",
+   "Earn rental income, appreciation or resale gains",
+   "Trade fractions around the clock",
+   "List custom assets at any time"
+  ],
+  "highlights": [
+   {
+    "title": "Smart Contracts",
+    "text": "Automated income without intermediaries."
+   },
+   {
+    "title": "Auto Wallet Creation",
+    "text": "Multi-level views and custom team dashboards."
+   },
+   {
+    "title": "Issuer Compliance Controls",
+    "text": "Per-asset toggles for KYC, AML, passport checks or escrow."
+   },
+   {
+    "title": "Turn Assets into Revenue",
+    "text": "Earn from rent, appreciation or resale while keeping ownership."
+   }
+  ],
+  "useCases": [
+   "Fractional asset investing",
+   "Earning yield and rewards",
+   "Trading assets anytime",
+   "Owning assets on-chain"
+  ],
+  "stats": [
+   "3-week white-label launch",
+   "24/7 trading",
+   "4 asset paths"
+  ],
+  "investUrl": "https://resystem.org/business-opportunity/fractionaire",
+  "pdfDesktop": "https://drive.google.com/uc?export=download&id=1UNMBTr6eXNg9KqdtIL37ZAqfF6jSHkjE",
+  "pdfMobile": "https://drive.google.com/uc?export=download&id=1jhSroCpN--5sSbpl-V6vQELYQoTX8lDe",
+  "mobileImage": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a31b3c954d5cb22f4a4a7a2_Fractionaire_pdf_mobile.png",
+  "sourceUrl": "https://resystem.org/suit/fractionaire",
+  "category": "Real-world assets",
+  "tone": "b",
+  "deploy": "2 weeks",
+  "externalUrl": "",
+  "demoUrl": "",
+  "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96ba08f2f6a430d175e244_fractionaire.jpg",
+  "status": "",
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb75e7df169b7fea3cf59_fractionaire.png"
+ },
+ {
+  "slug": "cet",
+  "name": "CET (Crypto Estate Tech)",
+  "tagline": "Launch your real estate app and sell properties in crypto",
+  "group": "RePartner",
+  "summary": "CET is a compliant crypto-to-real-estate platform. It lets agencies and developers launch branded property apps, accept crypto from buyers worldwide and settle automatically in fiat.",
+  "whatItIs": "A white-label property listing and payment platform with escrow, AML/KYC and crypto-to-fiat conversion built in, using blockchain for global real estate payments.",
+  "features": [
+   "Legal crypto payments for real estate",
+   "Automated escrow, AML/KYC & fiat conversion",
+   "Launch your own branded property app",
+   "Guaranteed payouts in your preferred currency",
+   "Global listings with full transparency & control"
+  ],
+  "whyPoints": [
+   "Compliant crypto-to-fiat conversion built in",
+   "Commissions tracked on-chain",
+   "Run contracts, payments and tracking from your phone"
+  ],
+  "whatYouCanDo": [
+   "Run your own liquidity pool and set your margin",
+   "List off-plan, primary or resale projects as a developer",
+   "Launch a branded brokerage app in about 3 weeks"
+  ],
+  "highlights": [
+   {
+    "title": "Secure Escrow",
+    "text": "Holds buyer crypto, runs AML/KYC and converts to fiat."
+   },
+   {
+    "title": "Multiple Dashboards",
+    "text": "Pre-built multi-level views for teams and stakeholders."
+   },
+   {
+    "title": "One Platform",
+    "text": "Listings, escrow, payouts and conversions worldwide."
+   },
+   {
+    "title": "Flexible Fees",
+    "text": "Use CET's ready pool or keep the fee yourself."
+   }
+  ],
+  "useCases": [
+   "Sell property via crypto",
+   "Automate escrow and compliance",
+   "Launch a branded property app",
+   "Enable global real estate sales"
+  ],
+  "stats": [
+   "Launch in 3 weeks",
+   "6-step payment and transfer process"
+  ],
+  "investUrl": "https://resystem.org/business-opportunity/cet",
+  "pdfDesktop": "https://drive.google.com/uc?export=download&id=1ZyH2vN4potjVay7bNgZS2StvoRLw0k7V",
+  "pdfMobile": "https://drive.google.com/uc?export=download&id=1Awuxh5sfKThQ4voPZYGNi8v5k-rhCNnL",
+  "mobileImage": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a28132657afd6b80817faad_CET_pdf_mobile.png",
+  "sourceUrl": "https://resystem.org/suit/cet",
+  "category": "Real-world assets",
+  "tone": "c",
+  "deploy": "2 weeks",
+  "externalUrl": "",
+  "demoUrl": "",
+  "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96bab1c74ba97029e254e1_CET.jpg",
+  "status": "",
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb7d5b834979e2553e0b2_CET.png"
+ },
+ {
+  "slug": "rechain",
+  "name": "ReChain",
+  "tagline": "A fast Layer-1 that rewards every on-chain action",
+  "group": "ReSuit",
+  "summary": "ReChain is a Layer-1 blockchain that shares a large portion of transaction fees with referrers, stakers and long-term holders. It runs its own consensus, validators and native gas token, and powers apps across the ReSystem ecosystem.",
+  "whatItIs": "An everyday-user Layer-1 with automated infinity referrals and staking rewards, supporting smart contracts, DeFi, NFTs, gaming, payments and bridging, with ReCoin as gas.",
+  "features": [
+   "Earn on Every Action",
+   "Unlimited On-Chain Referrals",
+   "Fast, Low-Fee Layer-1",
+   "Built for All ReSystem Apps"
+  ],
+  "whyPoints": [
+   "Transparent, algorithmic payouts executed by smart contracts",
+   "No manual handling or middlemen"
+  ],
+  "whatYouCanDo": [
+   "Earn from every on-chain interaction",
+   "Grow a referral network",
+   "Build fast, low-fee dApps",
+   "Stake and hold for rewards"
+  ],
+  "highlights": [],
+  "useCases": [
+   "Earn on every on-chain interaction",
+   "Grow networks through referrals",
+   "Run fast, low-fee blockchain apps",
+   "Power the ReSystem ecosystem"
+  ],
+  "stats": [],
+  "investUrl": "",
+  "pdfDesktop": "https://drive.google.com/uc?export=download&id=1Am3fYvFAo9RJvDbTLayRIFi08kRGUvg3",
+  "pdfMobile": "https://drive.google.com/uc?export=download&id=1v6lV4zTMchxGehn3VeLewT1RZpMnN-sz",
+  "mobileImage": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a2802530d3a908954b4ba18_reCHAIN_pdf_mobile.png",
+  "sourceUrl": "https://resystem.org/suit/rechain",
+  "category": "Blockchain",
+  "tone": "d",
+  "deploy": "",
+  "externalUrl": "",
+  "demoUrl": "",
+  "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a28024b877bfaca6f8b6ab9_reCHAIN_pdf_Desktop.png",
+  "status": "",
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a28024b877bfaca6f8b6ab9_reCHAIN_pdf_Desktop.png"
+ },
+ {
+  "slug": "redomain",
+  "name": "reDOMAINS",
+  "tagline": "Secure, high-performance hosting, domains and servers",
+  "group": "RePartner",
+  "summary": "reDOMAINS provides web hosting and cloud infrastructure including domains, VPS, dedicated servers and AI/GPU hosting. It is backed by NVMe storage and 24/7 support (the page details describe the GlobalHostia service).",
+  "whatItIs": "A hosting and domain provider covering domain registration, managed cloud VPS, dedicated servers, WordPress hosting, SSL, business email and AI/GPU servers.",
+  "features": [
+   "Cloud & VPS Hosting",
+   "Dedicated Servers",
+   "Domain & SSL Services",
+   "AI & GPU Hosting",
+   "NVMe SSD Storage"
+  ],
+  "whyPoints": [],
+  "whatYouCanDo": [],
+  "highlights": [
+   {
+    "title": "Performance",
+    "text": "NVMe SSD cloud hosting with 99.9%+ uptime."
+   },
+   {
+    "title": "Security & Backups",
+    "text": "Enterprise-grade security with daily and weekly backups."
+   },
+   {
+    "title": "Easy Migration",
+    "text": "Website migration and scalable infrastructure for any size business."
+   },
+   {
+    "title": "Support",
+    "text": "24/7 expert technical support."
+   }
+  ],
+  "useCases": [
+   "Business Websites",
+   "AI & GPU Workloads",
+   "SaaS Applications",
+   "Enterprise Infrastructure"
+  ],
+  "stats": [
+   "99.9%+ uptime",
+   "24/7 support"
+  ],
+  "investUrl": "https://resystem.org/business-opportunity/globalhostia",
+  "pdfDesktop": "https://drive.google.com/uc?export=download&id=1z7Mn8D5Zi2F4hqMv8OY_kG7A9Ib0nWi-",
+  "pdfMobile": "https://drive.google.com/uc?export=download&id=1Awuxh5sfKThQ4voPZYGNi8v5k-rhCNnL",
+  "mobileImage": "",
+  "sourceUrl": "https://resystem.org/suit/redomain",
+  "category": "Infrastructure",
+  "tone": "a",
+  "deploy": "3 days",
+  "externalUrl": "https://globalhostia.com/",
+  "demoUrl": "",
+  "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96bb99fb44053ea5834e92_Globalhostia.jpg",
+  "status": "",
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb371f88b75560b6e4e17_redomain.png"
+ },
+ {
+  "slug": "mine",
+  "name": "21 Mine",
+  "tagline": "Professional crypto mining with fixed costs and daily payouts",
+  "group": "RePartner",
+  "summary": "21 Mine offers hosted crypto mining on high-efficiency machines in UAE facilities. Customers own their miners, pay fixed monthly power costs, monitor performance 24/7 and receive daily payouts.",
+  "whatItIs": "A hosted mining service run by miners active since 2017, with 500+ machines installed, payouts in BTC, DOGE, LTC or stablecoins, and PPS+/PPLNS payout models.",
+  "features": [
+   "Lifetime miner ownership",
+   "Daily crypto payouts",
+   "Fixed, transparent costs",
+   "24/7 performance monitoring",
+   "High-efficiency UAE infrastructure"
+  ],
+  "whyPoints": [],
+  "whatYouCanDo": [],
+  "highlights": [
+   {
+    "title": "Proven operator",
+    "text": "Mining since 2017 with 500+ machines installed."
+   },
+   {
+    "title": "Flexible payouts",
+    "text": "Daily earnings in BTC, DOGE, LTC or stablecoins, with auto-reinvest options."
+   }
+  ],
+  "useCases": [
+   "Earn daily crypto income",
+   "Diversify beyond traditional assets",
+   "Own mining without operations",
+   "Grow wealth long term"
+  ],
+  "stats": [
+   "500+ machines installed",
+   "95.5% average reward acceptance",
+   "Operating since 2017"
+  ],
+  "investUrl": "",
+  "pdfDesktop": "https://drive.google.com/uc?export=download&id=1LHFYb7EKSj9E0XqbLAB7enomB3lZ63KH",
+  "pdfMobile": "https://drive.google.com/uc?export=download&id=1yIi4icPDIFAaDj6UapJja6z6-xnb55Cw",
+  "mobileImage": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6ac5012f4e4c3a06fb85d315_21MINE%20mobile.png",
+  "sourceUrl": "https://resystem.org/suit/mine",
+  "category": "Infrastructure",
+  "tone": "c",
+  "deploy": "",
+  "externalUrl": "https://21mine.shop",
+  "demoUrl": "",
+  "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb09dccb168702b6fd4e9_21MINE.png",
+  "status": "",
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb09dccb168702b6fd4e9_21MINE.png"
+ },
+ {
+  "slug": "tunetailor",
+  "name": "TuneTailor",
+  "tagline": "Personalised AI-powered songs for every occasion",
+  "group": "RePartner",
+  "summary": "TuneTailor turns memories, stories or lyrics into personalised songs with studio-quality audio and custom artwork. Songs are delivered within 24 hours with revision support.",
+  "whatItIs": "An AI-powered custom song service producing personalised lyrics, studio-quality MP3s and cover art, with add-ons such as instrumentals, lyric videos and commercial licensing.",
+  "features": [
+   "AI-Powered Song Creation",
+   "Personalized Lyrics",
+   "Studio-Quality Production",
+   "Custom Cover Artwork",
+   "Fast Delivery"
+  ],
+  "whyPoints": [],
+  "whatYouCanDo": [],
+  "highlights": [
+   {
+    "title": "24-Hour Delivery",
+    "text": "Finished songs delivered within a day."
+   },
+   {
+    "title": "30-Day Revisions",
+    "text": "Revision support after delivery."
+   },
+   {
+    "title": "Private Sharing Page",
+    "text": "Download and share songs privately."
+   },
+   {
+    "title": "Add-ons & Licensing",
+    "text": "Instrumental and lyric video add-ons; commercial licensing available."
+   }
+  ],
+  "useCases": [
+   "Personalized Gifts",
+   "Weddings & Celebrations",
+   "Business & Brand Music",
+   "Memorial & Tribute Songs"
+  ],
+  "stats": [
+   "24-hour song delivery",
+   "30-day revision support"
+  ],
+  "investUrl": "https://resystem.org/business-opportunity/tunetailor",
+  "pdfDesktop": "https://drive.google.com/uc?export=download&id=1ENyr6Dqa46MFXluyasVGlTuavE7t2SWk",
+  "pdfMobile": "https://drive.google.com/uc?export=download&id=1ENyr6Dqa46MFXluyasVGlTuavE7t2SWk",
+  "mobileImage": "",
+  "sourceUrl": "https://resystem.org/suit/tune-tailor-5q29d",
+  "category": "AI",
+  "tone": "c",
+  "deploy": "1 week",
+  "externalUrl": "https://tunetailor.org/",
+  "demoUrl": "",
+  "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96bc4f949c97d8e19803fc_Tunetailor.jpg",
+  "status": "",
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb442c9cc07c1d0814d61_TueTailor.png"
+ },
+ {
+  "slug": "prohandover",
+  "name": "ProHandover",
+  "tagline": "One platform for property handovers, maintenance and renewals",
+  "group": "RePartner",
+  "summary": "ProHandover connects owners, tenants, maintenance teams and property managers in one workspace. It replaces spreadsheets and phone calls with a single system covering handovers through renewals.",
+  "whatItIs": "An all-in-one property operations platform for handovers, maintenance tickets, leases, payments, cheques, documents and reporting.",
+  "features": [
+   "Complete Property Portfolio Management",
+   "Smart Maintenance Request Tracking",
+   "Owner & Tenant Self-Service Portal",
+   "Automated Lease & Payment Tracking",
+   "Centralized Property Operations Dashboard"
+  ],
+  "whyPoints": [
+   "Replaces scattered spreadsheets and manual processes",
+   "Reduces delays and improves communication",
+   "Manages properties from handover to renewal"
+  ],
+  "whatYouCanDo": [
+   "Connect every stakeholder on one platform",
+   "Manage the full property lifecycle",
+   "Resolve maintenance faster",
+   "Automate workflows and notifications",
+   "Track documents and payments securely",
+   "Scale from one property to many"
+  ],
+  "highlights": [],
+  "useCases": [
+   "Residential Property Management",
+   "Commercial Real Estate",
+   "Property Developers",
+   "Facility & Maintenance Management"
+  ],
+  "stats": [],
+  "investUrl": "https://resystem.org/business-opportunity/prohandover",
+  "pdfDesktop": "https://drive.google.com/uc?export=download&id=1nGG9fNkrO7PqKagFUeC9psUqhCL5sMpH",
+  "pdfMobile": "https://drive.google.com/uc?export=download&id=1nGG9fNkrO7PqKagFUeC9psUqhCL5sMpH",
+  "mobileImage": "",
+  "sourceUrl": "https://resystem.org/suit/prohandover",
+  "category": "Real estate services",
+  "tone": "b",
+  "deploy": "",
+  "externalUrl": "",
+  "demoUrl": "",
+  "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96bdd9cca22cd8f7c34949_Prohandover.jpg",
+  "status": "",
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a49071b7d3b027f52b63d83_Prohandover.png"
+ },
+ {
+  "slug": "hostick",
+  "name": "Hostick",
+  "tagline": "Events, QR check-ins and sales pipelines in one platform",
+  "group": "RePartner",
+  "summary": "Hostick combines event management, QR invitations and check-in, guest lists and CRM in one workspace. It helps teams capture leads at events, track attendance and close more deals.",
+  "whatItIs": "An event management and CRM platform covering invitations, RSVP, QR check-in, attendee management, lead pipelines and analytics.",
+  "features": [
+   "Smart Event Planning & Management",
+   "QR Invitations & Instant Check-In",
+   "Integrated CRM & Lead Tracking",
+   "Team Roles & Access Control",
+   "Live Analytics & Performance Reports"
+  ],
+  "whyPoints": [
+   "Removes the need for disconnected tools",
+   "Saves time and improves follow-ups",
+   "Turns events into measurable business growth"
+  ],
+  "whatYouCanDo": [
+   "Run events and CRM in one place",
+   "Track attendees in real time",
+   "Capture leads instantly",
+   "Follow up on sales faster",
+   "Build custom workflows and pipelines",
+   "Manage multiple events"
+  ],
+  "highlights": [],
+  "useCases": [
+   "Property Launch Events",
+   "Corporate Conferences",
+   "Exhibitions & Trade Shows",
+   "Sales & Networking Events"
+  ],
+  "stats": [],
+  "investUrl": "https://resystem.org/business-opportunity/hostick",
+  "pdfDesktop": "https://drive.google.com/uc?export=download&id=1ZARKPKGCYn5Xvnm2NT88UdIIFeympu2v",
+  "pdfMobile": "https://drive.google.com/uc?export=download&id=1ZARKPKGCYn5Xvnm2NT88UdIIFeympu2v",
+  "mobileImage": "",
+  "sourceUrl": "https://resystem.org/suit/hostick",
+  "category": "Events",
+  "tone": "b",
+  "deploy": "",
+  "externalUrl": "",
+  "demoUrl": "",
+  "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96bdfcc0d75d925f5a80b9_Hostick.jpg",
+  "status": "",
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a4914c275e49a6ca987fe47_hostick.png"
+ },
+ {
+  "slug": "rediscover",
+  "name": "reDiscover",
+  "tagline": "Coming soon",
+  "group": "ReSuit",
+  "summary": "reDiscover is listed in the ReSystem suite but its page is currently a coming-soon placeholder. A product PDF is available for download.",
+  "whatItIs": "",
+  "features": [],
+  "whyPoints": [],
+  "whatYouCanDo": [],
+  "highlights": [],
+  "useCases": [],
+  "stats": [],
+  "investUrl": "",
+  "pdfDesktop": "https://drive.google.com/uc?export=download&id=1hdHynGXmu-KSwl7qumB1H44T503fyo6x",
+  "pdfMobile": "https://drive.google.com/uc?export=download&id=16ZCGd8SLClPTozfzxqvEjAa_WZNcZ0Rr",
+  "mobileImage": "",
+  "sourceUrl": "https://resystem.org/suit/rediscover",
+  "category": "AI",
+  "tone": "c",
+  "deploy": "",
+  "externalUrl": "",
+  "demoUrl": "",
+  "image": "",
+  "status": "Coming soon",
+  "hero": ""
+ },
+ {
+  "slug": "aiconcierge",
+  "name": "AI Concierge",
+  "tagline": "Coming soon",
+  "group": "ReSuit",
+  "summary": "AI Concierge is listed in the ReSystem suite but its page is currently a coming-soon placeholder. A product PDF is available for download.",
+  "whatItIs": "",
+  "features": [],
+  "whyPoints": [],
+  "whatYouCanDo": [],
+  "highlights": [],
+  "useCases": [],
+  "stats": [],
+  "investUrl": "",
+  "pdfDesktop": "https://drive.google.com/uc?export=download&id=1Garzn8vYJS1Icbs0ffansUySNnYy5EXE",
+  "pdfMobile": "https://drive.google.com/uc?export=download&id=1TFWZo-hHjVwiG7jGGnoOowArvIFegOJW",
+  "mobileImage": "",
+  "sourceUrl": "https://resystem.org/suit/aiconcierge",
+  "category": "AI",
+  "tone": "c",
+  "deploy": "",
+  "externalUrl": "",
+  "demoUrl": "",
+  "image": "",
+  "status": "Coming soon",
+  "hero": ""
+ },
+ {
+  "slug": "ico-platform",
+  "name": "ICO Platform",
+  "tagline": "Coming soon",
+  "group": "ReSuit",
+  "summary": "The ICO Platform is listed in the ReSystem suite but its page is currently a coming-soon placeholder with no published details.",
+  "whatItIs": "",
+  "features": [],
+  "whyPoints": [],
+  "whatYouCanDo": [],
+  "highlights": [],
+  "useCases": [],
+  "stats": [],
+  "investUrl": "",
+  "pdfDesktop": "",
+  "pdfMobile": "",
+  "mobileImage": "",
+  "sourceUrl": "https://resystem.org/suit/ico-platform",
+  "category": "Finance / DeFi",
+  "tone": "a",
+  "deploy": "",
+  "externalUrl": "",
+  "demoUrl": "",
+  "image": "",
+  "status": "Coming soon",
+  "hero": ""
+ }
+]

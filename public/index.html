@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>reMarketplace — Launch fintech & Web3 products in days</title>
+<meta name="description" content="reMarketplace gives businesses pre-built, white-label fintech, Web3, AI and identity products to customise, rebrand and deploy in days, not months.">
+<meta name="theme-color" content="#F7541D">
+<meta property="og:title" content="reMarketplace — Launch fintech & Web3 products in days, not months">
+<meta property="og:description" content="Pre-built infrastructure to build, launch and scale products under your brand. Part of the ReSystem ecosystem.">
+<meta property="og:url" content="https://remarketplace.store/">
+<link rel="icon" type="image/png" href="/img/favicon.png">
+<script src="/js/theme.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="logo" href="/" aria-label="reMarketplace home"><img class="lg-light" src="/img/logo-light.png" alt="reMarketplace" width="225" height="30"><img class="lg-dark" src="/img/logo-dark.png" alt="" width="225" height="30"></a>
+    <label class="nav-search"><span aria-hidden="true">⌕</span><input id="q" type="search" placeholder="Search products" aria-label="Search products"></label>
+    <nav class="nav-links"><a href="#catalog">Products</a><a href="#why">Why us</a><a href="#use-cases">Use cases</a><a href="https://resystem.org" target="_blank" rel="noopener">ReSystem ↗</a></nav>
+    <a class="btn btn-ghost signin" id="signin" href="/api/auth/reid/start"><span class="reid-dot">re</span><span class="lbl">Sign in with reID</span></a>
+    <div class="user" id="user" hidden><span class="avatar" id="uAv"></span><span class="u-name" id="uName"></span><button class="link" id="signout">Sign out</button></div>
+    <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode"><span class="sun">☀</span><span class="moon">☾</span></button>
+    <button class="btn btn-dark" data-book>Book a demo</button>
+  </div>
+</header>
+<div class="toast" id="toast" hidden></div>
+
+<main>
+  <!-- Hero -->
+  <section class="hero wrap">
+    <span class="eyebrow">White-label concept · ReSystem ecosystem</span>
+    <div class="hero-grid">
+      <h1>Launch fintech &amp; Web3 products in days, <em>not months.</em></h1>
+      <div class="hero-side">
+        <p>reMarketplace provides pre-built infrastructure for businesses to build, launch and scale fully functional products that are simple to customise, rebrand and deploy.</p>
+        <div class="hero-cta">
+          <a class="btn btn-accent" href="#catalog">Browse products</a>
+          <button class="btn btn-ghost" data-book>Book a demo call</button>
+        </div>
+      </div>
+    </div>
+    <div class="stats stats-4">
+      <div><b id="statCount">15+</b><span>ecosystem products</span></div>
+      <div><b>3 weeks</b><span>to launch a vertical marketplace</span></div>
+      <div><b>99.9%</b><span>uptime · 38ms latency</span></div>
+      <div><b>1,200</b><span>TPS on the ReSystem backend</span></div>
+    </div>
+  </section>
+
+  <!-- Why + listing (pitch page 1) -->
+  <section class="wrap pitch" id="why">
+    <div class="pitch-col">
+      <h2>Why reMarketplace?</h2>
+      <ol class="pitch-list">
+        <li><span>01</span>Affordable entry into assets that are normally out of reach.</li>
+        <li><span>02</span>Fast resale in a built-in marketplace.</li>
+        <li><span>03</span>Ownership is provable on-chain.</li>
+        <li><span>04</span>White-label option to launch a vertical marketplace in 3 weeks.</li>
+      </ol>
+    </div>
+    <div class="pitch-col">
+      <h2>Everyone gets a chance to be listed</h2>
+      <ol class="pitch-list">
+        <li><span>01</span>Have the ReSystem team build your master label.</li>
+        <li><span>02</span>List your own master label in a pre-built marketplace.</li>
+        <li><span>03</span>Advertise your product to the ecosystem.</li>
+        <li><span>04</span>Upgrade your B2C product into a master label.</li>
+        <li><span>05</span>Compliant and audit-ready by default.</li>
+        <li><span>06</span>Scale globally with the ReSystem backend.</li>
+      </ol>
+    </div>
+    <aside class="qr-card">
+      <img src="/qr/home.svg" alt="QR code linking to remarketplace.store" width="168" height="168">
+      <b>Scan to explore reMarketplace</b>
+      <span>Open the catalog on your phone. Every product page has its own QR code too.</span>
+    </aside>
+  </section>
+
+  <!-- Glossary -->
+  <section class="wrap">
+    <div class="glossary">
+      <span class="eyebrow-light">Glossary</span>
+      <dl>
+        <div><dt>Master label</dt><dd>Software or a B2B-licensed product created to be scaled and customised.</dd></div>
+        <div><dt>White label</dt><dd>A sub-licensed product created and rebranded from a master label.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- Catalog -->
+  <section class="wrap catalog" id="catalog">
+    <div class="cat-head">
+      <h2>What you can own</h2>
+      <span id="count" class="muted"></span>
+    </div>
+    <div class="chips" id="cats"></div>
+    <div class="sort-row"><span class="sort-label">SORT</span><div class="chips" id="sorts"></div></div>
+    <p class="muted small">Open any product for full details, its live demo, brochure, QR code and investment opportunity.</p>
+    <div class="grid" id="grid"></div>
+    <p class="empty" id="empty" hidden>No products match your search.</p>
+  </section>
+
+  <!-- Use cases & target market (pitch page 2) -->
+  <section class="wrap usecases" id="use-cases">
+    <div class="band-title">Use cases &amp; target market</div>
+    <div class="uc-grid">
+      <article class="uc uc-dark">
+        <h3>List your product on reMarketplace</h3>
+        <p>You built something great — now reach buyers you'd never find alone. reMarketplace puts your master label in front of businesses actively looking to license and deploy. List once, sell repeatedly, and let the platform handle discovery, compliance and scale.</p>
+      </article>
+      <article class="uc uc-soft">
+        <h3>Why use reMarketplace</h3>
+        <p>Skip the 12-month build cycle. Get a ready-to-deploy product with compliance, payments and blockchain infrastructure already built in. You focus on your brand and customers, not engineering.</p>
+      </article>
+      <article class="uc uc-accent">
+        <h3>Why white-label from reMarketplace</h3>
+        <div class="uc-compare"><div><b>$200K+</b><span>and 6–12 months to build white-label from scratch</span></div><div><b>3 weeks</b><span>with pre-certified KYC, audit trails and a global-ready backend</span></div></div>
+        <p>You own the brand, we carry the infrastructure.</p>
+      </article>
+      <article class="uc uc-dark">
+        <h3>Built for every industry that moves money or identity</h3>
+        <div class="industries">
+          <span>Real estate</span><span>Fintech &amp; neobanks</span><span>Investment platforms</span><span>Retail &amp; e-commerce</span><span>Crypto exchanges</span><span>Payroll</span><span>Web3 wallets</span><span>Healthcare</span><span>Education</span><span>Logistics</span><span>Government</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- Infrastructure -->
+  <section class="wrap infra">
+    <div class="infra-card"><span class="i-num">01</span><h3>Scalable &amp; compliant infrastructure</h3><p>Blockchain-powered and scalable, with built-in KYC, audit logs and modular growth support.</p></div>
+    <div class="infra-card"><span class="i-num">02</span><h3>Modular &amp; customisable by design</h3><p>Pick the modules you need. Products share one identity layer (reID), one ledger and one admin console.</p></div>
+    <div class="infra-card"><span class="i-num">03</span><h3>Enterprise-grade performance</h3><p>38ms latency, 99.9% uptime and 1,200 TPS on INFRA Network, the ReSystem L1 with the reAED stablecoin.</p></div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq">
+    <div class="wrap faq-grid">
+      <div>
+        <span class="eyebrow-dark">FAQ</span>
+        <h2>Questions buyers ask before the first call.</h2>
+        <p>Anything not covered here, we answer live in a 30-minute walkthrough of the product you care about.</p>
+        <button class="btn btn-accent" data-book>Book a demo call</button>
+      </div>
+      <div id="faqs"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-grid">
+    <div>
+      <a class="logo" href="/" aria-label="reMarketplace home"><img class="lg-light" src="/img/logo-light.png" alt="reMarketplace" width="225" height="30"><img class="lg-dark" src="/img/logo-dark.png" alt="" width="225" height="30"></a>
+      <p class="muted small">Pre-built, white-label products for fintech, Web3, AI and identity. Part of the ReSystem ecosystem.</p>
+    </div>
+    <div><h5>ReSystem</h5><a href="https://resystem.org" target="_blank" rel="noopener">resystem.org</a><a href="https://resystem.org/ecosystem" target="_blank" rel="noopener">Ecosystem</a><a href="https://resystem.org/business-opportunity" target="_blank" rel="noopener">Business opportunity</a><a href="https://resystem.org/id" target="_blank" rel="noopener">Join reID</a></div>
+    <div><h5>Contact</h5><a href="mailto:info@resystem.org">info@resystem.org</a><a href="https://www.linkedin.com/company/resystemglobal" target="_blank" rel="noopener">LinkedIn</a><a href="https://x.com/Reidentity_net" target="_blank" rel="noopener">X</a></div>
+  </div>
+  <div class="wrap foot-bottom muted small">© <span id="yr"></span> Desert Tech Cloud Services LLC · Dubai, UAE</div>
+</footer>
+
+<div class="overlay center" id="bookOv" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="bTitle">
+    <div class="modal-head"><div><span class="muted small" id="bCounter"></span><h3 id="bTitle"></h3></div><button class="x" data-close aria-label="Close">×</button></div>
+    <div class="progress"><i id="bProg"></i></div>
+    <div class="modal-body" id="bBody"></div>
+    <div class="modal-foot" id="bFoot"><button class="btn btn-ghost" id="bBack">Back</button><button class="btn btn-accent grow" id="bNext">Continue</button></div>
+  </div>
+</div>
+
+<script src="/js/common.js"></script>
+<script src="/js/home.js"></script>
+</body>
+</html>
