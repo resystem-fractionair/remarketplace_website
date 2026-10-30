@@ -7,8 +7,9 @@ Sign in with `ADMIN_USER` / `ADMIN_PASSWORD`. The badge at the top right shows *
 - **+ New product / Edit:**
   - *Basics* — name, URL slug, tagline, category, group, badge (e.g. Coming soon), go-live time, pricing, summary, what it is, visible, icon colour.
   - *Schedule* — show from / hide after (Dubai dates). Plan launches in advance.
-  - *SEO & sharing* — custom search title and description.
-  - *Images* — card image (catalog, banner, share image), banner override, logo. Upload or paste a URL.
+  - *Share link & social preview* — the product's shareable link (copy / open / share to WhatsApp, LinkedIn, X, Facebook, Telegram), share title, description (50–160 chars) and share image (1200 × 630). Live preview of the link card and a checklist. The list shows **Share ✓** or **Share: N to fix** per product, and a **🔗 Link** button to copy the link.
+  - *Images* — card image 1600 × 900, banner override 2100 × 800, logo 512 × 512; each box says where it is used and checks the uploaded size.
+  - *Feature icons* — click the icon next to each key feature to pick from the library or upload one (96 × 96).
   - *Links, demo access & brochures* — live site, demo URL, sandbox note, investment URL, desktop/mobile PDF (upload or URL), source page.
   - *Page content* — features, why points, what you can do, use cases, stats, highlights (`Title | text`), one per line.
   - *Sandbox / demo credentials* — `Label | value` per line; shown in the Try-demo panel with Copy buttons.

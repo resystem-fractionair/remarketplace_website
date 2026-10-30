@@ -215,13 +215,15 @@ app.get(['/', '/index.html'], wrap(async (_req, res) => {
       { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: c.faq.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }]
   }));
 }));
+// Share/search descriptions: cut to ~160 characters on a word boundary
+const clip = (t, n) => { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length <= n ? t : t.slice(0, n - 1).replace(/\s+\S*$/, '').replace(/[,;:.\s]+$/, '') + '…'; };
 app.get('/product/:slug', wrap(async (req, res, next) => {
   const p = await bySlug(req.params.slug); if (!p) return next();
   const { settings } = await store.load(); const c = settings.content, url = `${SITE_URL}/product/${p.slug}`;
   res.set('Cache-Control', 'no-cache').type('html').send(page('product.html', {
-    title: p.seoTitle || `${p.name} — ${p.tagline || p.category} | ${c.seo.siteName}`, description: p.seoDescription || p.summary || p.tagline || c.seo.description,
+    title: p.seoTitle || `${p.name} — ${p.tagline || p.category} | ${c.seo.siteName}`, description: clip(p.seoDescription || p.summary || p.tagline || c.seo.description, 160),
     keywords: [p.name, p.category, p.group, 'white label', ...(p.useCases || [])].filter(Boolean).join(', '), url, siteName: c.seo.siteName, twitter: c.seo.twitter, type: 'product',
-    image: abs(p.image || p.hero) || abs(c.seo.ogImage) || SITE_URL + '/img/og.png',
+    image: abs(p.ogImage || p.image || p.hero) || abs(c.seo.ogImage) || SITE_URL + '/img/og.png',
     jsonld: [org(c), { '@context': 'https://schema.org', '@type': 'SoftwareApplication', name: p.name, url, description: p.summary || p.tagline, applicationCategory: 'BusinessApplication',
       applicationSubCategory: p.category, operatingSystem: 'Web', image: abs(p.image || p.hero) || undefined, featureList: (p.features || []).join(', ') || undefined,
       brand: { '@type': 'Brand', name: c.seo.siteName }, publisher: { '@type': 'Organization', name: c.seo.siteName, url: SITE_URL },

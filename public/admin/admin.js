@@ -64,12 +64,14 @@
         <span class="grip" title="${filtering ? 'Clear search/filter to reorder' : 'Drag to reorder'}">⋮⋮</span>
         ${thumb(p)}
         <div class="pi-t"><b>${esc(p.name)}</b><span>${esc(p.category || 'No category')} · /${esc(p.slug)}${p.status ? ' · ' + esc(p.status) : ''}</span></div>
-        <div class="pi-rows">${sched(p)}${inRows(p.slug).map(r => `<span>${r}</span>`).join('')}</div>
+        <div class="pi-rows">${sched(p)}${inRows(p.slug).map(r => `<span>${r}</span>`).join('')}${(() => { const s = shareInfo(p), bad = s.checks.filter(c => !c[0]).length; return `<span class="${bad ? 'sh-bad' : 'sh-ok'}" title="${esc(s.checks.map(c => (c[0] ? '✓ ' : '! ') + c[1]).join('\n'))}">${bad ? 'Share: ' + bad + ' to fix' : 'Share ✓'}</span>`; })()}</div>
+        <button class="btn btn-ghost sm" data-copylink="${esc(p.slug)}" title="Copy share link">🔗 Link</button>
         <label class="switch" title="Show on site"><input type="checkbox" data-vis="${esc(p.slug)}"${p.visible ? ' checked' : ''}><span class="sw"></span></label>
         <button class="btn btn-ghost sm" data-edit="${esc(p.slug)}">Edit</button>
       </div>`).join('') || '<p class="muted">No products match.</p>';
   }
   $('#pq').oninput = e => { S.q = e.target.value; renderProducts(); };
+  $('#plist').addEventListener('click', async e => { const b = e.target.closest('[data-copylink]'); if (!b) return; e.stopPropagation(); const site = await siteInfo(); navigator.clipboard.writeText(`${site.siteUrl}/product/${b.dataset.copylink}`).then(() => toast('Share link copied')); }, true);
   $('#pcat').onchange = e => { S.cat = e.target.value; renderProducts(); };
   $('#plist').addEventListener('change', async e => {
     const slug = e.target.dataset.vis; if (!slug) return;
@@ -101,6 +103,7 @@
     try { await api('PUT', '/api/admin/order', { slugs }); toast('Order saved'); } catch (err) { toast(err.message); }
   });
 
+  let SITE = null;
   /* ---------- Icon picker (library from /js/icons.js + upload) ---------- */
   function iconPicker(anchor, current, onPick, uploadName) {
     let pop = $('#iconPop'); if (pop) pop.remove();
@@ -127,6 +130,7 @@
   const IMAGES = [
     ['image', 'Card image', '1600 × 900 px · 16:9 · JPG/WebP ≤ 400 KB', 1200, 675, 'Catalog cards, featured products, booking wizard, share preview (social), and the product banner when no banner override is set.'],
     ['hero', 'Banner override', '2100 × 800 px · 21:8 · JPG/WebP ≤ 600 KB', 1600, 600, 'Top banner on the product page only. Desktop crops to 21:8, phones to 16:9 — keep the important part in the centre.'],
+    ['ogImage', 'Share image (social preview)', '1200 × 630 px · 1.91:1 · JPG/PNG ≤ 300 KB', 1200, 630, 'Shown when the product link is shared on WhatsApp, LinkedIn, X, Facebook, Slack, Telegram etc. Blank = card image is used.'],
     ['logo', 'Logo / app icon', '512 × 512 px · square · transparent PNG or SVG', 256, 256, 'Small product mark in cards, header chips and booking list when there is no card image.']];
   const sizeNote = (img, box) => { const k = box.dataset.img, spec = IMAGES.find(x => x[0] === k), w = img.naturalWidth, h = img.naturalHeight, out = box.querySelector('.dim'); if (!out || !spec) return;
     const small = w < spec[3] || h < spec[4]; out.className = 'dim ' + (small ? 'bad' : 'good'); out.textContent = `Current: ${w} × ${h} px` + (small ? ` — too small, use ${spec[2].split(' ·')[0]}` : ' ✓'); };
@@ -158,10 +162,19 @@
       </fieldset>
       <fieldset><legend>Schedule (optional)</legend><p class="muted small">Plan launches ahead: the product appears automatically from the start date and disappears after the end date (Dubai time). Leave blank to follow the Visible switch only.</p>
         <div class="two"><label>Show from<input type="date" name="showFrom" value="${esc(p.showFrom || '')}"></label><label>Hide after<input type="date" name="showUntil" value="${esc(p.showUntil || '')}"></label></div></fieldset>
-      <fieldset><legend>SEO & sharing (optional)</legend><p class="muted small">Overrides the page title and search/social description. The card image is used as the share image.</p>
-        ${field('seoTitle', 'SEO title', p.seoTitle || '', 'placeholder="' + esc(p.name || '') + ' — ' + esc(p.tagline || '') + '"')}
-        ${area('seoDescription', 'SEO description (≈155 characters)', p.seoDescription || '', 2)}</fieldset>
-      <fieldset><legend>Images</legend><p class="muted small">Recommended sizes are shown on each image. After upload the actual size is checked; a red note means the image will look blurry.</p><div class="img-grid">${IMAGES.map(([k, l]) => `
+      <fieldset class="share-fs"><legend>Share link & social preview</legend>
+        <div class="sh-link"><input id="shUrl" readonly value=""><button type="button" class="btn btn-ghost sm" data-shcopy>Copy link</button><a class="btn btn-ghost sm" id="shOpen" target="_blank" rel="noopener">Open ↗</a></div>
+        <div class="sh-net" id="shNet"></div>
+        ${field('seoTitle', 'Share / search title', p.seoTitle || '', 'placeholder="' + esc(p.name || '') + ' — ' + esc(p.tagline || '') + '"')}
+        ${area('seoDescription', 'Share / search description (50–160 characters)', p.seoDescription || '', 2)}
+        <div class="img-f" data-img="ogImage"><span class="lbl">Share image <em class="rec">1200 × 630 px · JPG/PNG ≤ 300 KB</em></span>
+          <small class="use">${esc(IMAGES.find(x => x[0] === 'ogImage')[5])}</small>
+          <div class="prev og">${prevHTML(p.ogImage)}</div><span class="dim"></span>
+          <input name="ogImage" value="${esc(p.ogImage || '')}" placeholder="Blank = use card image">
+          <div class="img-a"><label class="btn btn-ghost sm">Upload<input type="file" accept="image/*" data-up="ogImage" hidden></label><button type="button" class="btn btn-ghost sm" data-clear="ogImage">Remove</button></div></div>
+        <span class="lbl">Preview — how the link looks when shared</span><div id="shPrev"></div>
+        <ul class="sh-check" id="shCheck"></ul></fieldset>
+      <fieldset><legend>Images</legend><p class="muted small">Recommended sizes are shown on each image. After upload the actual size is checked; a red note means the image will look blurry.</p><div class="img-grid">${IMAGES.filter(x => x[0] !== 'ogImage').map(([k, l]) => `
         <div class="img-f" data-img="${k}"><span class="lbl">${esc(l)} <em class="rec">${esc(IMAGES.find(x => x[0] === k)[2])}</em></span>
           <small class="use">${esc(IMAGES.find(x => x[0] === k)[5])}</small>
           <div class="prev${k === 'logo' ? ' sq' : k === 'hero' ? ' wide' : ''}">${prevHTML(p[k])}</div><span class="dim"></span>
@@ -180,8 +193,24 @@
         ${area('demoCreds', 'Credentials', (p.demoCreds || []).map(c => c.label + ' | ' + c.value).join('\n'), 5, 'Label | value — one per line, e.g. Test email | demo@yourapp.io')}
       </fieldset></div>`;
     editing.icons = {}; (p.features || []).forEach((f, i) => { editing.icons[f] = (p.featureIcons || [])[i] || ''; });
-    renderFeatIcons();
+    renderFeatIcons(); renderShare();
     document.body.classList.add('lock'); $('#edOv').hidden = false;
+  }
+  const SHARE_TPL = { wa: ['WhatsApp', u => 'https://wa.me/?text=' + encodeURIComponent(u)], li: ['LinkedIn', u => 'https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(u)], x: ['X', u => 'https://x.com/intent/post?url=' + encodeURIComponent(u)], fb: ['Facebook', u => 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(u)], tg: ['Telegram', u => 'https://t.me/share/url?url=' + encodeURIComponent(u)] };
+  async function siteInfo() { if (!SITE) try { SITE = await fetch('/api/site').then(r => r.json()); } catch (_) { SITE = { siteUrl: location.origin }; } return SITE; }
+  const shareInfo = p => {
+    const t = p.seoTitle || `${p.name} — ${p.tagline || p.category || ''} | reMarketplace`, d = p.seoDescription || p.summary || p.tagline || '', img = p.ogImage || p.image || p.hero || '';
+    return { t, d, img, checks: [[!!p.slug, 'Share link'], [!!(p.seoTitle || p.name), p.seoTitle ? 'Custom title' : 'Title (automatic from name + tagline)'], p.seoDescription ? [d.length >= 50 && d.length <= 160, `Custom description ${d.length} characters` + (d.length > 160 ? ' — over 160, will be cut' : d.length < 50 ? ' — too short (aim for 50–160)' : '')] : [d.length >= 50, d.length >= 50 ? 'Description (automatic from summary, cut to 160)' : 'Description missing — add a summary or share description'], [!!img, p.ogImage ? 'Custom share image' : img ? 'Share image (using card image)' : 'No share image — upload one']] };
+  };
+  async function renderShare() {
+    const f = $('#edForm'); if (!f || !$('#shPrev')) return;
+    const site = await siteInfo(), v = k => (f.querySelector(`[name="${k}"]`) || {}).value || '';
+    const p = { slug: v('slug'), name: v('name'), tagline: v('tagline'), category: v('category'), summary: v('summary'), seoTitle: v('seoTitle'), seoDescription: v('seoDescription'), ogImage: v('ogImage'), image: v('image'), hero: v('hero') };
+    const url = `${site.siteUrl}/product/${p.slug}`, s = shareInfo(p), host = site.siteUrl.replace(/^https?:\/\//, '');
+    $('#shUrl').value = p.slug ? url : 'Set a URL slug first'; $('#shOpen').href = url;
+    $('#shNet').innerHTML = Object.values(SHARE_TPL).map(([n, fn]) => `<a href="${esc(fn(url))}" target="_blank" rel="noopener">${n}</a>`).join('');
+    $('#shPrev').innerHTML = `<div class="og-card">${s.img ? `<img src="${esc(s.img)}" alt="">` : '<div class="og-noimg">No image</div>'}<div><span>${esc(host)}</span><b>${esc(s.t)}</b><small>${esc(s.d.length > 160 ? s.d.slice(0, 157) + '…' : s.d)}</small></div></div>`;
+    $('#shCheck').innerHTML = s.checks.map(([ok, l]) => `<li class="${ok ? 'ok' : 'no'}">${ok ? '✓' : '!'} ${esc(l)}</li>`).join('');
   }
   function renderFeatIcons() {
     const box = $('#featIcons'); if (!box) return;
@@ -189,6 +218,7 @@
     box.innerHTML = feats.length ? feats.map(f => `<div class="fi-row"><button type="button" class="ip-btn" data-ficon="${esc(f)}" title="Change icon">${RMI.render(editing.icons[f], 20) || '<span class="auto">Auto</span>'}</button><span>${esc(f)}</span></div>`).join('') : '<p class="muted small">Add key features above first.</p>';
   }
   $('#edForm').addEventListener('click', e => {
+    if (e.target.closest('[data-shcopy]')) { navigator.clipboard.writeText($('#shUrl').value).then(() => toast('Link copied')); return; }
     const b = e.target.closest('[data-ficon]'); if (!b) return;
     iconPicker(b, editing.icons[b.dataset.ficon], v => { editing.icons[b.dataset.ficon] = v; renderFeatIcons(); }, ($('#edForm').slug.value || 'product') + '-icon');
   });
@@ -201,10 +231,11 @@
     const box = e.target.closest('.img-f');
     if (box && e.target.tagName === 'INPUT') { box.querySelector('.prev').innerHTML = prevHTML(e.target.value); box.querySelector('.dim').textContent = ''; }
     if (e.target.name === 'features') renderFeatIcons();
+    if (/^(slug|name|tagline|summary|seoTitle|seoDescription|ogImage|image|hero)$/.test(e.target.name)) renderShare();
   });
   $('#edForm').addEventListener('click', e => {
     const k = e.target.dataset && e.target.dataset.clear; if (!k) return;
-    const box = e.target.closest('.img-f'); box.querySelector('input[name]').value = ''; box.querySelector('.prev').innerHTML = '<span>No image</span>'; box.querySelector('.dim').textContent = '';
+    const box = e.target.closest('.img-f'); box.querySelector('input[name]').value = ''; box.querySelector('.prev').innerHTML = '<span>No image</span>'; box.querySelector('.dim').textContent = ''; renderShare();
   });
   $('#edForm').addEventListener('change', async e => {
     const k = e.target.dataset.up; if (!k || !e.target.files[0]) return;
@@ -215,7 +246,7 @@
       const { url } = await api('POST', '/api/admin/upload?name=' + encodeURIComponent(($('#edForm').slug.value || 'product') + '-' + k), null, f);
       $('#edForm').querySelector(`[name="${k}"]`).value = url;
       const box = e.target.closest('.img-f'); if (box) box.querySelector('.prev').innerHTML = prevHTML(url);
-      toast('Uploaded — remember to save');
+      toast('Uploaded — remember to save'); renderShare();
     } catch (err) { toast(err.message); }
     e.target.value = '';
   });
@@ -503,7 +534,6 @@
   $('#saveContent').onclick = async () => { S.settings.content = CT || S.settings.content; await saveSettings('Site content saved — refresh the site to see it'); renderContent(); };
 
   /* ---------- QR codes ---------- */
-  let SITE = null;
   async function renderQR() {
     if (!SITE) try { SITE = await fetch('/api/site').then(r => r.json()); } catch (_) { SITE = { siteUrl: location.origin }; }
     const q = S.settings.qr || (S.settings.qr = { mainUrl: '' }), v = Date.now();

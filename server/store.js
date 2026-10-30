@@ -17,7 +17,7 @@ const UPLOADS = path.join(__dirname, '..', 'public', 'uploads');
 
 const LIST_FIELDS = ['features', 'whyPoints', 'whatYouCanDo', 'useCases', 'stats'];
 const TEXT_FIELDS = ['showFrom', 'showUntil', 'seoTitle', 'seoDescription', 'name', 'tagline', 'category', 'group', 'status', 'deploy', 'price', 'summary', 'whatItIs',
-  'image', 'hero', 'mobileImage', 'logo', 'externalUrl', 'demoUrl', 'demoEmail', 'demoPassword', 'demoNote', 'investUrl', 'pdfDesktop', 'pdfMobile', 'tone', 'sourceUrl'];
+  'image', 'hero', 'ogImage', 'mobileImage', 'logo', 'externalUrl', 'demoUrl', 'demoEmail', 'demoPassword', 'demoNote', 'investUrl', 'pdfDesktop', 'pdfMobile', 'tone', 'sourceUrl'];
 
 const slugify = s => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
 
