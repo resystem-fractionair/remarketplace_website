@@ -92,8 +92,8 @@
   /* ---------- Editor ---------- */
   let editing = null;
   const LISTS = [['features', 'Key features'], ['whyPoints', 'Why points'], ['whatYouCanDo', 'What you can do'], ['useCases', 'Use cases'], ['stats', 'Stats chips (e.g. 99.9% uptime)']];
-  const IMAGES = [['image', 'Card image (catalog, 16:9)'], ['hero', 'Hero image (product page)'], ['mobileImage', 'Mobile screenshot'], ['logo', 'Logo / icon (square)']];
-  const LINKS = [['externalUrl', 'Live site'], ['demoUrl', 'Demo URL'], ['investUrl', 'Investment opportunity URL'], ['pdfDesktop', 'Brochure PDF — desktop'], ['pdfMobile', 'Brochure PDF — mobile'], ['sourceUrl', 'resystem.org page']];
+  const IMAGES = [['image', 'Card image (catalog + banner, 16:9)'], ['hero', 'Banner image override (wide)'], ['logo', 'Logo / icon (square)']];
+  const LINKS = [['externalUrl', 'Live site'], ['demoUrl', 'Demo URL (login page)'], ['demoEmail', 'Demo login — email / username'], ['demoPassword', 'Demo login — password'], ['demoNote', 'Demo note (e.g. resets nightly)'], ['investUrl', 'Investment opportunity URL'], ['pdfDesktop', 'Brochure PDF — desktop'], ['pdfMobile', 'Brochure PDF — mobile'], ['sourceUrl', 'resystem.org page']];
   const field = (k, label, v, attrs) => `<label>${esc(label)}<input name="${k}" value="${esc(v)}" ${attrs || ''}></label>`;
   const area = (k, label, v, rows, hint) => `<label>${esc(label)}${hint ? `<small>${esc(hint)}</small>` : ''}<textarea name="${k}" rows="${rows || 4}">${esc(v)}</textarea></label>`;
   const select = (k, label, v, opts) => `<label>${esc(label)}<select name="${k}">${opts.map(o => `<option${o === v ? ' selected' : ''}>${esc(o)}</option>`).join('')}</select></label>`;
@@ -123,7 +123,7 @@
           <input name="${k}" value="${esc(p[k] || '')}" placeholder="Paste URL or upload">
           <div class="img-a"><label class="btn btn-ghost sm">Upload<input type="file" accept="image/*" data-up="${k}" hidden></label><button type="button" class="btn btn-ghost sm" data-clear="${k}">Remove</button></div>
         </div>`).join('')}</div></fieldset>
-      <fieldset><legend>Links & brochures</legend>${LINKS.map(([k, l]) => k.startsWith('pdf')
+      <fieldset><legend>Links, demo access & brochures</legend>${LINKS.map(([k, l]) => k.startsWith('pdf')
         ? `<label>${esc(l)}<div class="inline"><input name="${k}" value="${esc(p[k] || '')}"><label class="btn btn-ghost sm">Upload PDF<input type="file" accept="application/pdf" data-up="${k}" hidden></label></div></label>`
         : field(k, l, p[k] || '')).join('')}</fieldset>
       <fieldset><legend>Page content</legend><p class="muted small">One item per line.</p>

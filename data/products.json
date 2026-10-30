@@ -64,7 +64,7 @@
   "investUrl": "https://resystem.org/business-opportunity/remarketplace",
   "pdfDesktop": "https://drive.google.com/uc?export=download&id=1KqAZeEO07ozj23-h6SCnaQ7IPJhbJabI",
   "pdfMobile": "https://drive.google.com/uc?export=download&id=1WQf5RcfgWZTiDt-v55sZdXHtlYc4MZKc",
-  "mobileImage": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a31b4a8d498abbe4cd6adfb_reMarketplace_pdf_mobile.png",
+  "mobileImage": "",
   "sourceUrl": "https://resystem.org/suit/remarketplace",
   "category": "White label",
   "tone": "a",
@@ -73,7 +73,10 @@
   "demoUrl": "",
   "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96b8b2bc6a8b111e68866a_reMarketplace.jpg",
   "status": "",
-  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a31b4a335fdf7bce6df9bb2_reMarketplace_Desktop.png"
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a31b4a335fdf7bce6df9bb2_reMarketplace_Desktop.png",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  },
  {
   "slug": "infra-global",
@@ -113,7 +116,10 @@
   "demoUrl": "",
   "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96b0a9500376d3547114f2_GLOBAL.jpg",
   "status": "",
-  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96b0a9500376d3547114f2_GLOBAL.jpg"
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96b0a9500376d3547114f2_GLOBAL.jpg",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  },
  {
   "slug": "infra-reaed",
@@ -154,7 +160,10 @@
   "demoUrl": "",
   "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96aef1500376d3546eb6b0_INFRAreAED.jpg",
   "status": "",
-  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96aef1500376d3546eb6b0_INFRAreAED.jpg"
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96aef1500376d3546eb6b0_INFRAreAED.jpg",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  },
  {
   "slug": "reid",
@@ -214,7 +223,7 @@
   "investUrl": "https://resystem.org/business-opportunity/reid",
   "pdfDesktop": "https://drive.google.com/uc?export=download&id=1tiqU9ONdccQ0gz_IoBXBw3z55zSVzMjy",
   "pdfMobile": "https://drive.google.com/uc?export=download&id=1dGbbXy1M7KYQSB40UtHMP1kmDawZC5Md",
-  "mobileImage": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a31b2d25b913ec200810174_reID_pdf_mobile.png",
+  "mobileImage": "",
   "sourceUrl": "https://resystem.org/suit/reid",
   "category": "Identity",
   "tone": "a",
@@ -223,7 +232,10 @@
   "demoUrl": "",
   "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96b2f977b35e9ae7a923e0_reID.jpg",
   "status": "",
-  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb632642ed9e671d79c8b_reID.png"
+  "hero": "",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  },
  {
   "slug": "rewallet",
@@ -306,7 +318,10 @@
   "demoUrl": "",
   "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb6fe1d2430055f5b19fb_reWALLET.png",
   "status": "",
-  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb6fe1d2430055f5b19fb_reWALLET.png"
+  "hero": "",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  },
  {
   "slug": "reinvest",
@@ -361,7 +376,7 @@
   "investUrl": "https://resystem.org/business-opportunity/reinvest",
   "pdfDesktop": "https://drive.google.com/uc?export=download&id=1yKmF6An-1NIeiWlBTaD5OZdpvRyMnRTl",
   "pdfMobile": "https://drive.google.com/uc?export=download&id=1H6QzQWrVKy5TxM4aHOx16S6rxBjp2WRC",
-  "mobileImage": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a31af46d10933942ef86689_reINVEST_pdf_mobile.png",
+  "mobileImage": "",
   "sourceUrl": "https://resystem.org/suit/reinvest",
   "category": "Finance / DeFi",
   "tone": "b",
@@ -370,7 +385,10 @@
   "demoUrl": "",
   "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96b95b5d1b1243be1870b5_reINVEST.jpg",
   "status": "",
-  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb015899d2c4143f1e3ad_invest.png"
+  "hero": "",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  },
  {
   "slug": "fractionaire",
@@ -430,7 +448,7 @@
   "investUrl": "https://resystem.org/business-opportunity/fractionaire",
   "pdfDesktop": "https://drive.google.com/uc?export=download&id=1UNMBTr6eXNg9KqdtIL37ZAqfF6jSHkjE",
   "pdfMobile": "https://drive.google.com/uc?export=download&id=1jhSroCpN--5sSbpl-V6vQELYQoTX8lDe",
-  "mobileImage": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a31b3c954d5cb22f4a4a7a2_Fractionaire_pdf_mobile.png",
+  "mobileImage": "",
   "sourceUrl": "https://resystem.org/suit/fractionaire",
   "category": "Real-world assets",
   "tone": "b",
@@ -439,7 +457,10 @@
   "demoUrl": "",
   "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96ba08f2f6a430d175e244_fractionaire.jpg",
   "status": "",
-  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb75e7df169b7fea3cf59_fractionaire.png"
+  "hero": "",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  },
  {
   "slug": "cet",
@@ -496,7 +517,7 @@
   "investUrl": "https://resystem.org/business-opportunity/cet",
   "pdfDesktop": "https://drive.google.com/uc?export=download&id=1ZyH2vN4potjVay7bNgZS2StvoRLw0k7V",
   "pdfMobile": "https://drive.google.com/uc?export=download&id=1Awuxh5sfKThQ4voPZYGNi8v5k-rhCNnL",
-  "mobileImage": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a28132657afd6b80817faad_CET_pdf_mobile.png",
+  "mobileImage": "",
   "sourceUrl": "https://resystem.org/suit/cet",
   "category": "Real-world assets",
   "tone": "c",
@@ -505,7 +526,10 @@
   "demoUrl": "",
   "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96bab1c74ba97029e254e1_CET.jpg",
   "status": "",
-  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb7d5b834979e2553e0b2_CET.png"
+  "hero": "",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  },
  {
   "slug": "rechain",
@@ -541,7 +565,7 @@
   "investUrl": "",
   "pdfDesktop": "https://drive.google.com/uc?export=download&id=1Am3fYvFAo9RJvDbTLayRIFi08kRGUvg3",
   "pdfMobile": "https://drive.google.com/uc?export=download&id=1v6lV4zTMchxGehn3VeLewT1RZpMnN-sz",
-  "mobileImage": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a2802530d3a908954b4ba18_reCHAIN_pdf_mobile.png",
+  "mobileImage": "",
   "sourceUrl": "https://resystem.org/suit/rechain",
   "category": "Blockchain",
   "tone": "d",
@@ -550,7 +574,10 @@
   "demoUrl": "",
   "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a28024b877bfaca6f8b6ab9_reCHAIN_pdf_Desktop.png",
   "status": "",
-  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a28024b877bfaca6f8b6ab9_reCHAIN_pdf_Desktop.png"
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a28024b877bfaca6f8b6ab9_reCHAIN_pdf_Desktop.png",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  },
  {
   "slug": "redomain",
@@ -608,7 +635,10 @@
   "demoUrl": "",
   "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96bb99fb44053ea5834e92_Globalhostia.jpg",
   "status": "",
-  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb371f88b75560b6e4e17_redomain.png"
+  "hero": "",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  },
  {
   "slug": "mine",
@@ -650,7 +680,7 @@
   "investUrl": "",
   "pdfDesktop": "https://drive.google.com/uc?export=download&id=1LHFYb7EKSj9E0XqbLAB7enomB3lZ63KH",
   "pdfMobile": "https://drive.google.com/uc?export=download&id=1yIi4icPDIFAaDj6UapJja6z6-xnb55Cw",
-  "mobileImage": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6ac5012f4e4c3a06fb85d315_21MINE%20mobile.png",
+  "mobileImage": "",
   "sourceUrl": "https://resystem.org/suit/mine",
   "category": "Infrastructure",
   "tone": "c",
@@ -659,7 +689,10 @@
   "demoUrl": "",
   "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb09dccb168702b6fd4e9_21MINE.png",
   "status": "",
-  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb09dccb168702b6fd4e9_21MINE.png"
+  "hero": "",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  },
  {
   "slug": "tunetailor",
@@ -717,7 +750,10 @@
   "demoUrl": "",
   "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96bc4f949c97d8e19803fc_Tunetailor.jpg",
   "status": "",
-  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6abbb442c9cc07c1d0814d61_TueTailor.png"
+  "hero": "",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  },
  {
   "slug": "prohandover",
@@ -766,7 +802,10 @@
   "demoUrl": "",
   "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96bdd9cca22cd8f7c34949_Prohandover.jpg",
   "status": "",
-  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a49071b7d3b027f52b63d83_Prohandover.png"
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a49071b7d3b027f52b63d83_Prohandover.png",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  },
  {
   "slug": "hostick",
@@ -815,7 +854,10 @@
   "demoUrl": "",
   "image": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a96bdfcc0d75d925f5a80b9_Hostick.jpg",
   "status": "",
-  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a4914c275e49a6ca987fe47_hostick.png"
+  "hero": "https://cdn.prod.website-files.com/67d2a1fe96de106b9998ace1/6a4914c275e49a6ca987fe47_hostick.png",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  },
  {
   "slug": "rediscover",
@@ -842,7 +884,10 @@
   "demoUrl": "",
   "image": "",
   "status": "Coming soon",
-  "hero": ""
+  "hero": "",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  },
  {
   "slug": "aiconcierge",
@@ -869,7 +914,10 @@
   "demoUrl": "",
   "image": "",
   "status": "Coming soon",
-  "hero": ""
+  "hero": "",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  },
  {
   "slug": "ico-platform",
@@ -896,6 +944,9 @@
   "demoUrl": "",
   "image": "",
   "status": "Coming soon",
-  "hero": ""
+  "hero": "",
+  "demoEmail": "",
+  "demoPassword": "",
+  "demoNote": ""
  }
 ]

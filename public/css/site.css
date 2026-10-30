@@ -278,3 +278,51 @@ body { background: var(--bg); position: relative; z-index: 0; }
   .pa-feat span { font-size: 12px; }
   .pa-res { grid-template-columns: 1fr 1fr; }
 }
+
+/* ===== Template A v2 — richer tiles, icons, demo panel ===== */
+.pa { max-width: 1320px; }
+.pa-hero { display: grid; gap: 12px; animation: rise .5s .05s both; }
+@media (min-width: 900px) { .pa-hero { grid-template-columns: minmax(0, 1fr) 260px; } }
+.pa-hero .pa-banner { aspect-ratio: 16 / 7; animation: none; }
+.pa-facts { display: grid; gap: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: stretch; }
+@media (min-width: 900px) { .pa-facts { grid-template-columns: 1fr; grid-auto-rows: 1fr; } }
+.pa-facts div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; display: flex; flex-direction: column; justify-content: center; }
+.pa-facts span { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.pa-facts b { font: 700 16px var(--head); }
+.pa-facts .acc { background: var(--dark); border-color: var(--dark); color: #fff; }
+.pa-facts .acc span { color: var(--accent); }
+.ic { display: inline-grid; place-items: center; width: 36px; height: 36px; flex: none; border-radius: 10px; background: var(--accent-soft); color: var(--accent-ink); }
+.pa-ov { display: grid; gap: 12px; }
+@media (min-width: 760px) { .pa-ov.two { grid-template-columns: 1.3fr 1fr; align-items: start; } }
+.pa-callout { background: var(--dark); color: #fff; border-radius: 12px; padding: 14px 16px; display: grid; gap: 4px; }
+.pa-callout span { font: 700 11px var(--head); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.pa-callout p { color: rgba(255,255,255,.85); font-size: 14px; }
+.pa-feat div { flex-direction: row; align-items: flex-start; gap: 12px; }
+.pa-feat .fi { display: inline-grid; place-items: center; width: 38px; height: 38px; flex: none; border-radius: 10px; background: var(--accent-soft); color: var(--accent-ink); }
+.pa-feat div:nth-child(3n+2) .fi { background: var(--t-d-bg); color: var(--t-d); }
+.pa-feat div:nth-child(3n) .fi { background: var(--t-b-bg); color: var(--t-b); }
+.pa-feat .ft { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pa-feat small { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+.pa-uc { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+.pa-uc div { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-size: 14px; font-weight: 600; display: flex; gap: 10px; align-items: center; }
+.pa-uc span { font: 700 12px var(--head); color: #fff; background: var(--accent); border-radius: 7px; padding: 4px 7px; flex: none; }
+.pa-side .pa-card { gap: 8px; }
+.pa-side h3 { display: flex; align-items: center; gap: 10px; font-size: 15px; margin: 0 0 2px; }
+.pa-side h3 .ic { width: 30px; height: 30px; }
+a.pa-res { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); transition: border-color .2s, background .2s; }
+a.pa-res:hover { border-color: var(--accent); background: var(--accent-soft); }
+a.pa-res > span:not(.ic) { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+a.pa-res b { font-size: 13.5px; } a.pa-res small { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+a.pa-res i { font-style: normal; color: var(--accent); font-weight: 700; }
+.pa-demo { border-color: var(--accent-line); }
+.pa-cred { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 9px; background: var(--bg); border: 1px solid var(--line); }
+.pa-cred span { font-size: 11px; color: var(--muted); width: 58px; flex: none; }
+.pa-cred code { flex: 1; min-width: 0; font: 13px ui-monospace, Menlo, monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pa-cred .copy { padding: 4px 9px; font-size: 11px; }
+.pa-invest .ic { background: rgba(255,255,255,.18); color: #fff; }
+.pa-actions .btn svg { margin-right: -2px; }
+.pa-rel .ri { width: 52px; height: 36px; flex: none; border-radius: 8px; overflow: hidden; background: var(--line); }
+.pa-rel .ri img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pa-rel a > span.rt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+@media (max-width: 720px) { .pa-hero .pa-banner { aspect-ratio: 16 / 9; } .pa-feat { grid-template-columns: 1fr; } .pa-feat .fi { width: 32px; height: 32px; } }
+.pa-rel a > span.ri { flex: none; display: block; }
