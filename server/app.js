@@ -133,6 +133,34 @@ const TPL = {};
 const tpl = f => TPL[f] || (TPL[f] = fs.readFileSync(path.join(PUB, f), 'utf8'));
 const ea = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const abs = u => !u ? '' : /^https?:/.test(u) ? u : SITE_URL + (u.startsWith('/') ? u : '/' + u);
+/* ---------- Share images (Open Graph) ----------
+   WhatsApp, LinkedIn, X, Facebook and Telegram drop images that are large (WhatsApp ~600 KB) or the wrong shape.
+   /og/<slug>.jpg and /og/home.jpg serve the chosen image resized to 1200×630 JPEG (~100–200 KB), cached at the edge. */
+const sharp = (() => { try { return require('sharp'); } catch (_) { return null; } })();
+const ogSrc = (p, c) => (p ? p.ogImage || p.image || p.hero : '') || c.seo.ogImage || '/img/og.png';
+const ogUrl = (key, src) => `${SITE_URL}/og/${key}.jpg?v=${crypto.createHash('sha1').update(String(src)).digest('hex').slice(0, 8)}`;
+async function readImage(src) {
+  if (/^https?:/.test(src) && !src.startsWith(SITE_URL)) {
+    const ac = new AbortController(), t = setTimeout(() => ac.abort(), 8000);
+    try { const r = await fetch(src, { signal: ac.signal }); if (!r.ok) throw new Error('image ' + r.status); return Buffer.from(await r.arrayBuffer()); } finally { clearTimeout(t); }
+  }
+  const rel = src.replace(SITE_URL, '').split('?')[0];
+  const f = path.join(PUB, path.normalize(rel).replace(/^([/\\])+/, ''));
+  if (!f.startsWith(PUB)) throw new Error('bad path');
+  return fs.readFileSync(f);
+}
+app.get('/og/:key', wrap(async (req, res, next) => {
+  const key = String(req.params.key).replace(/\.jpg$/, '');
+  const { settings } = await store.load(), c = settings.content;
+  let src;
+  if (key === 'home') src = ogSrc(null, c); else { const p = await bySlug(key); if (!p) return next(); src = ogSrc(p, c); }
+  if (!sharp) return res.redirect(302, abs(src));
+  let out;
+  try { out = await sharp(await readImage(src)).rotate().resize(1200, 630, { fit: 'cover', position: 'centre' }).flatten({ background: '#141317' }).jpeg({ quality: 80, mozjpeg: true }).toBuffer(); }
+  catch (e) { console.error('[og]', key, e.message); out = await sharp(fs.readFileSync(path.join(PUB, 'img/og.png'))).resize(1200, 630, { fit: 'cover' }).jpeg({ quality: 80, mozjpeg: true }).toBuffer(); }
+  res.set({ 'Content-Type': 'image/jpeg', 'Cache-Control': 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400' }).send(out);
+}));
+
 function page(file, m) {
   const ld = m.jsonld.map(o => `<script type="application/ld+json">${JSON.stringify(o).replace(/</g, '\\u003c')}</script>`).join('\n');
   const head = `<title>${ea(m.title)}</title>
@@ -140,9 +168,9 @@ function page(file, m) {
 ${m.keywords ? `<meta name="keywords" content="${ea(m.keywords)}">` : ''}
 <link rel="canonical" href="${ea(m.url)}">
 <meta name="robots" content="index,follow,max-image-preview:large">
-<meta property="og:type" content="${m.type || 'website'}"><meta property="og:site_name" content="${ea(m.siteName)}">
+<meta property="og:type" content="website"><meta property="og:site_name" content="${ea(m.siteName)}">
 <meta property="og:title" content="${ea(m.title)}"><meta property="og:description" content="${ea(m.description)}">
-<meta property="og:url" content="${ea(m.url)}"><meta property="og:image" content="${ea(m.image)}"><meta property="og:image:alt" content="${ea(m.title)}">
+<meta property="og:url" content="${ea(m.url)}"><meta property="og:image" content="${ea(m.image)}"><meta property="og:image:secure_url" content="${ea(m.image)}"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="${ea(m.title)}">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${ea(m.title)}"><meta name="twitter:description" content="${ea(m.description)}"><meta name="twitter:image" content="${ea(m.image)}">${m.twitter ? `<meta name="twitter:site" content="${ea(m.twitter)}">` : ''}
 <link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" href="/img/favicon.png"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png"><link rel="manifest" href="/site.webmanifest">
 <link rel="alternate" type="text/plain" title="LLM summary" href="/llms.txt">
@@ -160,7 +188,7 @@ app.get(['/', '/index.html'], wrap(async (_req, res) => {
   res.set('Cache-Control', 'no-cache').type('html').send(page('index.html', {
     googleVerify: c.seo.googleVerify, bingVerify: c.seo.bingVerify,
     title: c.seo.title, description: c.seo.description, keywords: c.seo.keywords, url: SITE_URL + '/', siteName: c.seo.siteName, twitter: c.seo.twitter,
-    image: abs(c.seo.ogImage) || SITE_URL + '/img/og.png',
+    image: ogUrl('home', ogSrc(null, c)),
     jsonld: [org(c), { '@context': 'https://schema.org', '@type': 'WebSite', name: c.seo.siteName, url: SITE_URL + '/', description: c.seo.description },
       { '@context': 'https://schema.org', '@type': 'ItemList', name: 'reMarketplace products', itemListElement: list.map((p, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE_URL}/product/${p.slug}`, name: p.name })) },
       { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: c.faq.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }]
@@ -174,7 +202,7 @@ app.get('/product/:slug', wrap(async (req, res, next) => {
   res.set('Cache-Control', 'no-cache').type('html').send(page('product.html', {
     title: p.seoTitle || `${p.name} — ${p.tagline || p.category} | ${c.seo.siteName}`, description: clip(p.seoDescription || p.summary || p.tagline || c.seo.description, 160),
     keywords: [p.name, p.category, p.group, 'white label', ...(p.useCases || [])].filter(Boolean).join(', '), url, siteName: c.seo.siteName, twitter: c.seo.twitter, type: 'product',
-    image: abs(p.ogImage || p.image || p.hero) || abs(c.seo.ogImage) || SITE_URL + '/img/og.png',
+    image: ogUrl(p.slug, ogSrc(p, c)),
     jsonld: [org(c), { '@context': 'https://schema.org', '@type': 'SoftwareApplication', name: p.name, url, description: p.summary || p.tagline, applicationCategory: 'BusinessApplication',
       applicationSubCategory: p.category, operatingSystem: 'Web', image: abs(p.image || p.hero) || undefined, featureList: (p.features || []).join(', ') || undefined,
       brand: { '@type': 'Brand', name: c.seo.siteName }, publisher: { '@type': 'Organization', name: c.seo.siteName, url: SITE_URL },

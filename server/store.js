@@ -289,7 +289,21 @@ async function saveSettings(s, raw) {
 }
 
 const EXT = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif', 'image/svg+xml': 'svg', 'application/pdf': 'pdf' };
+/* Large photos are shrunk on upload (max 2400 px wide, recompressed) so pages and share previews load fast. */
+const sharp = (() => { try { return require('sharp'); } catch (_) { return null; } })();
+async function optimise(buf, type) {
+  if (!sharp || !/^image\/(jpeg|png|webp)$/.test(type) || buf.length < 350 * 1024) return { buf, type };
+  try {
+    const img = sharp(buf).rotate(), meta = await img.metadata(), pipe = img.resize({ width: 2400, withoutEnlargement: true });
+    if (type === 'image/png' && meta.hasAlpha) return { buf: await pipe.png({ compressionLevel: 9, palette: true, quality: 90 }).toBuffer(), type };
+    if (type === 'image/webp') return { buf: await pipe.webp({ quality: 82 }).toBuffer(), type };
+    const out = await pipe.jpeg({ quality: 82, mozjpeg: true }).toBuffer();
+    return out.length < buf.length ? { buf: out, type: 'image/jpeg' } : { buf, type };
+  } catch (_) { return { buf, type }; }
+}
 async function upload(buf, type, name) {
+  if (!EXT[type]) throw Object.assign(new Error('Only PNG, JPG, WEBP, GIF, SVG or PDF files'), { status: 415 });
+  ({ buf, type } = await optimise(buf, type));
   const ext = EXT[type];
   if (!ext) throw Object.assign(new Error('Only PNG, JPG, WEBP, GIF, SVG or PDF files'), { status: 415 });
   const file = `${slugify(name) || 'file'}-${crypto.randomBytes(4).toString('hex')}.${ext}`;
