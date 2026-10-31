@@ -299,3 +299,12 @@ body, .card, .nav, .chip, .row, .pill, .day { transition: background-color .25s,
 /* reID mark: blue face-scan icon (same in light and dark mode) instead of the "re" text badge */
 .reid-dot, .btn-reid .reid-dot { background: url('/img/reid-icon.svg') center / contain no-repeat !important; color: transparent !important; font-size: 0 !important; border-radius: 0; width: 20px; height: 20px; }
 .reid-dot.big { width: 52px; height: 52px; }
+
+/* Homepage layout rows (Admin → Homepage): each row fills the width; columns adapt to the screen */
+.hrows { display: grid; gap: clamp(12px, 1.2vw, 20px); }
+.hrow { display: grid; gap: clamp(12px, 1.2vw, 20px); grid-template-columns: repeat(var(--nd), minmax(0, 1fr)); }
+@media (max-width: 1199px) { .hrow { grid-template-columns: repeat(var(--nt), minmax(0, 1fr)); } }
+@media (max-width: 899px) { .hrow { grid-template-columns: repeat(var(--ns), minmax(0, 1fr)); } }
+@media (max-width: 599px) { .hrow { grid-template-columns: 1fr; } }
+.hrow .pc-img { max-height: 280px; }
+.hrow .pc-img img { object-position: center top; }

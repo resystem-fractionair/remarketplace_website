@@ -2,8 +2,13 @@
 
 Sign in with `ADMIN_USER` / `ADMIN_PASSWORD`. The badge at the top right shows **● Live database** (Supabase) or **● Local files (dev)**.
 
+## Overview (first tab)
+- Counts of visible / hidden products, products on the homepage, average content completeness.
+- **Site setup** checklist: reID connected, booking emails (SMTP), admin password, Google/Bing verification, footer email, booking email, specialist photos, homepage layout (and no hidden products in it). **Fix** jumps to the right tab.
+- **Products — content to add**: every product with a % score and the missing items (red = required), worst first. **Edit** opens it.
+
 ## Products
-- **List:** drag ⋮⋮ to set catalog order; switch = show/hide; badges show homepage row and schedule ("Goes live …", "Live until …", "Ended …").
+- **List:** drag ⋮⋮ to set catalog order; switch = show/hide (saves only the switch, nothing else); **% content** badge (hover for what is missing); badges show homepage row and schedule ("Goes live …", "Live until …", "Ended …").
 - **+ New product / Edit:**
   - *Basics* — name, URL slug, tagline, category, group, badge (e.g. Coming soon), go-live time, pricing, summary, what it is, visible, icon colour.
   - *Schedule* — show from / hide after (Dubai dates). Plan launches in advance.
@@ -16,7 +21,7 @@ Sign in with `ADMIN_USER` / `ADMIN_PASSWORD`. The badge at the top right shows *
 - **Duplicate** copies a product into a hidden draft. **Delete** is permanent (hide instead to keep data).
 
 ## Homepage
-- **Default products** — which products the homepage shows first, in order, and how many. Visitors see "View all products (N)". Search and category chips always cover every product.
+- **Homepage layout** — rows of products, any number per row (1–8). Quick starts: 4·3·3, 5·3·3, 4·4, 3·3·3. Add products per row, drag to reorder inside a row, ⤒/⤓ to move a product to the row above/below, ↑/↓ to move rows, ✕ to remove. Each row fills the screen width: desktop up to 6 across, tablet up to 3, small tablet 2, phone 1. Everything else is under "View all products (N)". Search, categories and sorting always use every visible product.
 - **Featured on product pages** — row 1 is the "Featured products" list on every product page.
 
 ## Site content

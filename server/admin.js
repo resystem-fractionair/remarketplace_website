@@ -26,9 +26,12 @@ module.exports = function (app, store) {
   const guard = (req, res, next) => req.session && req.session.admin ? next() : res.status(401).json({ error: 'unauthorised' });
   app.use('/api/admin', guard);
 
+  app.get('/api/admin/product/:slug', wrap(async (req, res) => { const p = await store.getProduct(req.params.slug); if (!p) return res.status(404).json({ error: 'Not found' }); res.json(p); }));
+  app.put('/api/admin/products/:slug/visible', wrap(async (req, res) => { await store.setVisible(req.params.slug, req.body && req.body.visible); ping(); res.json({ ok: true }); }));
   app.get('/api/admin/state', wrap(async (_req, res) => {
-    const { products, settings } = await store.load();
-    res.json({ mode: store.MODE, products, settings });
+    const { products, settings } = await store.load({ fresh: true });
+    const e = k => !!(process.env[k] || '').trim();
+    res.json({ mode: store.MODE, products, settings, env: { smtp: e('SMTP_HOST') && e('SMTP_USER'), reid: e('REID_CLIENT_ID') && e('REID_CLIENT_SECRET'), siteUrl: (process.env.SITE_URL || '').trim(), adminDefault: !e('ADMIN_PASSWORD') } });
   }));
   /* every product change pings IndexNow in production so search engines re-crawl it */
   const ping = () => { if (process.env.NODE_ENV === 'production' || process.env.VERCEL) app.locals.indexNow && app.locals.indexNow().catch(() => {}); };

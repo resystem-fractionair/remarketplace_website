@@ -211,3 +211,31 @@ input:checked + .sw::after { transform: translateX(16px); }
 .sh-check { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 12.5px; } .sh-check .ok { color: #1F7A4D; } .sh-check .no { color: #B7791F; font-weight: 600; }
 .pi-rows .sh-ok { background: #E7F5EE !important; color: #1F7A4D !important; } .pi-rows .sh-bad { background: #FDF3E1 !important; color: #9A6A12 !important; }
 .od-st { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--line); } .od-st.broadcast { background: #E7F5EE; color: #1F7A4D; } .od-st.denied, .od-st.failed { background: #FDECEA; color: #B3261E; } .od-st.pending { background: #FDF3E1; color: #9A6A12; }
+
+/* Content completeness badges */
+.pi-rows .cq, .cq { font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+.cq.ok { background: #E7F5EE; color: #1F7A4D; } .cq.mid { background: #FDF3E1; color: #9A6A12; } .cq.bad { background: #FDECEA; color: #B3261E; }
+/* Overview */
+.ov-kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 22px; }
+.ov-kpi div { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; } .ov-kpi b { display: block; font: 800 26px var(--head); } .ov-kpi span { font-size: 12.5px; color: var(--muted); }
+.ov-h { font: 700 16px var(--head); margin: 18px 0 10px; }
+.ov-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 8px; }
+.ov-list li { display: flex; align-items: center; gap: 10px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; flex-wrap: wrap; }
+.ov-list li > span { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 12px; flex: none; }
+.ov-list .ok > span { background: #E7F5EE; color: #1F7A4D; } .ov-list .no > span { background: #FDECEA; color: #B3261E; }
+.ov-list b { font-size: 13.5px; flex: 1; min-width: 140px; } .ov-list small { color: var(--muted); font-size: 12px; width: 100%; padding-left: 32px; } .ov-list .btn { margin-left: auto; }
+.ov-prods { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 10px; }
+.ov-p { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: grid; gap: 10px; } .ov-p.off { opacity: .7; }
+.ov-pt { display: flex; align-items: center; gap: 10px; } .ov-pt b { flex: 1; font-size: 14px; } .ov-pt em { font-style: normal; font-size: 11px; color: var(--muted); }
+.ov-miss { display: flex; flex-wrap: wrap; gap: 6px; } .ov-miss span { font-size: 12px; padding: 3px 9px; border-radius: 8px; background: var(--bg); border: 1px solid var(--line); }
+.ov-miss span.must { border-color: #F2B8B5; background: #FDECEA; color: #B3261E; font-weight: 600; } .ov-miss i { font-style: normal; color: var(--muted); font-weight: 400; } .ov-miss .done { color: #1F7A4D; border-color: #BFE3CF; background: #E7F5EE; }
+/* Homepage layout builder */
+.lay-row { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; margin-bottom: 12px; }
+.lay-h { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; } .lay-a { margin-left: auto; display: flex; gap: 6px; }
+.lay-cells { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 900px) { .lay-cells { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.lay-cell { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line-2); border-radius: 10px; padding: 8px; background: var(--bg); cursor: grab; min-width: 0; position: relative; }
+.lay-cell.off { border-style: dashed; opacity: .7; } .lay-cell em { font-style: normal; font-size: 10.5px; color: #B3261E; }
+.lay-cell .th { width: 34px; height: 34px; } .lc-n { flex: 1; font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lc-a { display: flex; gap: 4px; } .lc-a .icon { width: 26px; height: 26px; font-size: 12px; }
+.lay-add select { width: 100%; height: 100%; min-height: 52px; border-style: dashed; }

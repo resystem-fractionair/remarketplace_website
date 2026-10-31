@@ -164,6 +164,18 @@ function cleanBooking(b) {
     specialists: sp.length ? sp : d.specialists
   };
 }
+/* Homepage layout: rows of products, any number per row (1–8). Older settings (defaultSlugs + limit) become rows of 4, 3, 3 … */
+function cleanHome(h) {
+  h = h || {};
+  const list = a => [...new Set((Array.isArray(a) ? a : []).map(x => slugify(String(x))).filter(Boolean))];
+  let layout = (Array.isArray(h.layout) ? h.layout : []).map(r => ({ slugs: list(r && r.slugs).slice(0, 8) })).filter(r => r.slugs.length).slice(0, 12);
+  if (!layout.length && Array.isArray(h.defaultSlugs) && h.defaultSlugs.length) {
+    const src = list(h.defaultSlugs).slice(0, Math.min(24, Math.max(1, +h.limit || 6)));
+    for (let i = 0, k = 0; i < src.length; k++) { const n = k === 0 ? 4 : 3; layout.push({ slugs: src.slice(i, i + n) }); i += n; }
+  }
+  const flat = layout.flatMap(r => r.slugs);
+  return { layout, defaultSlugs: flat, limit: Math.max(1, flat.length) };
+}
 function cleanSettings(s) {
   const strList = a => (Array.isArray(a) ? a : []).map(x => String(x).trim()).filter(Boolean).slice(0, 50);
   return {
@@ -171,7 +183,7 @@ function cleanSettings(s) {
     groups: [...new Set(strList(s.groups))],
     showCatalog: s.showCatalog !== false,
     booking: cleanBooking(s.booking),
-    home: { defaultSlugs: [...new Set(strList(s.home && s.home.defaultSlugs).map(slugify))].slice(0, 24), limit: Math.min(24, Math.max(1, +(s.home && s.home.limit) || 6)) },
+    home: cleanHome(s.home),
     qr: { mainUrl: /^https?:\/\//.test(String(s.qr && s.qr.mainUrl || '')) ? String(s.qr.mainUrl).trim().slice(0, 300) : '' },
     content: cleanContent(s.content),
     rows: (Array.isArray(s.rows) ? s.rows : []).slice(0, 12).map((r, i) => ({
@@ -204,11 +216,11 @@ const productToRow = p => {
 
 /* ---------- Cache ---------- */
 let cache = null, cacheAt = 0;
-const TTL = 30 * 1000;
+const TTL = 10 * 1000; // public pages; admin reads and every write use fresh data (Vercel runs several instances, each with its own cache)
 const bust = () => { cache = null; };
 
-async function load() {
-  if (cache && Date.now() - cacheAt < TTL) return cache;
+async function load(opts) {
+  if (!(opts && opts.fresh) && cache && Date.now() - cacheAt < TTL) return cache;
   let products, settings;
   if (MODE === 'supabase') {
     const rows = await sb('/rest/v1/rm_products?select=*&order=position.asc');
@@ -234,7 +246,7 @@ async function saveAllFile(products) {
 }
 
 async function saveProduct(input, originalSlug) {
-  const { products } = await load();
+  const { products } = await load({ fresh: true });
   const p = clean(input);
   if (!p.slug || !p.name) throw Object.assign(new Error('Name and slug are required'), { status: 400 });
   const clash = products.find(x => x.slug === p.slug && x.slug !== originalSlug);
@@ -262,10 +274,11 @@ async function deleteProduct(slug) {
 }
 
 async function reorder(slugs) {
-  const { products } = await load();
+  const { products } = await load({ fresh: true });
   const pos = new Map(slugs.map((s, i) => [s, i]));
   const next = products.map(p => Object.assign({}, p, { position: pos.has(p.slug) ? pos.get(p.slug) : 900 + p.position }));
-  if (MODE === 'supabase') await sb('/rest/v1/rm_products', { method: 'POST', headers: { Prefer: 'resolution=merge-duplicates' }, body: JSON.stringify(next.map(productToRow)) });
+  // Only the position column is written, so a reorder can never overwrite other edits (visibility, images …)
+  if (MODE === 'supabase') await Promise.all(next.map(p => sb('/rest/v1/rm_products?slug=eq.' + encodeURIComponent(p.slug), { method: 'PATCH', body: JSON.stringify({ position: p.position }) })));
   else await saveAllFile(next);
   bust();
 }
@@ -354,6 +367,14 @@ async function setBookingStatus(ref, status) {
   writeJson(BOOKINGS, all);
 }
 
+/* Switch one product on/off without touching any other field */
+async function setVisible(slug, visible) {
+  if (MODE === 'supabase') await sb('/rest/v1/rm_products?slug=eq.' + encodeURIComponent(slug), { method: 'PATCH', body: JSON.stringify({ visible: !!visible, updated_at: new Date().toISOString() }) });
+  else { const { products } = await load({ fresh: true }); await saveAllFile(products.map(p => p.slug === slug ? Object.assign({}, p, { visible: !!visible }) : p)); }
+  bust();
+}
+async function getProduct(slug) { return (await load({ fresh: true })).products.find(p => p.slug === slug) || null; }
+
 /* ---------- Orders (reID purchases) ---------- */
 const ORDERS = path.join(DATA, 'orders.json');
 async function saveOrder(o) {
@@ -372,4 +393,4 @@ async function listOrders(limit) {
   return readJson(ORDERS, []).slice().reverse().slice(0, limit || 500);
 }
 
-module.exports = { saveOrder, updateOrder, listOrders, DEFAULT_CONTENT, MODE, load, saveProduct, deleteProduct, reorder, saveSettings, upload, slugify, listBookings, takenSlots, addBooking, setBookingStatus, cleanBooking };
+module.exports = { setVisible, getProduct, saveOrder, updateOrder, listOrders, DEFAULT_CONTENT, MODE, load, saveProduct, deleteProduct, reorder, saveSettings, upload, slugify, listBookings, takenSlots, addBooking, setBookingStatus, cleanBooking };

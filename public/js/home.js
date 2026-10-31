@@ -11,7 +11,7 @@
         <p>${esc(p.tagline || p.summary)}</p>
         <div class="card-foot"><span>${p.deploy ? 'Live in ' + esc(p.deploy) : esc(p.group || '')}</span><span class="view">View product →</span></div>
       </a>`;
-  let FAQS = [], C = null, HOME = { defaultSlugs: [], limit: 6 };
+  let FAQS = [], C = null, HOME = { layout: [] };
   const days = s => (parseInt(s, 10) || 99) * (/week/.test(s || '') ? 7 : 1);
   const st = { q: '', cat: 'All', sort: 'Featured', faq: 0, all: false };
   let cats = ['All'];
@@ -26,17 +26,27 @@
       (!q || [p.name, p.category, p.tagline, p.summary].join(' ').toLowerCase().includes(q)));
     if (st.sort === 'A–Z') list.sort((a, b) => a.name.localeCompare(b.name));
     else if (st.sort === 'Fastest to deploy') list.sort((a, b) => days(a.deploy) - days(b.deploy));
-    /* default view: the products chosen in Admin → Homepage, in that order */
-    const curated = st.cat === 'All' && !q && !st.all && HOME.defaultSlugs.length;
+    /* default view: the rows built in Admin → Homepage layout (any number of products per row) */
+    const bySlug = s => all.find(p => p.slug === s);
+    const rows = (HOME.layout || []).map(r => r.slugs.map(bySlug).filter(Boolean)).filter(r => r.length);
+    const curated = st.cat === 'All' && !q && !st.all && st.sort === 'Featured' && rows.length > 0;
+    const g = $('#grid');
     if (curated) {
-      const pick = HOME.defaultSlugs.map(s => all.find(p => p.slug === s)).filter(Boolean).slice(0, HOME.limit);
-      if (pick.length) list = st.sort === 'Featured' ? pick : list.filter(p => pick.includes(p)).slice(0, HOME.limit);
+      const shown = rows.flat();
+      $('#count').textContent = `Showing ${shown.length} of ${all.length} products`;
+      $('#empty').hidden = true;
+      g.className = 'hrows';
+      let i = 0;
+      g.innerHTML = rows.map(r => `<div class="hrow" style="--nd:${Math.min(r.length, 6)};--nt:${Math.min(r.length, 3)};--ns:${Math.min(r.length, 2)}">${r.map(p => card(p, i++)).join('')}</div>`).join('');
+      list = shown;
+    } else {
+      $('#count').textContent = `${list.length} of ${all.length} products`;
+      $('#empty').hidden = list.length > 0;
+      g.className = 'grid';
+      g.innerHTML = list.map(card).join('');
     }
-    $('#count').textContent = curated ? `Showing ${list.length} of ${all.length} products` : `${list.length} of ${all.length} products`;
-    $('#empty').hidden = list.length > 0;
-    $('#grid').innerHTML = list.map(card).join('');
     const va = $('#viewAll');
-    if (va) { va.hidden = !(curated && list.length < all.length) && !(st.all && st.cat === 'All' && !q && HOME.defaultSlugs.length);
+    if (va) { va.hidden = !(curated && list.length < all.length) && !(st.all && st.cat === 'All' && !q && rows.length);
       va.textContent = st.all ? 'Show featured only' : `${(C && C.catalog.viewAll) || 'View all products'} (${all.length})`; }
   }
   function renderFaq() {

@@ -33,7 +33,7 @@
       $('#login').hidden = true; $('#app').hidden = false;
       $('#mode').textContent = S.mode === 'supabase' ? '● Live database' : '● Local files (dev)';
       $('#mode').className = 'mode ' + S.mode;
-      renderProducts(); renderRows(); renderCats(); renderHome();
+      renderProducts(); renderRows(); renderCats(); renderHome(); renderOverview();
     } catch (_) { showLogin(); }
   }
 
@@ -41,7 +41,8 @@
   $('#tabs').onclick = e => {
     const b = e.target.closest('[data-tab]'); if (!b) return;
     document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('on', x === b));
-    ['products', 'rows', 'content', 'cats', 'bookings', 'qr'].forEach(t => { $('#tab-' + t).hidden = t !== b.dataset.tab; });
+    ['overview', 'products', 'rows', 'content', 'cats', 'bookings', 'qr'].forEach(t => { $('#tab-' + t).hidden = t !== b.dataset.tab; });
+    if (b.dataset.tab === 'overview') renderOverview();
     if (b.dataset.tab === 'bookings') loadBookings();
     if (b.dataset.tab === 'qr') renderQR();
     if (b.dataset.tab === 'content') renderContent();
@@ -54,6 +55,30 @@
     if (p.showFrom && p.showFrom > t) return `<span class="sch up">Goes live ${esc(p.showFrom)}</span>`;
     if (p.showUntil && p.showUntil < t) return `<span class="sch end">Ended ${esc(p.showUntil)}</span>`;
     return `<span class="sch on">${p.showUntil ? 'Live until ' + esc(p.showUntil) : 'Scheduled · live'}</span>`; };
+  /* ---------- Content completeness (used by the list badges and the Overview tab) ---------- */
+  const okUrl = u => /^(https?:\/\/|\/)/.test(u || '');
+  function checks(p) {
+    const soon = /soon/i.test(p.status || ''), d = p.seoDescription || p.summary || '';
+    const c = [
+      ['Card image', okUrl(p.image), 'Images', true],
+      ['Logo / app icon', okUrl(p.logo), 'Images', false],
+      ['Tagline', !!p.tagline, 'Basics', true],
+      ['Summary (2–3 sentences)', (p.summary || '').length >= 60, 'Basics', true],
+      ['What it is', !!p.whatItIs, 'Basics', false],
+      ['Go-live time', !!p.deploy, 'Basics', false],
+      ['3+ key features', (p.features || []).length >= 3, 'Page content', !soon],
+      ['Feature descriptions (highlights)', (p.highlights || []).length >= 2, 'Page content', false],
+      ['2+ use cases', (p.useCases || []).length >= 2, 'Page content', false],
+      ['Demo link or sandbox credentials', !!(p.demoUrl || (p.demoCreds || []).length), 'Sandbox', !soon],
+      ['Brochure PDF (desktop)', okUrl(p.pdfDesktop), 'Links', false],
+      ['Brochure PDF (mobile)', okUrl(p.pdfMobile), 'Links', false],
+      ['Share image', okUrl(p.ogImage || p.image), 'Share', true],
+      ['Share description 50–160 chars', p.seoDescription ? d.length >= 50 && d.length <= 160 : d.length >= 50, 'Share', false]
+    ];
+    if (p.buy && p.buy.enabled) c.push(['Buy with reID: price & wallet', /^\d/.test(p.buy.amount || '') && /^0x[0-9a-fA-F]{40}$/.test(p.buy.payTo || ''), 'Buy', true]);
+    return c.map(([label, ok, where, must]) => ({ label, ok, where, must }));
+  }
+  const score = p => { const c = checks(p); return { pct: Math.round(100 * c.filter(x => x.ok).length / c.length), missing: c.filter(x => !x.ok), must: c.filter(x => !x.ok && x.must) }; };
   function renderProducts() {
     const sel = $('#pcat'); const cur = sel.value;
     sel.innerHTML = '<option value="">All categories</option>' + S.settings.categories.map(c => `<option${c === cur ? ' selected' : ''}>${esc(c)}</option>`).join('');
@@ -64,7 +89,7 @@
         <span class="grip" title="${filtering ? 'Clear search/filter to reorder' : 'Drag to reorder'}">⋮⋮</span>
         ${thumb(p)}
         <div class="pi-t"><b>${esc(p.name)}</b><span>${esc(p.category || 'No category')} · /${esc(p.slug)}${p.status ? ' · ' + esc(p.status) : ''}</span></div>
-        <div class="pi-rows">${sched(p)}${inRows(p.slug).map(r => `<span>${r}</span>`).join('')}${(() => { const s = shareInfo(p), bad = s.checks.filter(c => !c[0]).length; return `<span class="${bad ? 'sh-bad' : 'sh-ok'}" title="${esc(s.checks.map(c => (c[0] ? '✓ ' : '! ') + c[1]).join('\n'))}">${bad ? 'Share: ' + bad + ' to fix' : 'Share ✓'}</span>`; })()}</div>
+        <div class="pi-rows">${(() => { const s = score(p); return `<span class="cq ${s.must.length ? 'bad' : s.pct < 100 ? 'mid' : 'ok'}" title="${esc(s.missing.length ? 'Missing:\n' + s.missing.map(m => '• ' + m.label + ' (' + m.where + ')').join('\n') : 'All content complete')}">${s.pct}% content</span>`; })()}${sched(p)}${inRows(p.slug).map(r => `<span>${r}</span>`).join('')}${(() => { const s = shareInfo(p), bad = s.checks.filter(c => !c[0]).length; return `<span class="${bad ? 'sh-bad' : 'sh-ok'}" title="${esc(s.checks.map(c => (c[0] ? '✓ ' : '! ') + c[1]).join('\n'))}">${bad ? 'Share: ' + bad + ' to fix' : 'Share ✓'}</span>`; })()}</div>
         <button class="btn btn-ghost sm" data-copylink="${esc(p.slug)}" title="Copy share link">🔗 Link</button>
         <label class="switch" title="Show on site"><input type="checkbox" data-vis="${esc(p.slug)}"${p.visible ? ' checked' : ''}><span class="sw"></span></label>
         <button class="btn btn-ghost sm" data-edit="${esc(p.slug)}">Edit</button>
@@ -77,10 +102,16 @@
     const slug = e.target.dataset.vis; if (!slug) return;
     const p = S.products.find(x => x.slug === slug);
     p.visible = e.target.checked; renderProducts();
-    try { await api('PUT', '/api/admin/products/' + encodeURIComponent(slug), p); toast(`${p.name} is now ${p.visible ? 'visible' : 'hidden'}`); }
+    try { await api('PUT', '/api/admin/products/' + encodeURIComponent(slug) + '/visible', { visible: p.visible }); toast(`${p.name} is now ${p.visible ? 'visible on the site' : 'hidden'}`); }
     catch (err) { toast(err.message); p.visible = !p.visible; renderProducts(); }
   });
-  $('#plist').addEventListener('click', e => { const b = e.target.closest('[data-edit]'); if (b) openEditor(b.dataset.edit); });
+  /* Always edit the latest saved version, so an old copy in this tab can never overwrite newer changes */
+  async function editFresh(slug) {
+    try { const fresh = await api('GET', '/api/admin/product/' + encodeURIComponent(slug)); const i = S.products.findIndex(x => x.slug === slug); if (i >= 0) S.products[i] = fresh; }
+    catch (_) { /* fall back to the list copy */ }
+    openEditor(slug);
+  }
+  $('#plist').addEventListener('click', e => { const b = e.target.closest('[data-edit]'); if (b) editFresh(b.dataset.edit); });
   $('#newProd').onclick = () => openEditor(null);
 
   /* Drag to reorder (generic) */
@@ -493,18 +524,70 @@
   };
 
   /* ---------- Homepage default products ---------- */
+  /* ---------- Homepage layout: rows of products (any count per row) ---------- */
+  const H = () => { const h = S.settings.home || (S.settings.home = {}); if (!Array.isArray(h.layout)) h.layout = []; return h; };
   function renderHome() {
-    const h = S.settings.home || (S.settings.home = { defaultSlugs: [], limit: 6 });
-    $('#homeLimit').value = h.limit;
-    $('#homeChips').innerHTML = h.defaultSlugs.map((s, i) => { const p = pBy(s); return p ? `<div class="pchip${p.visible ? '' : ' off'}${i >= h.limit ? ' over' : ''}" draggable="true" data-s="${esc(s)}"><span class="pn">${i + 1}</span>${thumb(p)}<span>${esc(p.name)}${p.visible ? '' : ' <em>(hidden)</em>'}</span><button data-hrem="${esc(s)}" title="Remove">×</button></div>` : ''; }).join('')
-      || '<span class="muted small">No default products — the homepage will show every product.</span>';
-    $('#homeAdd').innerHTML = '<option value="">+ Add a product…</option>' + S.products.filter(p => !h.defaultSlugs.includes(p.slug)).map(p => `<option value="${esc(p.slug)}">${esc(p.name)} — ${esc(p.category)}</option>`).join('');
+    const L = H().layout, used = new Set(L.flatMap(r => r.slugs));
+    $('#layout').innerHTML = L.length ? L.map((r, ri) => `<div class="lay-row" data-r="${ri}">
+        <div class="lay-h"><b>Row ${ri + 1}</b><span class="muted small">${r.slugs.length} product${r.slugs.length === 1 ? '' : 's'} · desktop ${Math.min(r.slugs.length, 6)} across · tablet ${Math.min(r.slugs.length, 3)} · phone ${Math.min(r.slugs.length, 2) > 1 && r.slugs.length > 1 ? '2' : '1'}</span>
+          <span class="lay-a"><button class="icon" data-lmv="${ri}.-1" title="Move row up"${ri ? '' : ' disabled'}>↑</button><button class="icon" data-lmv="${ri}.1" title="Move row down"${ri < L.length - 1 ? '' : ' disabled'}>↓</button><button class="icon danger" data-ldel="${ri}" title="Delete row">✕</button></span></div>
+        <div class="lay-cells" style="--n:${Math.max(1, Math.min(r.slugs.length, 6))}">${r.slugs.map((s, ci) => { const p = pBy(s); return p ? `<div class="lay-cell${p.visible ? '' : ' off'}" draggable="true" data-s="${esc(s)}">${thumb(p)}<span class="lc-n">${esc(p.name)}</span>${p.visible ? '' : '<em>hidden</em>'}
+          <span class="lc-a">${ri ? `<button class="icon" data-lto="${ri}.${ci}.-1" title="Move to row ${ri}">⤒</button>` : ''}${ri < L.length - 1 ? `<button class="icon" data-lto="${ri}.${ci}.1" title="Move to row ${ri + 2}">⤓</button>` : ''}<button class="icon danger" data-lrem="${ri}.${ci}" title="Remove">✕</button></span></div>` : ''; }).join('')}
+          ${r.slugs.length < 8 ? `<label class="lay-add"><select data-ladd="${ri}"><option value="">+ Add product</option>${S.products.filter(p => !used.has(p.slug)).map(p => `<option value="${esc(p.slug)}">${esc(p.name)}${p.visible ? '' : ' (hidden)'}</option>`).join('')}</select></label>` : ''}</div></div>`).join('')
+      : '<p class="muted">No layout yet — pick a quick start above or add a row. Without a layout the homepage shows every product.</p>';
+    document.querySelectorAll('.lay-cells').forEach(el => sortable(el, '.lay-cell', () => { const ri = +el.closest('.lay-row').dataset.r; H().layout[ri].slugs = [...el.querySelectorAll('.lay-cell')].map(x => x.dataset.s); renderHome(); }));
   }
-  sortable($('#homeChips'), '.pchip', () => { S.settings.home.defaultSlugs = [...document.querySelectorAll('#homeChips .pchip')].map(el => el.dataset.s); renderHome(); });
-  $('#homeAdd').onchange = e => { if (e.target.value) { S.settings.home.defaultSlugs.push(e.target.value); renderHome(); } };
-  $('#homeChips').addEventListener('click', e => { const b = e.target.closest('[data-hrem]'); if (b) { S.settings.home.defaultSlugs = S.settings.home.defaultSlugs.filter(s => s !== b.dataset.hrem); renderHome(); } });
-  $('#homeLimit').oninput = e => { S.settings.home.limit = Math.max(1, Math.min(24, +e.target.value || 6)); renderHome(); };
-  $('#saveHome').onclick = () => saveSettings('Default products saved');
+  $('#layout').addEventListener('change', e => { const ri = e.target.dataset.ladd; if (ri == null || !e.target.value) return; H().layout[+ri].slugs.push(e.target.value); renderHome(); });
+  $('#layout').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return; const d = b.dataset, L = H().layout;
+    if (d.lmv) { const [r, dir] = d.lmv.split('.').map(Number); [L[r], L[r + dir]] = [L[r + dir], L[r]]; }
+    else if (d.ldel) L.splice(+d.ldel, 1);
+    else if (d.lrem) { const [r, c] = d.lrem.split('.').map(Number); L[r].slugs.splice(c, 1); }
+    else if (d.lto) { const [r, c, dir] = d.lto.split('.').map(Number); const [s] = L[r].slugs.splice(c, 1); L[r + dir].slugs.push(s); }
+    else return;
+    H().layout = L.filter(x => x.slugs.length || L.length === 1); renderHome();
+  });
+  $('#addLayoutRow').onclick = () => { H().layout.push({ slugs: [] }); renderHome(); };
+  document.querySelectorAll('[data-preset]').forEach(b => b.onclick = () => {
+    const sizes = b.dataset.preset.split(',').map(Number), cur = H().layout.flatMap(r => r.slugs);
+    const pool = [...new Set(cur.concat(S.products.filter(p => p.visible).map(p => p.slug)))];
+    let i = 0; H().layout = sizes.map(n => ({ slugs: pool.slice(i, i += n) })).filter(r => r.slugs.length); renderHome();
+    toast('Layout ' + sizes.join(' · ') + ' applied — adjust and Save');
+  });
+  $('#saveHome').onclick = () => { const h = H(); h.layout = h.layout.filter(r => r.slugs.length); h.defaultSlugs = h.layout.flatMap(r => r.slugs); h.limit = Math.max(1, h.defaultSlugs.length); saveSettings('Homepage layout saved'); renderHome(); };
+
+  /* ---------- Overview: live status and what is missing ---------- */
+  function renderOverview() {
+    const P = S.products, live = P.filter(p => p.visible), todayS = todayD();
+    const off = p => !p.visible || (p.showFrom && p.showFrom > todayS) || (p.showUntil && p.showUntil < todayS);
+    const lay = (S.settings.home && S.settings.home.layout) || [], inLay = lay.flatMap(r => r.slugs);
+    const c = S.settings.content || {}, seo = c.seo || {}, bk = S.settings.booking || {}, env = S.env || {};
+    const site = [
+      [env.reid, 'reID sign-in connected', 'Add REID_* values in Vercel → Environment Variables'],
+      [env.smtp, 'Booking emails (SMTP)', 'Add SMTP_HOST, SMTP_USER, SMTP_PASS, MAIL_FROM in Vercel'],
+      [!env.adminDefault, 'Admin password set', 'Set ADMIN_PASSWORD in Vercel'],
+      [!!seo.googleVerify, 'Google Search Console verified', 'Site content → SEO → Google verification code', 'content'],
+      [!!seo.bingVerify, 'Bing Webmaster verified', 'Site content → SEO → Bing verification code', 'content'],
+      [!!(c.footer && c.footer.email), 'Contact email in footer', 'Site content → Footer', 'content'],
+      [!!bk.notifyEmail, 'Booking notification email', 'Bookings → Booking settings', 'bookings'],
+      [(bk.specialists || []).filter(a => a.active).every(a => a.photo), 'All bookable specialists have photos', 'Bookings → Agents → Photo', 'bookings'],
+      [inLay.length > 0, 'Homepage layout set', 'Homepage → Quick start or + Add row', 'rows'],
+      [!inLay.some(s => { const p = P.find(x => x.slug === s); return !p || off(p); }), 'Homepage layout has no hidden products', 'Homepage → remove hidden products or switch them on', 'rows']
+    ];
+    const rows = P.map(p => ({ p, s: score(p) })).sort((a, b) => a.s.pct - b.s.pct);
+    const avg = P.length ? Math.round(rows.reduce((t, r) => t + r.s.pct, 0) / P.length) : 0;
+    $('#ovBody').innerHTML = `
+      <div class="ov-kpi"><div><b>${live.length}</b><span>visible products</span></div><div><b>${P.length - live.length}</b><span>hidden</span></div><div><b>${inLay.length}</b><span>on homepage · ${lay.length} rows</span></div><div><b>${avg}%</b><span>average content complete</span></div></div>
+      <h3 class="ov-h">Site setup</h3><ul class="ov-list">${site.map(([ok, l, fix, tab]) => `<li class="${ok ? 'ok' : 'no'}"><span>${ok ? '✓' : '!'}</span><b>${esc(l)}</b>${ok ? '' : `<small>${esc(fix)}</small>${tab ? `<button class="btn btn-ghost sm" data-go="${tab}">Fix</button>` : ''}`}</li>`).join('')}</ul>
+      <h3 class="ov-h">Products — content to add <span class="muted small">(worst first; <b>required</b> items in red)</span></h3>
+      <div class="ov-prods">${rows.map(({ p, s }) => `<div class="ov-p${p.visible ? '' : ' off'}"><div class="ov-pt">${thumb(p)}<b>${esc(p.name)}</b>${p.visible ? '' : '<em>hidden</em>'}<span class="cq ${s.must.length ? 'bad' : s.pct < 100 ? 'mid' : 'ok'}">${s.pct}%</span><button class="btn btn-ghost sm" data-ovedit="${esc(p.slug)}">Edit</button></div>
+        ${s.missing.length ? `<div class="ov-miss">${s.missing.map(m => `<span class="${m.must ? 'must' : ''}">${esc(m.label)} <i>${esc(m.where)}</i></span>`).join('')}</div>` : '<div class="ov-miss"><span class="done">Everything filled in ✓</span></div>'}</div>`).join('')}</div>`;
+  }
+  $('#ovBody').addEventListener('click', e => {
+    const g = e.target.closest('[data-go]'); if (g) { document.querySelector(`#tabs [data-tab="${g.dataset.go}"]`).click(); return; }
+    const ed = e.target.closest('[data-ovedit]'); if (ed) editFresh(ed.dataset.ovedit);
+  });
+  $('#ovRefresh').onclick = async () => { try { Object.assign(S, await api('GET', '/api/admin/state')); renderProducts(); renderHome(); renderOverview(); toast('Refreshed'); } catch (err) { toast(err.message); } };
 
   /* ---------- Site content (generic form built from the content structure) ---------- */
   const LABELS = { seo: 'SEO, social sharing & AI discovery', header: 'Header (menu, button, announcement bar)', product: 'Product page labels', booking: 'Book a demo panel', hero: 'Hero', why: 'Why reMarketplace cards', steps: 'Listing steps', usecases: 'Use cases & target market', glossary: 'Glossary & QR card', catalog: 'All products section', faq: 'FAQ', footer: 'Footer' };

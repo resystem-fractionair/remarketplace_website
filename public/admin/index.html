@@ -32,7 +32,8 @@
     <a class="logo" href="/" target="_blank"><img class="lg-light" src="/img/logo-light.png" alt="reMarketplace" height="26"><img class="lg-dark" src="/img/logo-dark.png" alt="" height="26"></a>
     <span class="a-badge">Admin</span>
     <nav class="tabs" id="tabs">
-      <button data-tab="products" class="on">Products</button>
+      <button data-tab="overview" class="on">Overview</button>
+      <button data-tab="products">Products</button>
       <button data-tab="rows">Homepage</button>
       <button data-tab="content">Site content</button>
       <button data-tab="cats">Categories</button>
@@ -45,7 +46,12 @@
   </header>
 
   <!-- Products -->
-  <section class="panel" id="tab-products">
+  <section class="panel" id="tab-overview">
+    <div class="p-head"><div><h2>Overview</h2><p class="muted small">What is live, what is missing and what to fix next. Click any item to go straight to it.</p></div><div class="p-tools"><a class="btn btn-ghost sm" href="/" target="_blank">View site ↗</a><button class="btn btn-ghost sm" id="ovRefresh">Refresh</button></div></div>
+    <div id="ovBody"></div>
+  </section>
+
+  <section class="panel" id="tab-products" hidden>
     <div class="p-head">
       <div><h2>Products</h2><p class="muted small">Drag ⋮⋮ to set catalog order. Toggle to show or hide on the site.</p></div>
       <div class="p-tools">
@@ -60,11 +66,11 @@
   <!-- Rows -->
   <section class="panel" id="tab-rows" hidden>
     <div class="p-head">
-      <div><h2>Homepage — default products</h2><p class="muted small">These show first in "All products", in this order. Visitors click "View all" to see every product; category filters always search all products.</p></div>
-      <div class="p-tools"><label class="inline-num">Show up to <input type="number" id="homeLimit" min="1" max="24"> products</label><button class="btn btn-accent sm" id="saveHome">Save default products</button></div>
+      <div><h2>Homepage layout</h2><p class="muted small">Build the rows visitors see first in "All products". Any number of products per row (1–8); each row fills the screen width and adapts to tablets and phones. Everything else appears under "View all products".</p></div>
+      <div class="p-tools"><span class="muted small">Quick start:</span><button class="btn btn-ghost sm" data-preset="4,3,3">4 · 3 · 3</button><button class="btn btn-ghost sm" data-preset="5,3,3">5 · 3 · 3</button><button class="btn btn-ghost sm" data-preset="4,4">4 · 4</button><button class="btn btn-ghost sm" data-preset="3,3,3">3 · 3 · 3</button><button class="btn btn-accent sm" id="saveHome">Save layout</button></div>
     </div>
-    <div class="row-card"><div class="chips-row" id="homeChips" data-axis="x"></div>
-      <div class="rc-add"><select id="homeAdd"><option value="">+ Add a product…</option></select><span class="muted small">Drag chips to reorder</span></div></div>
+    <div id="layout"></div>
+    <button class="btn btn-ghost sm" id="addLayoutRow" style="margin-top:10px">+ Add row</button>
     <div class="p-head" style="margin-top:28px">
       <div><h2>Featured on product pages</h2><p class="muted small">Row 1 is shown as <b>Featured products</b> at the bottom of every product page. Extra rows are kept for later use.</p></div>
       <div class="p-tools">
