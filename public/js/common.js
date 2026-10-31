@@ -62,7 +62,7 @@
   if (qs.get('reidError')) RM.toast(ERR[qs.get('reidError')] || ERR.reid_error);
   if (qs.has('reidError') || qs.has('signedIn')) history.replaceState(null, '', location.pathname + location.hash);
   RM.ready = loadMe().then(() => { if (RM.me && qs.has('signedIn')) RM.toast('Signed in as ' + (RM.me.name || 'reID user') + '.'); });
-  /* ---------- Sign in with reID: phone → reID app (redirect), computer → QR scanned with the reID app ---------- */
+  /* ---------- Sign in reID: phone → reID app (redirect), computer → QR scanned with the reID app ---------- */
   const isPhone = () => /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
   let qrTimer = null;
   RM.signIn = (ret, why) => {
@@ -73,7 +73,7 @@
     if (!ov) {
       ov = document.createElement('div'); ov.id = 'reidOv'; ov.className = 'overlay center'; ov.hidden = true;
       ov.innerHTML = `<div class="rq" role="dialog" aria-modal="true" aria-labelledby="rqT"><button class="x" data-rqx aria-label="Close">✕</button>
-        <span class="reid-dot big">re</span><h3 id="rqT">Sign in with reID</h3><p class="rq-why"></p>
+        <span class="reid-dot big">re</span><h3 id="rqT">Sign in reID</h3><p class="rq-why"></p>
         <div class="rq-qr"><span class="rq-spin"></span></div><p class="rq-code"></p><p class="rq-st muted">Scan with the reID app on your phone.</p>
         <a class="btn btn-ghost sm rq-alt" href="#">Open reID on this device instead</a></div>`;
       document.body.appendChild(ov);
