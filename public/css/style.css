@@ -296,3 +296,6 @@ body, .card, .nav, .chip, .row, .pill, .day { transition: background-color .25s,
 .btn-reid:hover { opacity: .9; color: var(--bg); } .btn-reid .reid-dot { background: var(--bg); color: var(--ink); }
 .avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
 .rq-qr:empty { display: none; }
+/* reID mark: blue face-scan icon (same in light and dark mode) instead of the "re" text badge */
+.reid-dot, .btn-reid .reid-dot { background: url('/img/reid-icon.svg') center / contain no-repeat !important; color: transparent !important; font-size: 0 !important; border-radius: 0; width: 20px; height: 20px; }
+.reid-dot.big { width: 52px; height: 52px; }
