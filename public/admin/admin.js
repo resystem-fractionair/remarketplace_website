@@ -188,6 +188,13 @@
         ${LISTS.map(([k, l]) => area(k, l, (p[k] || []).join('\n'), 4) + (k === 'features' ? '<div class="fi-box"><span class="lbl">Feature icons <small>— click an icon to change it. Library icon, or upload your own (96 × 96 px, transparent SVG/PNG).</small></span><div id="featIcons"></div></div>' : '')).join('')}
         ${area('highlights', 'Highlights', (p.highlights || []).map(h => h.title + ' | ' + h.text).join('\n'), 4, 'Title | description — one per line')}
       </fieldset>
+      <fieldset><legend>Buy with reID (payments)</legend>
+        <p class="muted small">Off = product can be viewed by anyone, no purchase. On = product page shows <b>Buy with reID</b>; buyers must sign in with reID and approve the payment in the reID app (INFRA chain).</p>
+        <label class="switch-l"><input type="checkbox" name="buyEnabled"${p.buy && p.buy.enabled ? ' checked' : ''}><span class="sw"></span>Sell this product with reID</label>
+        <div class="three">${field('buyAmount', 'Price amount *', (p.buy || {}).amount || '', 'placeholder="250" inputmode="decimal"')}${field('buySymbol', 'Currency symbol', (p.buy || {}).symbol || '', 'placeholder="USDC / reAED / INFRA"')}${field('buyLabel', 'Price label on page', (p.buy || {}).label || '', 'placeholder="250 USDC / one-time"')}</div>
+        ${field('buyPayTo', 'Receiving wallet address *', (p.buy || {}).payTo || '', 'placeholder="0x… (your company wallet)"')}
+        <div class="three">${field('buyToken', 'Token contract (blank = native coin)', (p.buy || {}).token || '', 'placeholder="0x… ERC-20 address"')}${field('buyDecimals', 'Token decimals', (p.buy || {}).decimals || 18, 'inputmode="numeric"')}${field('buyChainId', 'Chain ID', (p.buy || {}).chainId || 15324, 'inputmode="numeric"')}</div>
+      </fieldset>
       <fieldset><legend>Sandbox / demo credentials</legend>
         <p class="muted small">Shown on the product page with Copy buttons and a TEST DATA badge. The Demo URL row comes from the Demo URL field above.</p>
         ${area('demoCreds', 'Credentials', (p.demoCreds || []).map(c => c.label + ' | ' + c.value).join('\n'), 5, 'Label | value — one per line, e.g. Test email | demo@yourapp.io')}
@@ -259,12 +266,14 @@
     LISTS.forEach(([k]) => { p[k] = v(k).split('\n').map(s => s.trim()).filter(Boolean); });
     p.highlights = v('highlights').split('\n').map(s => s.trim()).filter(Boolean).map(s => { const [t, ...rest] = s.split('|'); return { title: t.trim(), text: rest.join('|').trim() }; });
     p.demoCreds = v('demoCreds').split('\n').map(s => s.trim()).filter(Boolean).map(s => { const [l, ...rest] = s.split('|'); return { label: l.trim(), value: rest.join('|').trim() }; }).filter(c => c.label && c.value);
+    p.buy = { enabled: f.buyEnabled.checked, amount: v('buyAmount').trim(), symbol: v('buySymbol').trim(), label: v('buyLabel').trim(), payTo: v('buyPayTo').trim(), token: v('buyToken').trim(), decimals: v('buyDecimals').trim(), chainId: v('buyChainId').trim() };
+    if (p.buy.enabled && (!/^\d+(\.\d+)?$/.test(p.buy.amount) || !/^0x[0-9a-fA-F]{40}$/.test(p.buy.payTo) || (p.buy.token && !/^0x[0-9a-fA-F]{40}$/.test(p.buy.token)))) throw new Error('Buy with reID: enter a price amount and valid 0x wallet / token addresses');
     p.featureIcons = p.features.map(x => (editing.icons || {})[x] || '');
     p.visible = f.visible.checked;
     return p;
   }
   $('#edSave').onclick = async () => {
-    const p = readForm();
+    let p; try { p = readForm(); } catch (err) { return toast(err.message); }
     if (!p.name) return toast('Name is required');
     $('#edSave').disabled = true;
     try {
@@ -275,7 +284,7 @@
     $('#edSave').disabled = false;
   };
   $('#edDup').onclick = () => {
-    const src = readForm(), base = (src.slug || 'product') + '-copy';
+    const src = (() => { try { return readForm(); } catch (_) { return Object.assign({}, editing.p); } })(), base = (src.slug || 'product') + '-copy';
     let s = base, n = 2; while (S.products.some(p => p.slug === s)) s = base + '-' + n++;
     closeEditor(); openEditor(null, Object.assign({}, src, { name: src.name + ' (copy)', slug: s, visible: false, position: S.products.length }));
     $('#edTitle').textContent = 'New product — copy of ' + src.name; toast('Copy ready — edit and save');
@@ -385,8 +394,15 @@
   let BK = [];
   async function loadBookings() {
     try { BK = await api('GET', '/api/admin/bookings'); } catch (err) { toast(err.message); }
-    renderBookings(); renderBkForm();
+    renderBookings(); renderBkForm(); loadOrders();
   }
+  async function loadOrders() {
+    let od = []; try { od = await api('GET', '/api/admin/orders'); } catch (_) {}
+    $('#odRows').innerHTML = od.map(o => `<tr><td>${esc((o.createdAt || '').slice(0, 16).replace('T', ' '))}</td><td><b>${esc(o.userName || '')}</b><br><span class="muted small">${esc(o.wallet || o.userId || '')}</span></td>
+      <td>${esc(o.product)}</td><td>${esc(o.price)}</td><td><span class="od-st ${esc(o.status)}">${esc(o.status)}</span>${o.error ? `<div class="muted small">${esc(o.error)}</div>` : ''}</td><td class="small">${o.txHash ? esc(o.txHash.slice(0, 10) + '…' + o.txHash.slice(-6)) : '—'}<br><span class="muted">${esc(o.ref)}</span></td></tr>`).join('')
+      || '<tr><td colspan="6" class="muted">No purchases yet.</td></tr>';
+  }
+  $('#odRefresh').onclick = loadOrders;
   function renderBookings() {
     const f = $('#bkFilter').value, rows = BK.filter(x => !f || x.status === f);
     $('#bkRows').innerHTML = rows.map(x => `<tr>

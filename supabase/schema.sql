@@ -27,3 +27,13 @@ create table if not exists public.rm_bookings (
 );
 create index if not exists rm_bookings_created_idx on public.rm_bookings (created_at desc);
 alter table public.rm_bookings enable row level security;
+
+-- reID purchases (wallet:tx payment requests)
+create table if not exists public.rm_orders (
+  ref text primary key,
+  intent_id text unique,
+  status text not null default 'pending',
+  data jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+alter table public.rm_orders enable row level security;

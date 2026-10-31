@@ -98,6 +98,8 @@
       <div class="p-tools"><select id="bkFilter"><option value="">All statuses</option><option value="confirmed">Confirmed</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option><option value="no_show">No-show</option></select><button class="btn btn-ghost sm" id="bkCsv">Export CSV</button><button class="btn btn-ghost sm" id="bkRefresh">Refresh</button></div>
     </div>
     <div class="bk-table-wrap"><table class="bk-table"><thead><tr><th>When (GST)</th><th>Customer</th><th>Products</th><th>Language · specialist</th><th>Ref</th><th>Status</th></tr></thead><tbody id="bkRows"></tbody></table></div>
+    <div class="p-head" style="margin-top:32px"><div><h2>reID purchases</h2><p class="muted small">Payments approved in the reID app for products with "Buy with reID" switched on. "broadcast" = sent to the INFRA chain; confirm the tx on-chain.</p></div><div class="p-tools"><button class="btn btn-ghost sm" id="odRefresh">Refresh</button></div></div>
+    <div class="bk-table-wrap"><table class="bk-table"><thead><tr><th>Date</th><th>Customer (reID)</th><th>Product</th><th>Price</th><th>Status</th><th>Tx</th></tr></thead><tbody id="odRows"></tbody></table></div>
     <div class="p-head" style="margin-top:32px"><div><h2>Booking settings</h2><p class="muted small">Controls the calendar, time slots, languages and specialists customers can pick.</p></div>
       <div class="p-tools"><button class="btn btn-accent sm" id="saveBk">Save booking settings</button></div></div>
     <form class="box-card bk-settings" id="bkForm"></form>

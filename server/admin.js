@@ -36,6 +36,7 @@ module.exports = function (app, store) {
   app.put('/api/admin/products/:slug', wrap(async (req, res) => { const p = await store.saveProduct(req.body || {}, req.params.slug); ping(); res.json(p); }));
   app.delete('/api/admin/products/:slug', wrap(async (req, res) => { await store.deleteProduct(req.params.slug); res.json({ ok: true }); }));
   app.put('/api/admin/order', wrap(async (req, res) => { await store.reorder((req.body && req.body.slugs) || []); res.json({ ok: true }); }));
+  app.get('/api/admin/orders', wrap(async (_req, res) => { try { res.json(await store.listOrders(500)); } catch (e) { res.json([]); } }));
   app.get('/api/admin/bookings', wrap(async (_req, res) => res.json(await store.listBookings(500))));
   app.put('/api/admin/bookings/:ref', wrap(async (req, res) => { await store.setBookingStatus(req.params.ref, req.body && req.body.status); res.json({ ok: true }); }));
   app.post('/api/admin/indexnow', wrap(async (_req, res) => res.json(await app.locals.indexNow())));

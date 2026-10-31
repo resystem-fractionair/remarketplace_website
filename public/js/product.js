@@ -35,6 +35,7 @@
     const demo = p.demoUrl || p.externalUrl;
     const soon = /soon/i.test(p.status || '');
     const banner = p.image || p.hero;
+    const buy = p.buy && p.buy.enabled ? p.buy : null; CUR = p;
     const bookLbl = soon ? 'Join early access' : (L.bookCta || 'Book a demo');
     const related = all.filter(x => x.slug !== p.slug && x.category === p.category)
       .concat(all.filter(x => x.slug !== p.slug && x.category !== p.category && x.group === p.group)).slice(0, 4);
@@ -68,7 +69,8 @@
           <div class="pa-meta">${p.deploy ? `<span>Live in <b>${esc(p.deploy)}</b></span>` : ''}${live ? `<span>Live site <b>${esc(host(live))}</b></span>` : ''}${L.model ? `<span>Model <b>${esc(L.model)}</b></span>` : ''}</div>
         </div>
         <div class="pa-actions">
-          <button class="btn btn-accent" data-book="${esc(p.name)}">${bookLbl}</button>
+          ${buy ? `<button class="btn btn-reid" data-buy><span class="reid-dot">re</span>Buy with reID${buy.label || buy.amount ? ` · ${esc(buy.label || (buy.amount + ' ' + (buy.symbol || '')).trim())}` : ''}</button>` : ''}
+          <button class="btn ${buy ? 'btn-ghost' : 'btn-accent'}" data-book="${esc(p.name)}">${bookLbl}</button>
           <button class="btn btn-ghost" data-demo>${I.play} ${hasCreds || demo ? esc(L.demoCta || 'Try demo') : 'Request demo'}</button>
           ${p.investUrl ? `<a class="btn btn-ghost" href="${esc(p.investUrl)}" target="_blank" rel="noopener">Invest ↗</a>` : ''}
         </div>
@@ -142,7 +144,7 @@
           <h3>${esc(r.name)}</h3><p>${esc(r.tagline || r.summary)}</p>
           <div class="card-foot"><span>${esc(r.group || '')}</span><span class="view">View product →</span></div></a>`).join('')}</div></section>` : ''}
     </div>
-    <div class="pa-mbar"><button class="btn btn-accent grow" data-book="${esc(p.name)}">${bookLbl}</button><button class="btn btn-ghost" data-demo>Try demo</button></div>`;
+    <div class="pa-mbar">${buy ? `<button class="btn btn-reid grow" data-buy>Buy with reID</button>` : `<button class="btn btn-accent grow" data-book="${esc(p.name)}">${bookLbl}</button>`}<button class="btn btn-ghost" data-demo>Try demo</button></div>`;
     openDrawer = () => drawer(p, features, demo, hasCreds, banner);
 
     const links = [...document.querySelectorAll('#paTabs a')];
@@ -176,6 +178,36 @@
     RM.openOv('#demoOv');
   }
   document.addEventListener('click', e => { if (e.target.closest('[data-demo]') && openDrawer) { e.preventDefault(); openDrawer(); } });
+
+  /* ---------- Buy with reID: sign in (required only to buy) → payment request → approve in reID app ---------- */
+  let CUR = null, payTimer = null;
+  async function startBuy() {
+    const p = CUR; if (!p || !p.buy || !p.buy.enabled) return;
+    await RM.ready;
+    if (!RM.me) return RM.signIn(location.pathname + '#buy', `Sign in to buy ${p.name}. Browsing stays open to everyone — reID is only needed to pay.`);
+    let ov = document.getElementById('buyOv');
+    if (!ov) { ov = document.createElement('div'); ov.id = 'buyOv'; ov.className = 'overlay center'; ov.hidden = true; document.body.appendChild(ov);
+      ov.addEventListener('click', e => { if (e.target === ov || e.target.closest('[data-byx]')) { clearTimeout(payTimer); RM.closeOv('#buyOv'); } }); }
+    const price = p.buy.label || `${p.buy.amount} ${p.buy.symbol || ''}`.trim();
+    const set = (st, body) => { ov.innerHTML = `<div class="rq" role="dialog" aria-modal="true"><button class="x" data-byx aria-label="Close">✕</button><span class="reid-dot big">re</span><h3>Buy ${esc(p.name)}</h3><p class="rq-price">${esc(price)}</p>${body}<p class="rq-st muted">${st}</p></div>`; };
+    set('Creating your payment request…', '<div class="rq-qr"><span class="rq-spin"></span></div>'); RM.openOv('#buyOv');
+    let r; try { r = await fetch('/api/buy/' + encodeURIComponent(p.slug), { method: 'POST' }).then(async x => Object.assign(await x.json(), { http: x.status })); } catch (_) { r = { error: 'network' }; }
+    if (r.http === 401) { RM.closeOv('#buyOv'); return RM.signIn(location.pathname + '#buy', 'Your reID session expired. Sign in again to continue.'); }
+    if (!r.intentId) return set(r.error === 'wallet_tx_not_granted' ? 'Payments were not allowed when you signed in. Sign out and sign in again, and allow “Transaction requests”.' : 'Could not start the payment. Please try again later.', '');
+    const phone = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    set('Waiting for your approval in the reID app…', `${phone ? '' : `<div class="rq-qr">${r.qr}</div><p class="muted small">Scan with the reID app, or</p>`}<a class="btn btn-reid" href="${esc(r.approvalUrl)}" target="_blank" rel="noopener">Open reID app to approve</a><p class="muted small">Order ${esc(r.ref)} · requests expire after 15 minutes.</p>`);
+    const until = Date.now() + 16 * 60000;
+    const poll = () => fetch('/api/buy/status/' + encodeURIComponent(r.intentId)).then(x => x.json()).then(s => {
+      if (s.status === 'broadcast') return set(`Payment sent ✓ — confirming on the INFRA chain.<br><span class="small">tx ${esc((s.txHash || '').slice(0, 12))}…${esc((s.txHash || '').slice(-8))}</span>`, '<p>Thank you! Our team will contact you to set up your product.</p>');
+      if (s.status === 'denied') return set('You declined the payment in the reID app. Nothing was charged.', '<button class="btn btn-ghost" data-buy>Try again</button>');
+      if (s.status === 'failed') return set('The payment could not be sent' + (s.error ? ': ' + esc(s.error) : '') + '. Nothing was charged.', '');
+      if (s.status === 'expired' || Date.now() > until) return set('The request expired. Nothing was charged.', '<button class="btn btn-ghost" data-buy>Start again</button>');
+      if (!ov.hidden) payTimer = setTimeout(poll, 3000);
+    }).catch(() => { if (!ov.hidden) payTimer = setTimeout(poll, 5000); });
+    payTimer = setTimeout(poll, 3000);
+  }
+  document.addEventListener('click', e => { if (e.target.closest('[data-buy]')) { e.preventDefault(); startBuy(); } });
+  window.addEventListener('rm:product-ready', () => { if (location.hash === '#buy') { history.replaceState(null, '', location.pathname + location.search); startBuy(); } });
   if (location.hash === '#try-demo') setTimeout(() => openDrawer && openDrawer(), 300);
 
   fetch('/api/home').then(r => r.json()).then(home => {
@@ -184,5 +216,6 @@
     const p = all.find(x => x.slug === slug);
     if (!p) { location.replace('/404'); return; }
     render(p, all, home.rows[0] ? home.rows[0].products : []);
+    window.dispatchEvent(new Event('rm:product-ready'));
   });
 })();

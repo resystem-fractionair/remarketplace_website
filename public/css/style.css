@@ -278,3 +278,21 @@ body, .card, .nav, .chip, .row, .pill, .day { transition: background-color .25s,
 }
 @media (max-width: 1024px) { .nav-switch { display: none; } .signin { margin-left: auto; } }
 @media (max-width: 900px) { .signin .lbl { display: none; } }
+
+/* reID sign-in (QR) and Buy with reID dialogs */
+.rq { position: relative; width: 100%; max-width: 400px; background: var(--card, #fff); color: var(--ink); border-radius: 22px 22px 0 0; padding: 30px 26px 26px; display: grid; justify-items: center; gap: 10px; text-align: center; animation: rise .3s both; }
+@media (min-width: 640px) { .rq { border-radius: 22px; } }
+.rq .x { position: absolute; top: 14px; right: 14px; }
+.rq h3 { font: 800 22px var(--head); margin: 2px 0 0; }
+.rq-why, .rq-price { color: var(--ink-2); font-size: 14px; margin: 0; max-width: 320px; } .rq-price { font: 800 20px var(--head); color: var(--accent-ink, var(--accent)); }
+.rq-qr { width: 220px; height: 220px; display: grid; place-items: center; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 10px; }
+.rq-qr svg { width: 100%; height: 100%; display: block; }
+.rq-code { font-size: 14px; margin: 0; } .rq-code b { font: 800 18px ui-monospace, monospace; letter-spacing: .08em; }
+.rq-st { font-size: 13px; margin: 0; } .rq-alt { margin-top: 4px; }
+.rq-spin { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--accent); animation: rqspin .8s linear infinite; }
+@keyframes rqspin { to { transform: rotate(360deg); } }
+.reid-dot.big { width: 46px; height: 46px; border-radius: 14px; font-size: 18px; }
+.btn-reid { background: var(--ink); color: var(--bg); display: inline-flex; align-items: center; gap: 8px; }
+.btn-reid:hover { opacity: .9; color: var(--bg); } .btn-reid .reid-dot { background: var(--bg); color: var(--ink); }
+.avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+.rq-qr:empty { display: none; }

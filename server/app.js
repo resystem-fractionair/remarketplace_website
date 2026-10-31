@@ -118,57 +118,8 @@ app.post('/api/bookings', wrap(async (req, res) => {
   res.json({ ok: true, ref, emailed: mail.sent, start: zonedToUtc(date, time, cfg.timezone).toISOString(), end: new Date(zonedToUtc(date, time, cfg.timezone).getTime() + cfg.durationMin * 60000).toISOString() });
 }));
 
-/* ---------- reID sign-in (OAuth 2.0 / OIDC authorization-code + PKCE) ---------- */
-const R = {
-  id: process.env.REID_CLIENT_ID,
-  secret: process.env.REID_CLIENT_SECRET,
-  auth: process.env.REID_AUTH_URL,
-  token: process.env.REID_TOKEN_URL,
-  info: process.env.REID_USERINFO_URL,
-  scope: process.env.REID_SCOPE || 'openid profile email'
-};
-const reidReady = () => R.id && R.auth && R.token && R.info;
-const b64url = buf => buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-const back = (res, q) => res.redirect('/?' + q);
-
-app.get('/api/auth/reid/start', (req, res) => {
-  if (!reidReady()) return back(res, 'reidError=not_configured');
-  const state = b64url(crypto.randomBytes(16));
-  const verifier = b64url(crypto.randomBytes(32));
-  req.session.oauth = { state, verifier, ret: String(req.query.ret || '/').startsWith('/') ? String(req.query.ret || '/') : '/' };
-  const u = new URL(R.auth);
-  u.search = new URLSearchParams({
-    response_type: 'code', client_id: R.id, redirect_uri: SITE_URL + '/api/auth/reid/callback', scope: R.scope, state,
-    code_challenge: b64url(crypto.createHash('sha256').update(verifier).digest()), code_challenge_method: 'S256'
-  });
-  res.redirect(u.toString());
-});
-
-app.get('/api/auth/reid/callback', async (req, res) => {
-  const o = req.session.oauth;
-  req.session.oauth = null;
-  if (req.query.error) return back(res, 'reidError=access_denied');
-  if (!o || !req.query.code || req.query.state !== o.state) return back(res, 'reidError=invalid_or_expired_request');
-  try {
-    const body = new URLSearchParams({ grant_type: 'authorization_code', code: req.query.code, redirect_uri: SITE_URL + '/api/auth/reid/callback', client_id: R.id, code_verifier: o.verifier });
-    if (R.secret) body.set('client_secret', R.secret);
-    const t = await fetch(R.token, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' }, body });
-    if (!t.ok) throw new Error('token ' + t.status);
-    const { access_token } = await t.json();
-    const i = await fetch(R.info, { headers: { Authorization: 'Bearer ' + access_token, Accept: 'application/json' } });
-    if (!i.ok) throw new Error('userinfo ' + i.status);
-    const u = await i.json();
-    req.session.user = { id: u.sub || u.id, name: u.name || u.preferred_username || '', email: u.email || '', wallet: u.wallet_address || u.wallet || '' };
-    const sep = o.ret.includes('?') ? '&' : '?';
-    res.redirect(o.ret + sep + 'signedIn=1');
-  } catch (e) {
-    console.error('[reid]', e.message);
-    back(res, 'reidError=sign_in_failed');
-  }
-});
-
-app.get('/api/me', (req, res) => res.json({ user: req.session.user || null }));
-app.post('/api/auth/logout', (req, res) => { req.session = null; res.json({ ok: true }); });
+/* ---------- reID Connect: sign-in, QR sign-in and purchases (server/reid.js) ---------- */
+require('./reid')(app, { SITE_URL, store, wrap });
 
 /* ---------- Admin console ---------- */
 require('./admin')(app, store);

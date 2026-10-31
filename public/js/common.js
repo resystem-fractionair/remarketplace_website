@@ -49,12 +49,12 @@
   async function loadMe() {
     try { RM.me = (await fetch('/api/me').then(r => r.json())).user; } catch (_) { RM.me = null; }
     const si = $('#signin'), u = $('#user');
-    if (si) { si.hidden = !!RM.me; si.href = '/api/auth/reid/start?ret=' + encodeURIComponent(location.pathname); }
+    if (si) { si.hidden = !!RM.me; si.href = '/auth/reid/start?ret=' + encodeURIComponent(location.pathname); }
     if (u) u.hidden = !RM.me;
     if (RM.me) {
       const n = RM.me.name || 'reID user';
       $('#uName').textContent = n;
-      $('#uAv').textContent = n.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+      $('#uAv').innerHTML = RM.me.photo ? `<img src="${esc(RM.me.photo)}" alt="">` : esc(n.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase());
       u.title = RM.me.wallet ? 'Wallet ' + RM.me.wallet : '';
     }
   }
@@ -62,6 +62,46 @@
   if (qs.get('reidError')) RM.toast(ERR[qs.get('reidError')] || ERR.reid_error);
   if (qs.has('reidError') || qs.has('signedIn')) history.replaceState(null, '', location.pathname + location.hash);
   RM.ready = loadMe().then(() => { if (RM.me && qs.has('signedIn')) RM.toast('Signed in as ' + (RM.me.name || 'reID user') + '.'); });
+  /* ---------- Sign in with reID: phone → reID app (redirect), computer → QR scanned with the reID app ---------- */
+  const isPhone = () => /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  let qrTimer = null;
+  RM.signIn = (ret, why) => {
+    ret = ret || (location.pathname + location.hash);
+    const redirect = '/auth/reid/start?ret=' + encodeURIComponent(ret);
+    if (isPhone()) { location.href = redirect; return; }
+    let ov = $('#reidOv');
+    if (!ov) {
+      ov = document.createElement('div'); ov.id = 'reidOv'; ov.className = 'overlay center'; ov.hidden = true;
+      ov.innerHTML = `<div class="rq" role="dialog" aria-modal="true" aria-labelledby="rqT"><button class="x" data-rqx aria-label="Close">✕</button>
+        <span class="reid-dot big">re</span><h3 id="rqT">Sign in with reID</h3><p class="rq-why"></p>
+        <div class="rq-qr"><span class="rq-spin"></span></div><p class="rq-code"></p><p class="rq-st muted">Scan with the reID app on your phone.</p>
+        <a class="btn btn-ghost sm rq-alt" href="#">Open reID on this device instead</a></div>`;
+      document.body.appendChild(ov);
+      ov.addEventListener('click', e => { if (e.target === ov || e.target.closest('[data-rqx]')) { clearTimeout(qrTimer); RM.closeOv('#reidOv'); } });
+    }
+    ov.querySelector('.rq-why').textContent = why || 'One tap in the reID app — no password needed.';
+    ov.querySelector('.rq-alt').href = redirect;
+    ov.querySelector('.rq-qr').innerHTML = '<span class="rq-spin"></span>'; ov.querySelector('.rq-code').textContent = '';
+    ov.querySelector('.rq-st').textContent = 'Scan with the reID app on your phone.';
+    RM.openOv('#reidOv');
+    clearTimeout(qrTimer);
+    fetch('/auth/reid/device/start', { method: 'POST' }).then(r => r.json()).then(a => {
+      if (!a.qr) { ov.querySelector('.rq-qr').innerHTML = ''; ov.querySelector('.rq-st').textContent = a.error === 'not_configured' ? 'reID sign-in is not configured yet.' : 'reID is not reachable right now. Try “Open reID on this device”.'; return; }
+      ov.querySelector('.rq-qr').innerHTML = a.qr;
+      ov.querySelector('.rq-code').innerHTML = `Code <b>${esc(a.userCode)}</b>`;
+      ov.querySelector('.rq-st').textContent = 'Waiting for approval on your phone…';
+      const until = Date.now() + a.expiresIn * 1000; let every = a.interval * 1000;
+      const poll = () => fetch('/auth/reid/device/poll', { method: 'POST' }).then(r => r.json()).then(r => {
+        if (r.status === 'approved') { ov.querySelector('.rq-st').textContent = 'Approved — signing you in…'; const u = new URL(ret, location.origin); u.searchParams.set('signedIn', '1'); location.href = u.pathname + u.search + u.hash; if (u.pathname === location.pathname) location.reload(); return; }
+        if (r.status === 'denied') { ov.querySelector('.rq-st').textContent = 'Sign-in was declined in the reID app.'; return; }
+        if (r.status === 'expired' || Date.now() > until) { ov.querySelector('.rq-qr').innerHTML = '<button class="btn btn-ghost sm" data-rqnew>Code expired — get a new one</button>'; ov.querySelector('.rq-st').textContent = ''; ov.querySelector('[data-rqnew]').onclick = () => RM.signIn(ret, why); return; }
+        if (r.slowDown) every += 5000;
+        if (!ov.hidden) qrTimer = setTimeout(poll, every);
+      }).catch(() => { if (!ov.hidden) qrTimer = setTimeout(poll, every); });
+      qrTimer = setTimeout(poll, every);
+    }).catch(() => { ov.querySelector('.rq-st').textContent = 'reID is not reachable right now.'; });
+  };
+  document.addEventListener('click', e => { const a = e.target.closest('#signin'); if (a) { e.preventDefault(); RM.signIn(location.pathname + location.hash); } });
   document.addEventListener('click', async e => {
     if (e.target.id !== 'signout') return;
     await fetch('/api/auth/logout', { method: 'POST' }); RM.me = null; loadMe(); RM.toast('Signed out.');

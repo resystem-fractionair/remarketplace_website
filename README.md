@@ -50,7 +50,7 @@ Without Supabase variables the site reads and writes `data/*.json` (local develo
 | `ADMIN_USER`, `ADMIN_PASSWORD` | Admin console login |
 | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | Database + image storage (required for admin saves on Vercel) |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | Booking emails to info@remarketplace.store and the customer |
-| `REID_CLIENT_ID`, `REID_CLIENT_SECRET`, `REID_AUTH_URL`, `REID_TOKEN_URL`, `REID_USERINFO_URL` | "Sign in with reID" (OAuth 2.0 + PKCE) |
+| `REID_CLIENT_ID`, `REID_CLIENT_SECRET`, `REID_REDIRECT_URI`, `REID_BASE_URL`, `REID_APP_URL`, `APP_PUBLIC_URL` | reID Connect: sign-in (redirect + desktop QR) and Buy with reID — see docs/REID.md |
 | `BOOKING_WEBHOOK_URL` | Optional: every booking is also POSTed here as JSON |
 | `INDEXNOW_KEY` | Optional: fixed IndexNow key (one is derived from `SITE_URL` otherwise) |
 

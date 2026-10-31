@@ -37,6 +37,10 @@ function clean(p) {
     if (o.demoPassword) o.demoCreds.push({ label: 'Password', value: o.demoPassword });
   }
   o.demoEmail = ''; o.demoPassword = '';
+  // Purchase with reID (wallet:tx). Off by default; when on, the product page shows "Buy with reID" and requires sign-in.
+  const b = p.buy && typeof p.buy === 'object' ? p.buy : {}, s = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
+  o.buy = { enabled: !!b.enabled, label: s(b.label, 60), amount: s(b.amount, 40).replace(/[^\d.]/g, ''), symbol: s(b.symbol, 12), decimals: Math.min(36, Math.max(0, parseInt(b.decimals, 10) || 18)),
+    token: s(b.token, 42), payTo: s(b.payTo, 42), chainId: parseInt(b.chainId, 10) || 15324 };
   o.visible = p.visible !== false;
   o.position = Number.isFinite(+p.position) ? +p.position : 999;
   o.tone = ['a', 'b', 'c', 'd'].includes(o.tone) ? o.tone : 'a';
@@ -336,4 +340,22 @@ async function setBookingStatus(ref, status) {
   writeJson(BOOKINGS, all);
 }
 
-module.exports = { DEFAULT_CONTENT, MODE, load, saveProduct, deleteProduct, reorder, saveSettings, upload, slugify, listBookings, takenSlots, addBooking, setBookingStatus, cleanBooking };
+/* ---------- Orders (reID purchases) ---------- */
+const ORDERS = path.join(DATA, 'orders.json');
+async function saveOrder(o) {
+  if (MODE === 'supabase') return sb('/rest/v1/rm_orders', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ ref: o.ref, intent_id: o.intentId, status: o.status, data: o }) });
+  const all = readJson(ORDERS, []); all.push(o); writeJson(ORDERS, all);
+}
+async function updateOrder(intentId, patch) {
+  if (MODE === 'supabase') {
+    const rows = await sb('/rest/v1/rm_orders?select=data&intent_id=eq.' + encodeURIComponent(intentId)); if (!rows.length) return;
+    return sb('/rest/v1/rm_orders?intent_id=eq.' + encodeURIComponent(intentId), { method: 'PATCH', body: JSON.stringify({ status: patch.status, data: Object.assign({}, rows[0].data, patch, { updatedAt: new Date().toISOString() }) }) });
+  }
+  const all = readJson(ORDERS, []); all.forEach(x => { if (x.intentId === intentId) Object.assign(x, patch, { updatedAt: new Date().toISOString() }); }); writeJson(ORDERS, all);
+}
+async function listOrders(limit) {
+  if (MODE === 'supabase') return (await sb('/rest/v1/rm_orders?select=*&order=created_at.desc&limit=' + (limit || 500))).map(r => Object.assign({}, r.data, { status: r.status }));
+  return readJson(ORDERS, []).slice().reverse().slice(0, limit || 500);
+}
+
+module.exports = { saveOrder, updateOrder, listOrders, DEFAULT_CONTENT, MODE, load, saveProduct, deleteProduct, reorder, saveSettings, upload, slugify, listBookings, takenSlots, addBooking, setBookingStatus, cleanBooking };

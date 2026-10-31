@@ -7,7 +7,7 @@ Project **Re-system-org's Project** (`plqxwrvktriaclifwurc`). Tables `rm_product
 Project `remarketplace_website` (team re-system) is linked to `resystem-fractionair/remarketplace_website` and deploys `main` automatically.
 
 Set in **Settings → Environment Variables** (Production), then **Redeploy**:
-`SITE_URL`, `SESSION_SECRET`, `ADMIN_USER`, `ADMIN_PASSWORD`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` (and the `REID_*` values when reID OAuth is ready).
+`SITE_URL`, `SESSION_SECRET`, `ADMIN_USER`, `ADMIN_PASSWORD`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` `REID_CLIENT_ID`, `REID_CLIENT_SECRET`, `REID_REDIRECT_URI`, `REID_BASE_URL`, `REID_APP_URL`, `APP_PUBLIC_URL` (see REID.md).
 
 ## 3. Domain
 Vercel → Settings → Domains → add `remarketplace.store` and `www.remarketplace.store`, then set the DNS records Vercel shows at the registrar. Keep `SITE_URL=https://remarketplace.store`.
